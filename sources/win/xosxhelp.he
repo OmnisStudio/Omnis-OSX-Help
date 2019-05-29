@@ -1,0 +1,36 @@
+/* $Header: */
+
+/* Changes
+Date			Edit				Fault					Description
+08-Mar-19	CR0583										Win/Linux stub changes and more tidy ( not marked ).
+04-Mar-19	CR0580										Initial Omnis implementation ( tidy up not marked ).
+*/
+
+#ifndef _XOSXHELP_HE_
+#define _XOSXHELP_HE_
+
+// object class - define any private variables and public/private static methods
+class tqfObj
+{
+	private:
+		// define private variables
+		qlong				mRefCount;
+	public:
+		tqfObj();
+		~tqfObj();
+
+		void		addRef() { mRefCount++; }
+		void		releaseRef() { mRefCount--; if ( !mRefCount ) delete this; }
+
+		qbool		methodCall(qobjinst pObjPtr, EXTCompInfo* pEci);
+		qlong		propertySupport( LPARAM pMessage, WPARAM wParam, LPARAM lParam, EXTCompInfo* eci );
+		
+		// Static Methods
+		static 	qbool 	staticMethod(EXTCompInfo* pEci);
+		// declare any other public static methods
+private:
+		// declare any private methods
+};
+#endif
+
+/* EOF */

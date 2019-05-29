@@ -1,0 +1,4 @@
+LIBRARY         GENERIC
+EXPORTS
+    OSXHelpProc  @1
+ 
