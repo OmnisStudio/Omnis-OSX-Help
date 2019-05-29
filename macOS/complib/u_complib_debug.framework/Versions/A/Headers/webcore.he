@@ -1,0 +1,8 @@
+/* $Header:   K:\vcs\studio50\extcomp\callback\webcore.hev   1.0   09 Feb 2010 15:25:50   JCOTTON  $*/
+
+/**************** Changes ******************
+Date			Edit				Bug					Description
+22-Jan-10	jc0048									Support for Web Service clients to be generated in a runtime.
+*/
+
+qbool WSCcallStartupMethod(str255 pMethodName, EXTfldval* pParams, EXTfldval* pReturnVal);

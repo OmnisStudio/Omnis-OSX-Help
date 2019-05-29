@@ -1,0 +1,156 @@
+/* $Header: svn://svn.omnis.net/trunk/Studio/EXTCOMP/CALLBACK/javacore.he 6285 2013-09-02 15:42:23Z bmitchell $*/
+ 
+//Q4 javacore.cpp
+//Independent Omnis callback interface
+//Copyright (C) Raining Data Corp 2001
+
+/**************** Changes ******************
+Date			Edit				Bug					Description
+19-Aug-13	rmm64bitux							Linux 64 bit port.
+10-Aug-09	jcAxis2									Axis2 support changes.
+15-Jun-09	jc0026									Added JPIcallServiceMethod callback
+13-Jun-06 ijtpf425		ST/PF/425		Fixed several memory leaks
+07-Nov-05	rmm_wsj									Added threading support, so that a server web service can be called by a client in the same process.
+18-May-05 MHnJava     ST/PF/337   Implemented Advanced Properties for Java
+08-Oct-04 MHn0408			ST/EC/859		Added static method support
+31-Aug-04	MHn0401			ST/PF/318		Implemented extcomp version of threadcritical.
+24-Oct-02 MHJOBJ2									Added getclassname callback
+10-Oct-02 MHJOBJ1									Added introspective java callbacks
+23-Sep-02 MHJB1										Added JPIgetJavaEnvironment callback
+26-Jul-02 MHUNI1									Unicode changes
+09-May-02	MHJCORE									Java support for Studio 4.0
+*/
+
+#ifndef _JAVACORE_HE_
+#define _JAVACORE_HE_
+
+#ifdef isXCOMPLIB
+	#ifndef _basics_
+	#	include "basics.h"
+	#endif
+
+	#ifndef EXTqlist_he
+		#include "extqlist.he"
+	#endif
+
+	#ifndef EXTfldval_he
+		#include "extfval.he"
+	#endif
+#else
+	#ifndef _dmlstuf1_
+		#include "dmlstuf1.h"
+	#endif
+
+	#ifndef _dmlstuff_
+		#include "dmlstuff.h"
+	#endif
+
+	// MHn0401 begins
+	#ifndef _threads_he_
+		#include "threads.he"
+	#endif
+	// MHn0401 ends
+#endif
+
+
+// JavaCore return Types.
+const qint kChar		= 1;
+const qint kBoolean = 2;
+const qint kInteger = 3;
+const qint kDouble	= 4;
+const qint kFloat		= 5;
+const qint kString  = 6;
+const qint kObject  = 7;
+
+// JavaCore return codes
+const qint kOk										=  1;
+const qint kBadIntegerConstructor = -1;
+const qint kFindBaseClassErr			= -2;
+const qint kNoTypesSpecified			= -3;
+const qint kInvalidParms					= -4; // returned if parm list is invalid.
+const qint kCouldNotGetTYPEfield  = -5; // Internal Error: Failed to get java.lang.Integer.TYPE
+const qint kCouldNotGetTYPEclass  = -6; // Internal Error: Failed to get java.lang.Integer.TYPE class.
+const qint kBadDoubleConstructor  = -7;
+const qint kDoubleConversionFailure = -8; // Could not convert double to jfloat.
+const qint kBadFloatConstructor			= -9;
+const qint kObjCreateFail						= -10;
+const qint kBadCharConstructor			= -11;
+const qint kBadBooleanConstructor		= -12;
+const qint kCouldNotCreateJString		= -13;
+const qint kInvalidObjectID					= -14;
+const qint kObjectNotFound					= -15;
+const qint kJavaCoreNotLoaded				= -16;
+const qint kJNIerr									= -17;
+const qint kNoObjectID							= -18;
+const qint kNoClassID								= -19;
+const qint kLongConversionFailure		= -20; // Could not convert double to jfloat.
+const qint kUnsupportedType					= -21; 
+const qint kUnknownJavaType					= -22; // MHJMAC
+const qint kJVMnotStarted						= -23; 
+
+const qint kConversionFailure = -8; // Could not convert double to jfloat.
+
+// getLastJavaError codes.
+const qint kNoError							= 1;
+const qint kNoJavaThreadID			= -101; // MHJMAC
+const qint kINoState						= -102;
+const qint kNoThreadStart			  = -103;
+const qint kINoSleep						= -104;
+const qint kINoOpCode					  = -105;
+const qint kINoInvokeOpCode		  = -106;
+const qint kNoClassLoader			  = -107;
+const qint kNoClassFound				= -108;
+const qint kNoObjInst					  = -109;
+const qint kNoConstruct				  = -110;
+const qint kNoInvokeConstruct   = -111;
+const qint kNoObject						= -112;
+const qint kNoMethod						= -113;
+const qint kNoInvokeMethod			= -114;
+
+
+// rmm64bitux: qlongptr
+typedef qlongptr jobjid;
+typedef qlongptr jsessionid;
+typedef qlongptr jclassid;
+
+
+qbool JPIstartJVM();
+void JPIstopJVM();
+qbool JPIisJCoreLoaded();
+qbool JPIisJVMrunning();
+qbool JPIsetPackagePath(str255 &pPath);
+qbool JPIsetJVMOptions(str255 &pPath); // MHnJava
+qbool JPIsetClassPath(str255 &pPath);
+qbool JPIsetJVMPath(str255 &pPath);
+
+jsessionid JPIgetCurrentJavaSession();
+jsessionid JPIcreateJavaSession();
+jobjid JPIcreateJavaObject(jsessionid pThreadID, str255 &pClassName, str255 &pClassPath);
+jclassid JPIcreateJavaClass(jsessionid pThreadID, str255 &pClassName);
+jclassid JPIcreateJavaClass(jsessionid pThreadID, str255 &pClassName, str255 &pClassPath);
+qlong JPIconstructJavaObject(jsessionid pThreadID, jclassid pClassID, jobjid *pReturnID);
+qlong JPIconstructJavaObject(jsessionid pThreadID, jclassid pClassID, EXTqlist *pparms, jobjid *pReturnID);
+
+qlong JPIcallJavaMethod(jsessionid pThreadID, jobjid pObjectID, str255 &pMethodName, qbool pThreaded = qfalse); // rmm_wsj
+qlong JPIcallJavaMethod(jsessionid pThreadID, jobjid pObjectID, str255 &pMethodName, 
+												EXTfldval *pRet, jobjid *pRetObj = NULL, qbool pThreaded = qfalse); // rmm_wsj
+qlong JPIcallJavaMethod(jsessionid pThreadID, jobjid pObjectID, str255 &pMethodName, EXTqlist *pparms, qbool pThreaded = qfalse); // rmm_wsj
+qlong JPIcallJavaMethod(jsessionid pThreadID, jobjid pObjectID, str255 &pMethodName, EXTqlist *pparms, 
+												EXTfldval *pRet, jobjid *pRetObj = NULL, qbool pThreaded = qfalse); // rmm_wsj
+
+qlong JPIcallStaticJavaMethod(jsessionid pThreadID, jclassid pClassID, str255 &pMethodName, EXTqlist *pparms, 
+												EXTfldval *pRet, jobjid *pRetObj, qbool pThreaded = qfalse); // MHn0408 // rmm_wsj
+qlong JPIgetObjectValue(jsessionid pThreadID, jobjid pObjectID, EXTfldval *pRet, qbool pFreeObject);//<ijtpf425>
+void JPIdisposeJavaObject(jsessionid pThreadID, jobjid *pObjectID);
+void JPIdisposeJavaClass(jsessionid pThreadID, jclassid *pClassID);
+void JPIdisposeJavaSession(jsessionid *pThreadID);
+qlong JPIgetLastError(jsessionid pThreadID);
+void JPIgetLastErrorText(jsessionid pThreadID, EXTfldval *pRet);
+void JPIgetLastJVMErrorText(jsessionid pThreadID, EXTfldval *pRet);
+void JPIgetJavaEnvironment(void **pVM, void **pEnv); // MHJB1
+qlong JPIcreateObjectsFromArray(jsessionid pThreadID, jobjid pObjectID, EXTqlist *pList); // MHJOBJ1
+qbool JPIisPrimitive(jsessionid pThreadID, jobjid pObjectID); // MHJOBJ1
+qbool JPIisArray(jsessionid pThreadID, jobjid pObjectID); // MHJOBJ1
+qlong JPIgetClassName(jsessionid pThreadID, jobjid pObjectID, EXTfldval *pRet); // MHJOBJ2 
+qlong JPIcallServiceMethod(jsessionid pThreadID, jobjid pObjectID, str255 &pMethodName, EXTqlist *pParms, EXTqlist *pOpts, EXTfldval *pRet, jobjid *pRetObj = NULL, qbool pThreaded = qfalse, qbool pQueryTypes = qfalse); // jcAxis2
+#endif

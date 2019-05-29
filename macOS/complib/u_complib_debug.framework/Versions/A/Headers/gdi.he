@@ -1,0 +1,1944 @@
+/* $Header: svn://svn.omnis.net/trunk/Studio/O7EXE/INDY/gdi.he 21834 2019-01-03 06:40:13Z bmitchell $ */
+ 
+//Q4 gdi.he
+//Independent Omnis GDI interface
+//Copyright (C) Blyth Holdings Inc 1996
+
+/**************** Changes ******************
+Date			Edit				Bug					Description
+15-Oct-18	rmm9808									Added "Highlight syntax words" to the method editor.
+17-Sep-18	rmm9790									User color pushbuttons with top-left border.
+11-Sep-18	rmm9776			ST/BE/1478	Added code editor other text color, used for drawing all text with no specific syntax color.
+17-Aug-18 pkcocoa_1212 ST/WO/2470 fixes issues with assignment of color constant to an alpha supporting object
+16-Jul-18	rmm9737a		ST/HE/1617	If macOS dock is visible, exclude dock area from default position of various other windows.
+13-Jul-18	rmm9737			ST/DB/999		If macOS dock is visible, exclude dock area from default position of method editor.
+28-Jun-18	rmm_rd									Studio 9.0 remote debugger
+18-Jun-18	rmm9714									pkcocoa_1205 did not build on Linux.
+16-Jun-18 pkcocoa_1205						Alpha support for colors
+15-Jun-18	rmm9712			ST/HE/1082	Added option to show alternate line colors in lists on Windows platform.
+31-May-18	rmm9688			ST/BE/1398	Changed appearance files to be grouped into different sets of colors.
+11-May-18	rmm9658			ST/BE/1393	Added code editor background color.
+09-May-18	rmm9650			ST/BE/1404	Allow triple click to select a line in a multi-line entry field.
+29-Apr-18 pkcocoa_1196 studio 9		macOS tree style
+12-Apr-18 pkcocoa_1194 studio9    alpha extras
+14-Dec-17	rmm9588			ST/DB/959		Added appearance color for macOS selected tab text.
+01-Dec-17	rmm_emat								Re-implemented Omnis language syntax coloring.
+25-Apr-17	rmm9347			ST/RC/1261	Added zoom capability to report class editor.
+11-Apr-17	rmm9320			ST/NT/717		Added line-through font style.
+14-Mar-17	rmm9287			ST/WO/2387	Added option to appearance.json to disable windows droplist theme for user windows.
+27-Feb-17	rmm9272			ST/HE/1506	Added option to appearance.json to disable docking area gradient.
+17-Feb-17	rmm9263			ST/RC/1257	Problem with $noscale set to kFalse when printing pictures.
+14-Feb-17	rmmheadless							Support for headless Omnis server.
+05-Jan-17	rmm9180			ST/HE/1493	Problem drawing fixed grid cells on Windows 7.
+22-Dec-16	rmm9170			ST/CE/133		Dropping controls from the component store now aligns the new control with the top left of the dragged rectangle.
+25-Oct-16	rmm9123									Implemented $exportjson() and $importjson().
+09-Nov-16	CR0387			ST/WO/2388	On Cocoa a button with style kHeadingButton is now highlighted when selected using GDI_COLOR_OMNIS_HEADER_BTN_PRESSED_OSX.
+19-Oct-16	rmm9117									Added option to have a footer for the fat client headed list box.
+10-Oct-16	rmm9092									Performance improvements. Includes renaming concatTokenizedChars to concatUtf8Chars,and setTokenizedChars to setUtf8Chars.
+07-Oct-16	rmm9091			ST/WO/2344	Added $showheaderlines property to headed list and tree.
+22-Sep-16	rmm9053			ST/DB/897		Added option to show control characters in variable windows etc.
+25-Aug-16	rmm9018									Miscellaneous tidying up - removed some non-Unicode code for example.
+17-Jun-16	rmm8945									Removed HWNDGROUP (was only present for Eclipse, and is now redundant) and other redundant Eclipse-related changes.
+15-Jun-16	rmm8941									Overload arrows for parameter help did not draw correctly on a black background.
+29-Apr-16	rmm8899									Removed old q q qs so we can see what needs to be tidied up.
+21-Apr-16	rmm8879									Fixed crash in Carbon version.
+14-Apr-16	pkcocoa_1084	ST/WO/2354 issues with osx and table control - we've now made cocoa draw offscreen like windows until this is resolved.
+13-Apr-16	rmm8860									Improved appearance of Windows drag images (taking themes into account).
+13-Apr-16	rmm8855									Added GDI_COLOR_OMNIS_THEME_RED - used rather than colRed and GDI_COLOR_QRED in the IDE etc.
+11-Apr-16	rmm8849									Cocoa printing issues.
+11-Apr-16	rmm8845									Option to draw highlighted method editor lines using Chroma coding colours on OSX.
+08-Apr-16	rmm8841			ST/HE/1401	Issues with icons in a runtime version.
+04-Apr-16	rmm8828									More colour configuration for menus.
+23-Mar-16	rmm8816									Scroll bar colours are now configurable.
+18-Mar-16	rmm8805									More appearance issues.
+14-Mar-16	rmm8792			ST/HE/1385	Added docking area and docking area text colors to appearance.json.
+01-Mar-16	rmm8758									Cocoa tab pane and group box drawing issues.
+29-Feb-16	rmm8753									Disable appearance.json changes for carbon.
+08-Feb-16	rmm8745									Changes to make appearance.json work nicely.
+19-Jan-16	rmm8714									Added appearance.json to allow system colors to be configurable.
+21-Oct-15	rmm8666			ST/DB/858		If possible,add return type for user methods to help panel.
+01-Oct-15	rmm8636			ST/JS/1258	Problem with pushbutton border color.
+24-Aug-15	rmm_cai7								Coding assistance improvements - parameter help.
+30-Jul-15	jmgunmarked							Removed jmg0295 - GDIDrawTextEng no longer does the conversion to spaces on Windows, as it conflicts with escape characters used for formatting columns.
+29-Jul-15	jmg0295									Added pConvertTabs param to CHRconvToOs - if true, tabs will be maintained through the conversion on Windows (rather than converted to spaces).
+11-Jun-15	CR0244			ST/PF/881		Cocoa pictconvto crash and other image issues.
+01-Jun-15	rmmhdpi									High DPI support for Windows.
+03-Oct-14	rmm8441									Navigation menu control.
+12-May-14	CRCOCOA3								More Cocoa callback work.
+08-May-14	rmm8318									New and improved page preview - text searching.
+22-Apr-14	rmm8306									New and improved page preview.
+09-Apr-14	CRHIRES									High resolution support
+10-Jun-13	CRCOCOA									Cocoa target
+03-Oct-12	rmm7649									Omnis PDF device did not work correctly when font point size is zero.
+04-Sep-12	rmm_pdf									Omnis PDF device for all platforms - modified version of Linux print device.
+06-Aug-12	rmm7592									Flush justification for report text fields.
+13-Jun-11	CR0037									iphone build issues.
+15-Apr-10	rmm_oe									Omnis Eclipse changes.
+25-Feb-10	rmm6908									Added cache for font height.
+19-Feb-10	rmm6905									Added ability to vertically align labels.
+23-Nov-09	rmm6798			ST/HE/1064	Gradient support issues.
+29-Oct-09	rmm_win7								Windows 7 appearance changes.
+17-Aug-09	rmm6736									Multi-line text class for GDI: implemented in chrbasic.cpp.
+15-Jun-09	rmm_nc									New controls and supporting APIs.
+21-May-09 pkgradient							Gradient support
+23-Jan-09	rmm_iphone2							iPhone test form changes.
+04-Nov-08	AE6829			ST/WC/439: 	Problems with DPI & Headed lists on Linux
+20-Oct-08	rmm6484			ST/BE/259		Headed list columns can now be dragged to change column ordering - added Vista drag and drop drag shape support from core.
+20-Aug-08	rmm6409			ST/WT/1348	owrite crash.
+14-Aug-08	pkiphone								iphone pass 1
+18-Feb-08	rmm_mobile							Mobile device support.
+28-Jan-08	rmm6317									OSX droplist and combo boxes now have standard OSX look.
+27-Dec-07	rmm6280									Added support for OSX full keyboard access.
+03-Dec-07	rmm6273									Leopard list and icon array changes.
+02-Nov-07	rmm6263									Leopard issues.
+25-Jun-07	rmm6116			ST/WO/2012	Problem setting headed list header fill colour.
+26-Mar-07	AE6781			ST/HE/807: 	problem with font scaling
+26-Feb-07	rmm6000									Windows Vista changes.
+12-Sep-06	rmmunilnx								Linux Unicode: Fonts.
+16-May-06 PK6758			ST/WO/1899	OSX issue with background images not aligning.
+05-May-06	rmm5745			ST/WT/1098	Drag and drop did not work in OSX Web Client.
+19-Apr-06	rmm5712			ST/CT/026		Outline and shadow font styles removed - they are not supported by ATSUI.
+20-Mar-06	rmm5681			ST/WO/1861	Problems with round button on OSX.
+15-Mar-06	rmm5676			ST/WO/1840	Scroll arrows were overwritten by text in vertical mode.
+06-Mar-06	rmm5662			ST/MC/206		Problem with the drawing of long scrolling menus, on Win32.
+08-Dec-05	rmm_macho								Unicode functions implemented (because qoschar and wchar_t are 2 and 4 bytes respectively in Unicode builds)
+27-Sep-05 MHMACH                  Mach-o changes
+23-Aug-05	rmm5484									Added $root.$prefs.$osxflashdefaultbutton preference - allows users to save CPU time for background tasks.
+10-Mar-05	PK6466			ST/WO/1712	ellipsis are now optional
+22-Dec-04	rmm5224									roundx and norm are now required in orfcgui.
+																	Moved design dpi constants to gdi.he, so web client compiles.
+10-Dec-04	AE6540			ST/HE/593: 	Added $designdpi & $designdpimode
+09-Sep-04	rmm5088									DEFAULT_CHARSET used instead of specific font charset, in Win32 Unicode version (see http://www.microsoft.com/globaldev/getwr/steps/wrg_font.mspx)
+25-May-04 MHn0368			ST/GS/123		Fixed issue with GDIoffscreenpaintbegin callback on OS9
+28-Apr-04	rmm4922									Pushbuttons did not always draw.
+12-Jan-04 MHADRAG									Fixed alpha drag&drop for OSX.
+14-Oct-03	rmmuni_osx							MacOSX Unicode port.
+29-Sep-03	AE6341			ST/WT/787: 	Attempt at removing globals to avoid multi threading/processor problems
+06-Aug-03 pkalpha									Alpha specific version of create bitmap - only works with depth of 32
+12-Jun-03	rmm4547			ST/WC/325		Problems with push button, checkbox, and radio button backgrounds.
+11-Jun-03 MHn0237									OSX alpha changes
+30-May-03	rmm4524									$hottree property, to enable XP-like tree behaviour.
+15-May-03	rmm4487									Windows platform list highlighting now uses a different colour when the field does not have the focus.
+																	Added $oldlisthiliting preference to disable the new behaviour if desired
+30-Apr-03	AE6231									Added GDIdrawAlphaBitmap & GDIalphaBitmapToPIXMAP
+07-Mar-03	AE6209			ST/NV/032: 	Reduced bitmaps used by external components by adding cache
+10-Jun-02	AE6098									Added rotated text to GDIdrawTextJst
+15 Feb 02 PK6270									GDIdrawTextJst callback for icon drawing.
+23-Oct-01	AEXP										XP Modifications (changed gridline colors to be default)
+05-Jul-01	AE5246									Added callback GDItextWidthJst (3.1)
+23 MAY 01 mpmCarbon57	st/wo/1256	Fixes problem with transparent controls and accumulating shadows
+11 APR 01 mpmCarbon41							Implements default button flashing
+10 APR 01 mpmCarbon40							Implements CGContext
+01 MAR 01 mpmCarbon30							Removed GDI_BUTT_NOSHADOW and GDI_BUTT_SUBSHADOW
+06 FEB 01 mpmCarbon24							Implements round button
+01 DEC 00 mpmCarbon11							Creating theme fonts should not be inlines
+20 OCT 00 mpmCarbon								OSX Changes NOT MARKED
+04-Aug-00 mlr0039									Added new justification jstRightToLeft for arabic  
+23-Dec-99	rmm_cldl								Automatic update of the main client components (orfcmain etc).
+11-Oct-99	rmm3489			ST/WT/111		Problem drawing highlighted headed list box lines containing styled text.
+22-Sep-99	rmm_thindl							Control download for Web Client.
+17-Sep-99	AEUNIX									Unix Port
+28 JUN 99 MHUX001                	Modified GDIselectObject to support HGDIOBJ
+11 MAR 99 PK4901									Added GDIdeleteRgn
+05 MAR 99 MHn0051			ST/WT/019FC Fixed crash in OMNIS list on WinNT.
+15 DEC 98 mpm4541			st/rc/516		Printing lines to postscript was generating huge postscript files
+17-Aug-98 PK4778									Added OMEX and various defines ( isOMNISCORE ) for RCC
+24 MAY 98 mt40490		st/he/013			Range check offset in GDIsysColArr.
+28-Jan-98	AE4688									Added GDIbitmapToPIXMAP
+26-Jan-98	mt40428									now have SET_CORE_PACKING && SET_BYTE_PACKING directives
+18-Dec-97	rmm2894									Problems drawing patterns to printer.
+21-Nov-97	rmm2797			ST/RC/302		Text was sometimes truncated when printing on Windows.
+12-Nov-97	mt40384									Appearance Manager && MenuBars
+07-Nov-97	rmm2758									Better handling of cursor properties.
+29-Oct-97	AEPRT3									GDIgetBitmapBounds & GDIgetPixmapBounds no longer OMNISAPI (can't be called externally)
+27-Oct-97	mt40368									added GDImakeMask
+17-OCT-97	mpmPRI									New print manager implementation.
+07-Oct-97	mt40338									HCURSOR Support
+01-Sep-97	rmm2645									$columnalignments runtime property for headed list box.
+11-Jul-96	mt40310									changes to mt40295 coz of MFC
+09-Jul-97 PK4625									MacOS8
+08-Jul-97	mt40307									added pattern for Pub & Sub
+13-Jun-97	mt40295									fixed WNDenumChildWindows && GDIsetOptionClick thru exteral component interface
+22-May-97	mt40270									Added  Stretch parameter to GDIhiliteBitmap
+13-May-97	mt40261									Dragging with Different color for masks 
+03-Apr-97	PK4578									moved bitmap drag functions from fldbasic to gdi
+24-Mar-97	mt40244									GDIsetFontName changes
+18-Mar-97	mt40230									removed GDIsetFontNum && GDIgetFontNum
+11-Mar-97	rmm2361									$style97 for toolbars.
+11-Mar-97 mt40224									Added GDIgetFontName
+10-Mar-97 PK4544									Different color for masks
+04-Mar-97 PK											Added GDIcreatePolyRgn	
+23-Jan-97 PK4503									Added GDIdrawCombo arrow drawing options
+19 NOV 96 mt40073									GDIdrawHPIXMAP has same params as GDIdrawHBITMAP
+15 NOV 96 PK											renames DIB to HPIXMAP on API calls, and added GDIcreateHPIXMAP
+13 NOV 96 mpm4089									fixed up wr design mode object framing
+11 NOV 96 mpm4086									New toolbar controls
+06-Nov-96	rmm1954			PR/NT/071		Use screen coordinates did not work correctly.
+04-Nov-96	mt40046									68k Code fragment
+28-Oct-96	AE4251									Wnd fieldlist - External component icons
+23-Oct-96	AE4244									Packing of 1byte for win16/win32
+22-Oct-96	rmm_fl									Window field list.
+19-Oct-96	rmm1890a								GDIdrawTextJst now takes column count.
+16-Oct-96 PK4311									Added GDI_BUTT_DISABLE
+07 OCT 96 mpm4080b								Asci escape support for GDIdrawTextJst
+01 OCT 96 mpm4079									Implemented bitmaps for GDIdrawTextJst
+13 AUG 96 mpm4046									Changes for printer paper margins and bobjs
+07 AUG 96 mpm4040									fixed line drawing so it draws like windows
+24-Jul-96	mtStyle									new font funcs
+17-Jun-96	DRS4076									Desktop modes
+15-Jul-96	rmm1534									Pass DC to GDIcreateBitmap - this enables us to create the correct bitmap for the device, so 16 and > 256 colours work OK.
+05-Jun-96	PK4043									No border buttons
+05-Jun-96	PK4039									Color Changes
+05-Jun-96	rmm1429									GDItextBox().
+07-May-96	rmm1347									Class browser drag and drop.
+07 MAY 96	rmm1345									Added GDIhiliteBitmap.
+04-May-96	rmm1342									Added flag for drawing toolbar buttons on Win95.
+17 APR 96	mpm4016									Various fixes
+
+********************************************/
+
+#ifndef	_GDI_HE_
+#define _GDI_HE_
+
+#if defined(iswin32) && !defined(isunix) && _MSC_VER < 1700
+	#include "xstdint.h"
+#else
+	#include <stdint.h>
+#endif
+#ifdef isOMNISCORE
+	#include <unordered_map>	// rmm9688
+	#include <vector>	// rmm9688
+#endif
+
+// PK6758
+// rmm4545: also disable off-screen painting on Unix
+#if defined(ismacosx) // AE6373 || defined(isunix)			 // AE6331 Brought back in because of toolbars!
+	#define GDI_DISABLE_OFFSCREEN_PAINTS
+#endif
+
+// ############################# independent types ####################################
+
+/*** the omnis color type ***/
+typedef uint32_t qcol;  //CRCOCOA : ensure 32 bit
+
+#define	GDImakeQcol( pRed, pGreen, pBlue ) (qcol)( (pBlue<<16)|(pGreen<<8)|(pRed) ) // rmm8745: Moved to here
+
+/*** omnis text justification modes ***/
+enum qjst {
+						jstLeft=0,
+						jstRight=1,
+						jstCenter=2,
+						jstExtending=3,
+						jstRightToLeft=4, // mlr0039
+						jstJustified=5,	// rmm7592
+						jstColSkip=14, // PKv40h
+						jstNone=15
+					};
+
+/*** omnis independent font stuff ***/
+typedef unsigned char qsty; // font style type
+
+enum eGDIfontPart { // enum for GDIfontPart functions
+										eFontAscent,
+										eFontDescent,
+										eFontLeading,
+										eFontHeight,
+										eFontLineHeight,
+										eFontMaxWidth
+									};
+
+
+/*** predefined basic font styles (qsty is a combination of these) ***/
+const qsty	styPlain =					0x00,
+						styBold =						0x01,
+						styItalic =					0x02,
+						styUnderline =			0x04,
+						styOutlineObsolete =0x08,	// rmm5712: not supported by ATSUI
+						styShadowObsolete =	0x10,	// rmm5712: not supported by ATSUI
+						styCondense =				0x20,
+						styExtend =					0x40,
+						styLineThrough =		0x80,	// rmm9320
+						styNone =						0xFF;	//used as default, most denote no legal style
+inline bool GDIfontStyleIsValid(int pStyleValue) { return (pStyleValue & ~(styBold | styItalic | styUnderline | styLineThrough)) == 0; }	// rmm9320
+						
+/*** escape characters for embeded style characters (used by GDIdrawTextJst) ***/
+const unsigned char	txtEsc				= 27, // escape code, followed by one of below
+										txtEscCol			=  1, // followed by qcol
+										txtEscSty			=  2, // followed by qsty
+										txtEscLTab		=  3, // left justified tab followed by qdim
+										txtEscCTab		=  4, // centre justified tab followed by qdim
+										txtEscRTab		=  5, // right justified tab followed by qdim
+										txtEscIcon		=  6, // icon escape character followed by icon id (short) and qdim
+										txtEscNextCol	=  7, // move preceding data to next column
+										txtEscBmp			=  8, // draw a bitmap from bitmap data file followed by bitmap id (long) // mpm4079
+										txtEscBmpCentreLarge =	9, // draw a centred 32x32 bitmap // rmm_fl
+										txtEscBmpHandle = 10, // Draw a bitmap from the HBITMAP AE4251
+										txtEscAngle = 11,			// AE6098
+										txtEscAdjustPos = 12,	// AE6098
+										txtEscBmpOffset = 13, // AE6209
+										txtEscAdjustPosNoScale = 14,	// rmm7592
+										txtEscHighlightStart = 15,	// rmm8306
+										txtEscHighlightEnd = 16,		// rmm8306
+										txtEscTextfoundStart = 17,	// rmm8318
+										txtEscTextfoundEnd = 18,	// rmm8318
+										txtAsciiEnd = '#';	// marks the end of an ascii number // mpm4086
+
+/*** GDIthemeText mode enums ***/
+enum eThemeTextMode { // actions
+											eThemeTextWidth = 0x01,				// return width of theme text (basic mode)
+											eThemeTextDraw = 0x02,				// draw theme text (basic mode)
+											// modifiers
+											eThemeTextNone = 0x00,				// no theme text
+											eThemeTextActive = 0x10,			// draw active text
+											eThemeTextInactive = 0x20,		// draw inactive text
+											eThemeTextPressed = 0x40,			// draw pressed text
+											// masks
+											eThemeTextActionMask = 0x0F, 
+											eThemeTextModifierMask = 0xF0
+										};
+
+/*** omnis pattern type (indexes into array of pattern or id's of patterns) ***/
+typedef unsigned short qpat;
+
+/******** pattern constants **********/
+// IMPORTANT: if you add more patterns use the spare constants. if there aren't any
+//						create new once and don't forget to increase patLast (you may need to do a full recompile)
+const qpat patStd0=0, patFill=0, /* standard 16 patterns */
+					 patStd1=1, patEmpty=1,
+           patStd2=2,
+					 patStd3=3,
+					 patStd4=4,
+					 patStd5=5,
+					 patStd6=6,
+					 patStd7=7,
+					 patStd8=8,
+           patStd9=9,
+					 patStd10=10,
+					 patStd11=11,
+					 patStd12=12,
+					 patStd13=13,
+					 patStd14=14,
+           patStd15=15, patTransparent=15,
+					 
+           patGray=16, patGrayor=16,
+					 patLtgray=17,
+					 patDkgray=18,
+					 
+					 patGrayFrame=19, // mpm4089
+					 
+           patPen8=20,
+					 patPen9=21,
+					 patPen10=22,
+					 patPen11=23,
+           patPen12=24,
+					 patPen13=25,
+					 patPen14=26,
+					 
+           patGray45=27,
+					 patGrayrev=28,
+					 patDash=29,
+					 
+					 patGrayFrame2=30,	// mt40307
+					 patWinDotLine=31, // mpm4541
+					 patSpare4=32,
+
+					 // pkgradient
+					 patGrad1=33,
+					 patGrad2=34,
+					 patGrad3=35,
+					 patGrad4=36,
+					 patLast=36;
+
+					 
+
+/*** pushbutton redraw flags used by GDIdrawSystemPushButton etc. ***/
+#define GDI_BUTT_HIGHLIGHT		0x01
+#define GDI_BUTT_DEFAULT			0x02
+#define GDI_BUTT_NOCOMBOARROW	0x04
+#define GDI_BUTT_TOOLBAR			0x08		// rmm1342
+#define GDI_BUTT_DISABLE			0x10		// PK4311
+#define GDI_BUTT_LISTHEADING	0x20		// used by GDIdrawHeadingButton // mpmCarbon3
+#define GDI_BUTT_SELECTED			0x40		// used by GDIdrawHeadingButton with GDI_BUTT_LISTHEADING // mpmCarbon3
+#define GDI_BUTT_NOFLASH			0x80							// rmm6000: now also applies on Vista: rmm5484: used on OSX to disable default button flashing (use in conjunction with GDI_BUTT_DEFAULT)
+#define GDI_BUTT_OSXNOFLASH		GDI_BUTT_NOFLASH	// rmm6000: for compatibility
+#define GDI_BUTT_LARGEROUND		0x100		// rmm5681: large round button, OSX only (similar to GDI_BUTT_ROUND)
+#define GDI_BUTT_SORTUP				0x200		// used by GDIdrawHeadingButton with GDI_BUTT_LISTHEADING // mpmCarbon3
+#define GDI_BUTT_NOSORT				0x400		// used by GDIdrawHeadingButton with GDI_BUTT_LISTHEADING // mpmCarbon3
+#define GDI_BUTT_ROUND				0x800		// used by GDIdrawSystem3dPushButton // mpmCarbon24
+#define GDI_BUTT_WIN_DRAW_BOTTOM_HEADER_LINE	0x800	// rmm_emat: Used for windows heading buttons only, to indicate that a bottom header line is to be drawn using the border colour
+#define GDI_BUTT_USER_BORDER_TOP_LEFT	0x1000  // rmm9790: For a GDI_BUTT_USER_COLORS button, just draw the top and left border lines (allows buttons to be nicely butted up against each other)
+#define GDI_BUTT_HOT					0x2000	// Hot button (ie mouse over) AEXP
+#define GDI_BUTT_USER_COLORS	0x4000	// rmm4547: draw the button using the user specified colors (button no longer has themed appearance)
+#define GDI_BUTT_NOCLIP				0x8000	// rmm5662: used in owner draw menu code, to disable clipping in paint button text function
+#define GDI_BUTT_ANIMATE			0x10000	// rmm6000: Used on Windows Vista only, to animate the default button
+#define GDI_BUTT_OSXINTERSECTCLIP 0x20000	// rmm6116: Used on OSX only to mean intersect rather than set the clipping rect
+#define GDI_BUTT_OSXBEVELBUTTON		0x40000	// rmm6263: OSX bevel button style
+#define GDI_BUTT_OSXFOCUS					0x80000	// rmm6280: OSX focus
+#define GDI_BUTT_WINDOWS7_HEADER	0x100000	// rmm_win7: Tells GDIdrawHeadingButton to draw a Windows 7 style header (applies on Win32 only)
+#define GDI_BUTT_USETOP						0x200000	// rmm6905: For internal use only
+#define GDI_BUTT_JSCLIENT					0x400000	// rmm8636: True when js client is drawing a button
+#define GDI_BUTT_NO_HEADER_SEPARATOR 0x800000	// rmm9091: Prevents GDIdrawHeadingButton from drawing a header separator at the right side of the button
+#ifdef ismacosx
+	#define GDI_COMBO_REAL_OSX		0x100000			// rmm6317: this means we are drawing the real OSX combo box button rather than the arrow button used up until Studio 4.3.1
+	#define GDI_BUTT_ARROW_ONLY		0							// rmm8745: Not relevant on OSX
+#else
+	#define GDI_COMBO_REAL_OSX		0							// rmm6317: not relevant on other platforms
+	#define GDI_BUTT_ARROW_ONLY		0x800000			// rmm8745: Win32 only - draw arrow only, when drawing combo box
+#endif
+// Start rmm9790: Adjusted these flags AS THE FLAGS BELOW CAN BE OR'D IN WITH GDI_BUTT... flags
+/*** flags used for GDIdrawComboButton ***/
+// PK4503
+#define GDI_COMBO_ARROWDOWN					0x00000000
+#define GDI_COMBO_ARROWUP						0x01000000
+#define GDI_COMBO_ARROWLEFT					0x02000000
+#define GDI_COMBO_ARROWRIGHT				0x03000000
+#define GDI_COMBO_ARROWMASK					0x03000000
+#define GDI_COMBO_WIN95_STYLE				0x04000000
+#define GDI_COMBO_97_STYLE					0x08000000	// rmm2361
+#define GDI_COMBO_97_STYLE_HILITED	0x10000000	// rmm2361
+// End rmm9790
+
+#define GDI_BUTT_ALPHA_INTERVAL	0x32				// recommended interval for drawing alpha shades 
+
+
+/*** constants passed to GDIinflateButtonRect ***/ // mpm4016
+#define GDI_BUTT_FACE_NOBORD	0			// PK4043
+#define GDI_BUTT_FACE_SYS			1
+#define GDI_BUTT_FACE_SYS3D		2
+#define GDI_BUTT_FACE_3D			3
+#define GDI_BUTT_FACE_HEADING	4
+#define GDI_BUTT_FACE_COMBO		5
+
+/*** modes passed to GDIrestrictScreenRect ***/
+#define GDI_SCR_TOP			1
+#define GDI_SCR_BOT			2
+#define GDI_SCR_LEFT		3
+#define GDI_SCR_RIGHT		4
+
+/*** modes passed to GDIgetScreenRect ***/
+#define GDI_SCR_SUB_TOP						0x01
+#define GDI_SCR_SUB_BOT						0x02
+#define GDI_SCR_SUB_LEFT					0x04
+#define GDI_SCR_SUB_RIGHT					0x08
+#define GDI_SCR_SUB_ALL						0x0F		// rmm9737a: excludes dock
+#define GDI_SCR_SUB_MACOS_DOCK		0x10		// rmm9737a
+#define GDI_SCR_GET_ALL						0x80
+#define GDI_SCR_GET_MAIN					0x40		// rmm1954
+
+/*** color constants ***/
+const qcol GDI_COLOR_SCROLLBAR							= 0x80000000L;
+const qcol GDI_COLOR_BACKGROUND							= 0x80000001L;
+const qcol GDI_COLOR_ACTIVECAPTION					= 0x80000002L;
+const qcol GDI_COLOR_INACTIVECAPTION				= 0x80000003L;
+const qcol GDI_COLOR_MENU										= 0x80000004L;
+const qcol GDI_COLOR_WINDOW									= 0x80000005L;
+const qcol GDI_COLOR_WINDOWFRAME						= 0x80000006L;
+const qcol GDI_COLOR_MENUTEXT								= 0x80000007L;
+const qcol GDI_COLOR_WINDOWTEXT							= 0x80000008L;
+const qcol GDI_COLOR_CAPTIONTEXT						= 0x80000009L;
+const qcol GDI_COLOR_ACTIVEBORDER						= 0x8000000aL;
+const qcol GDI_COLOR_INACTIVEBORDER					= 0x8000000bL;
+const qcol GDI_COLOR_APPWORKSPACE						= 0x8000000cL;
+const qcol GDI_COLOR_HIGHLIGHT							= 0x8000000dL;
+const qcol GDI_COLOR_HIGHLIGHTTEXT					= 0x8000000eL;
+const qcol GDI_COLOR_BTNFACE								= 0x8000000fL;
+const qcol GDI_COLOR_BTNSHADOW							= 0x80000010L;
+const qcol GDI_COLOR_GRAYTEXT								= 0x80000011L;
+const qcol GDI_COLOR_BTNTEXT								= 0x80000012L;
+const qcol GDI_COLOR_INACTIVECAPTIONTEXT		= 0x80000013L;
+const qcol GDI_COLOR_BTNHIGHLIGHT						= 0x80000014L;
+const qcol GDI_COLOR_3DDKSHADOW							= 0x80000015L;
+const qcol GDI_COLOR_3DLIGHT								= 0x80000016L;
+const qcol GDI_COLOR_INFOTEXT								= 0x80000017L;
+const qcol GDI_COLOR_INFOBK									= 0x80000018L;
+const qcol GDI_COLOR_HOTLIGHT								= 0x8000001AL;	// rmm4524
+const qcol GDI_COLOR_GRADIENTACTIVECAPTION	= 0x8000001BL;	// rmm6000
+const qcol GDI_COLOR_GRADIENTINACTIVECAPTION= 0x8000001CL;	// rmm6000
+const qcol GDI_COLOR_HIGHLIGHTNOFOCUS				= 0x8000001DL;	// rmm6273: OSX only
+
+const qcol GDI_COLOR_VISTA_TOOLBAR_DEFAULT	= 0x009F823F;		// rmm6000: Explorer toolbar colour - RGB(63,130,159)
+
+const qcol GDI_COLOR_QBLACK									= 0x8000001eL;
+const qcol GDI_COLOR_QDKBLUE								= 0x8000001fL;
+const qcol GDI_COLOR_QDKGREEN								= 0x80000020L;
+const qcol GDI_COLOR_QDKCYAN								= 0x80000021L;
+const qcol GDI_COLOR_QDKRED									= 0x80000022L;
+const qcol GDI_COLOR_QDKMAGENTA							= 0x80000023L;
+const qcol GDI_COLOR_QDKYELLOW							= 0x80000024L;
+const qcol GDI_COLOR_QDKGRAY								= 0x80000025L;
+const qcol GDI_COLOR_QBLUE									= 0x80000026L;
+const qcol GDI_COLOR_QGREEN									= 0x80000027L;
+const qcol GDI_COLOR_QCYAN									= 0x80000028L;
+const qcol GDI_COLOR_QRED										= 0x80000029L;
+const qcol GDI_COLOR_QMAGENTA								= 0x8000002aL;
+const qcol GDI_COLOR_QYELLOW								= 0x8000002bL;
+const qcol GDI_COLOR_QGRAY									= 0x8000002cL;
+const qcol GDI_COLOR_QWHITE									= 0x8000002dL;
+
+const qcol GDI_COLOR_QBACKFILL							= 0x8000002eL;
+const qcol GDI_COLOR_QFOREFILL							= 0x8000002fL;
+const qcol GDI_COLOR_QFRAME									= 0x80000030L;
+const qcol GDI_COLOR_QDEFAULT								= 0x80000031L;	// PK4039
+
+const qcol GDI_COLOR_DESKTOP								= 0x80000032L;
+const qcol GDI_COLOR_3DFACE									= 0x80000033L;
+const qcol GDI_COLOR_3DSHADOW								= 0x80000034L;
+const qcol GDI_COLOR_3DHIGHLIGHT						= 0x80000035L;
+const qcol GDI_COLOR_3DHILIGHT							= 0x80000036L;
+const qcol GDI_COLOR_BTNHILIGHT							= 0x80000037L;
+const qcol GDI_COLOR_MENUHILIGHT						= 0x80000038L;	// mt40384
+const qcol GDI_COLOR_LISTODDROWBACKGROUND		= 0x80000039L;	// rmm6273: OSX only - odd-numbered list row background
+const qcol GDI_COLOR_LISTEVENROWBACKGROUND	= 0x8000003AL;	// rmm6273: OSX only - even-numbered list row background
+const qcol GDI_COLOR_OUTLINESELECTED        = 0x8000003BL;  // pkcocoa_1196: OSX only
+const qcol GDI_COLOR_OUTLINEDESELECTED      = 0x8000003CL;  // pkcocoa_1196: OSX only
+const qcol GDI_COLOR_OUTLINETEXTSELECTED    = 0x8000003DL;  // pkcocoa_1196: OSX only
+const qcol GDI_COLOR_OUTLINETEXTDESELECTED  = 0x8000003EL;  // pkcocoa_1196: OSX only
+
+// Start rmm8745: New Omnis system colors
+const qcol GDI_COLOR_OMNIS_FST														= 0x80000040L;
+const qcol GDI_COLOR_OMNIS_TABPANE_TAB										= 0x80000040L;	// Tab pane unselected tab
+const qcol GDI_COLOR_OMNIS_TABPANE_HOT_TAB								= 0x80000041L;	// Tab pane hot unselected tab (used on Windows only)
+const qcol GDI_COLOR_OMNIS_TABPANE_SELECTED_TAB						= 0x80000042L;	// Tab pane selected tab
+const qcol GDI_COLOR_OMNIS_TABPANE_DISABLED_TAB						= 0x80000043L;	// Tab pane disabled tab
+const qcol GDI_COLOR_OMNIS_TABPANE_BORDER									= 0x80000044L;	// Tab pane border
+const qcol GDI_COLOR_OMNIS_PROPERTY_MANAGER								= 0x80000045L;	// Property manager
+const qcol GDI_COLOR_OMNIS_CLIENT_EXEC										= 0x80000046L;	// Client executed method
+const qcol GDI_COLOR_OMNIS_INHERITED											= 0x80000047L;	// Inherited
+const qcol GDI_COLOR_OMNIS_NOSET_PROPERTY									= 0x80000048L;	// No set property
+const qcol GDI_COLOR_OMNIS_RUNTIME_PROPERTY								= 0x80000049L;	// Runtime property
+const qcol GDI_COLOR_OMNIS_SET_PROPERTY										= 0x8000004AL;	// Set property
+const qcol GDI_COLOR_OMNIS_TOOLOBJ_SELECT									= 0x8000004BL;	// Selected tool object
+const qcol GDI_COLOR_OMNIS_LISTLINE_SELECTED							= 0x8000004CL;	// Selected list line
+const qcol GDI_COLOR_OMNIS_LISTLINE_HOT_SELECTED					= 0x8000004DL;	// Hot Selected list line
+const qcol GDI_COLOR_OMNIS_LISTLINE_HOT										= 0x8000004EL;	// Hot list line
+const qcol GDI_COLOR_OMNIS_LISTLINE_UNFOCUSED							= 0x8000004FL;	// Selected list line when control does not have focus
+const qcol GDI_COLOR_OMNIS_HEADER_HOT											= 0x80000050L;	// Hot header button
+const qcol GDI_COLOR_OMNIS_HEADER_PRESSED									= 0x80000051L;	// Pressed header button
+const qcol GDI_COLOR_OMNIS_HEADER_SEPARATOR								= 0x80000052L;	// Header separator
+const qcol GDI_COLOR_OMNIS_HEADER													= 0x80000053L;	// Normal header
+const qcol GDI_COLOR_OMNIS_PUSH														= 0x80000054L;	// Push button - normal state
+const qcol GDI_COLOR_OMNIS_PUSH_BORDER										= 0x80000055L;	// Push button - normal state border
+const qcol GDI_COLOR_OMNIS_PUSH_HOT												= 0x80000056L;	// Push button - hot state
+const qcol GDI_COLOR_OMNIS_PUSH_HOT_BORDER								= 0x80000057L;	// Push button - hot state border
+const qcol GDI_COLOR_OMNIS_PUSH_PRESSED										= 0x80000058L;	// Push button - pressed state
+const qcol GDI_COLOR_OMNIS_PUSH_PRESSED_BORDER						= 0x80000059L;	// Push button - pressed state border
+const qcol GDI_COLOR_OMNIS_PUSH_DEFAULT										= 0x8000005AL;	// Push button - default - normal state
+const qcol GDI_COLOR_OMNIS_PUSH_DEFAULT_BORDER						= 0x8000005BL;	// Push button - default - normal state border
+const qcol GDI_COLOR_OMNIS_PUSH_DISABLED									= 0x8000005CL;	// Push button - disabled state
+const qcol GDI_COLOR_OMNIS_PUSH_DISABLED_BORDER						= 0x8000005DL;	// Push button - disabled state border
+const qcol GDI_COLOR_OMNIS_PUSH_PRESSED_TEXT_OSX					= 0x8000005EL;	// Push button - pressed text on OSX
+const qcol GDI_COLOR_OMNIS_PUSH_DEFAULT_TEXT_OSX					= 0x8000005FL;	// Push button - default - text on OSX
+const qcol GDI_COLOR_OMNIS_CHECKRADIO_BORDER_OSX					= 0x80000060L;	// Check box/radio button border for OSX - normal state - not used when checked
+const qcol GDI_COLOR_OMNIS_CHECKRADIO_BACK_UNCHK					= 0x80000061L;	// Check box/radio button background - normal state - unchecked
+const qcol GDI_COLOR_OMNIS_CHECKRADIO_BACK_CHK						= 0x80000062L;	// Check box/radio button background - normal state - checked
+const qcol GDI_COLOR_OMNIS_CHECKRADIO_PRESSED_BACK_UNCHK	= 0x80000063L;	// Check box/radio button background - pressed state - unchecked
+const qcol GDI_COLOR_OMNIS_CHECKRADIO_PRESSED_BACK_CHK		= 0x80000064L;	// Check box/radio button background - pressed state - checked
+const qcol GDI_COLOR_OMNIS_CHECKRADIO_MARK								= 0x80000065L;	// Check box/radio button mark - normal state
+const qcol GDI_COLOR_OMNIS_CHECKRADIO_HOT_MARK						= 0x80000066L;	// Check box/radio button mark - hot state
+const qcol GDI_COLOR_OMNIS_CHECKRADIO_DISABLED_MARK				= 0x80000067L;	// Check box/radio button mark - disabled state
+const qcol GDI_COLOR_OMNIS_TREE_ICON_COLLAPSED						= 0x80000068L;	// Tree collapsed icon
+const qcol GDI_COLOR_OMNIS_TREE_ICON_EXPANDED							= 0x80000069L;	// Tree expanded icon
+const qcol GDI_COLOR_OMNIS_TREE_ICON_HOT									= 0x8000006AL;	// Tree icon (expanded and collapsed) - hot state
+const qcol GDI_COLOR_OMNIS_EDIT_TEXT_HIGHLIGHT_OSX				= 0x8000006BL;	// OSX edit fields - text highlight color
+const qcol GDI_COLOR_OMNIS_CTRL_EDIT_BORDER								= 0x8000006CL;	// Edit fields - theme ctrl border color
+const qcol GDI_COLOR_OMNIS_CTRL_EDIT_BORDER_INSET_OSX			= 0x8000006DL;	// Edit fields - theme ctrl border color for OSX - inset from main border - retina only
+const qcol GDI_COLOR_OMNIS_CTRL_LIST_BORDER								= 0x8000006EL;	// List fields - theme ctrl border color
+const qcol GDI_COLOR_OMNIS_CTRL_GROUPBOX_BORDER						= 0x8000006FL;	// Group boxes - theme ctrl border color
+const qcol GDI_COLOR_OMNIS_PREVIEW_PAPER									= 0x80000070L;	// Paper colour for print preview
+const qcol GDI_COLOR_OMNIS_PREVIEW_FOUND_HIGHLIGHT			  = 0x80000071L;	// Print preview - found highlight animation
+const qcol GDI_COLOR_OMNIS_PREVIEW_FOUND_TEXT_BACK				= 0x80000072L;	// Print preview - found text - background color
+const qcol GDI_COLOR_OMNIS_PREVIEW_FOUND_TEXT_TEXT				= 0x80000073L;	// Print preview - found text - text color
+const qcol GDI_COLOR_OMNIS_TOOLOBJ_HIGHLIGHT_WIN					= 0x80000074L;	// Toolbar object highlight color for windows
+const qcol GDI_COLOR_OMNIS_CHROMA_BRACKET_BACK						= 0x80000075L;	// Chroma coding - bracket background
+const qcol GDI_COLOR_OMNIS_CHROMA_BRACKET									= 0x80000076L;	// Chroma coding - bracket
+const qcol GDI_COLOR_OMNIS_CHROMA_COMMENT									= 0x80000077L;	// Chroma coding - comment
+const qcol GDI_COLOR_OMNIS_CHROMA_CTRLKEYWORD							= 0x80000078L;	// Chroma coding - ctrl keyword
+const qcol GDI_COLOR_OMNIS_CHROMA_CURRENT_BLOCK						= 0x80000079L;	// Chroma coding - current block
+const qcol GDI_COLOR_OMNIS_CHROMA_KEYWORD									= 0x8000007AL;	// Chroma coding - keyword
+const qcol GDI_COLOR_OMNIS_CHROMA_STRING									= 0x8000007BL;	// Chroma coding - string
+const qcol GDI_COLOR_OMNIS_CHROMA_VARIABLE								= 0x8000007CL;	// Chroma coding - variable
+const qcol GDI_COLOR_OMNIS_REPORTDESIGN_POSN_SECTION_TEXT	= 0x8000007DL;	// Report design - positioning section text
+const qcol GDI_COLOR_OMNIS_CTRL_GROUPBOX_OSX							= 0x8000007EL;	// rmm8758: Fill color for OSX group box with kBorderCtrlGroupBox border
+const qcol GDI_COLOR_OMNIS_DOCKING_AREA										= 0x8000007FL;	// rmm8792: Docking area color
+const qcol GDI_COLOR_OMNIS_DOCKING_AREA_TEXT							= 0x80000080L;	// rmm8792: Docking area text color
+const qcol GDI_COLOR_OMNIS_SCROLLBAR_THUMB								= 0x80000081L;	// rmm8816: Scrollbar thumb color
+const qcol GDI_COLOR_OMNIS_SCROLLBAR_HOT_THUMB						= 0x80000082L;	// rmm8816: Scrollbar hot thumb color
+const qcol GDI_COLOR_OMNIS_SCROLLBAR_WARM_THUMB_WIN				= 0x80000083L;	// rmm8816: Scrollbar warm thumb color - windows only
+const qcol GDI_COLOR_OMNIS_SCROLLBAR_TRACKING_THUMB_WIN		= 0x80000084L;	// rmm8816: Scrollbar tracking thumb color - windows only
+const qcol GDI_COLOR_OMNIS_SCROLLBAR_HOT_BUTTON_WIN				= 0x80000085L;	// rmm8816: Scrollbar hot button color - windows only
+const qcol GDI_COLOR_OMNIS_SCROLLBAR_TRACKING_BUTTON_WIN	= 0x80000086L;	// rmm8816: Scrollbar tracking button color - windows only
+const qcol GDI_COLOR_OMNIS_SCROLLBAR_ARROW_WIN						= 0x80000087L;	// rmm8816: Scrollbar arrow color - windows only
+const qcol GDI_COLOR_OMNIS_SCROLLBAR_HOT_ARROW_WIN				= 0x80000088L;	// rmm8816: Scrollbar hot arrow color - windows only
+const qcol GDI_COLOR_OMNIS_SCROLLBAR_TRACKING_ARROW_WIN		= 0x80000089L;	// rmm8816: Scrollbar tracking arrow color - windows only
+const qcol GDI_COLOR_OMNIS_SCROLLBAR_DISABLED_ARROW_WIN		= 0x8000008AL;	// rmm8816: Scrollbar tracking arrow color - windows only
+const qcol GDI_COLOR_OMNIS_WINDOW_MENUBAR_WIN							= 0x8000008BL;	// rmm8828: Window menubar color - windows only
+const qcol GDI_COLOR_OMNIS_WINDOW_MENUBAR_TEXT_WIN				= 0x8000008CL;	// rmm8828: Window menubar text color - windows only
+const qcol GDI_COLOR_OMNIS_MENU_PEN_WIN										= 0x8000008DL;	// rmm8828: Menu separator and gutter color - windows only
+const qcol GDI_COLOR_OMNIS_THEME_RED											= 0x8000008EL;	// rmm8855: Used in place of red
+const qcol GDI_COLOR_OMNIS_HEADER_BTN_PRESSED_OSX					= 0x8000008FL;	// CR0387:	Highlighting for a default heading button on OSX
+const qcol GDI_COLOR_OMNIS_TABPANE_SELECTED_TAB_TEXT_OSX	= 0x80000090L;	// rmm9588: Selected tab text color for macOSX
+// Start rmm_emat
+const qcol GDI_COLOR_OMNIS_CHROMA_OPTION									= 0x80000091L;	// Color used for syntax coloring command options
+const qcol GDI_COLOR_OMNIS_CHROMA_CONSTANT								= 0x80000092L;	// Color used for syntax coloring constants
+const qcol GDI_COLOR_OMNIS_CHROMA_EVPARM									= 0x80000093L;	// Color used for syntax coloring event parameters
+const qcol GDI_COLOR_OMNIS_CHROMA_FUNCTION								= 0x80000094L;	// Color used for syntax coloring built-in and external functions
+const qcol GDI_COLOR_OMNIS_CHROMA_HASHVAR									= 0x80000095L;	// Color used for syntax coloring hash variables
+const qcol GDI_COLOR_OMNIS_CHROMA_LOCALVAR								= 0x80000096L;	// Color used for syntax coloring local variables
+const qcol GDI_COLOR_OMNIS_CHROMA_PARAMETER_VAR						= 0x80000097L;	// Color used for syntax coloring parameter variables
+const qcol GDI_COLOR_OMNIS_CHROMA_INSTANCE_VAR						= 0x80000098L;	// Color used for syntax coloring instance variables
+const qcol GDI_COLOR_OMNIS_CHROMA_CLASS_VAR								= 0x80000099L;	// Color used for syntax coloring class variables
+const qcol GDI_COLOR_OMNIS_CHROMA_TASK_VAR								= 0x8000009AL;	// Color used for syntax coloring task variables
+const qcol GDI_COLOR_OMNIS_CHROMA_NOTATION								= 0x8000009BL;	// Color used for syntax coloring built-in notation
+const qcol GDI_COLOR_OMNIS_CHROMA_BAD_SYNTAX							= 0x8000009CL;	// Color used for syntax coloring bad syntax
+const qcol GDI_COLOR_OMNIS_HIGHLIGHT_METHOD								= 0x8000009DL;	// Highlight color for methods
+const qcol GDI_COLOR_OMNIS_CURRENT_METHOD_LINE_BACKGROUND = 0x8000009EL;	// Current method line background color
+const qcol GDI_COLOR_OMNIS_HIGHLIGHT_METHOD_NOFOCUS				= 0x8000009FL;	// Highlight color for methods, when control does not have the focus
+// End rmm_emat
+const qcol GDI_COLOR_OMNIS_CODE_EDITOR_BACKGROUND					= 0x800000A0L;	// rmm9658: background color for code editor
+const qcol GDI_COLOR_OMNIS_CODE_EDITOR_OTHER_TEXT					= 0x800000A1L;	// rmm9776: other text for code editor
+const qcol GDI_COLOR_OMNIS_CODE_EDITOR_SYNTAX_WORD				= 0x800000A2L;	// rmm9808: Highlight syntax word color
+// KEEP THIS UP TO DATE WITH THE LAST OMNIS COLOR
+const qcol GDI_COLOR_OMNIS_LST														= 0x800000A2L;	// rmm8855	// CR0387 // rmm_emat	// rmm9658 // rmm9776 // rmm9808
+// End rmm8745
+
+const qcol GDI_COLOR_FST				= 0x80000000L;
+const qcol GDI_COLOR_LST				= 0x80000018L;
+const qcol GDI_COLOR_QFST				= 0x8000001eL;
+const qcol GDI_COLOR_QLST				= 0x80000038L;
+const qcol COLOR_LAST						= 0x00000038L;
+const qcol COLOR_MAX						= (GDI_COLOR_OMNIS_LST & ~GDI_COLOR_FST);	// mt40490 // rmm8745
+
+// Start rmm_win7
+#define GDI_COLOR_WIN7_HEADER_TEXT	GDImakeQcol(76, 96, 122)	// Text for headed list box default Windows 7 style
+#define GDI_COLOR_WIN7_TOOLBAR_TEXT	GDImakeQcol(30, 57, 91)		// Text for default Windows 7 toolbar objects
+// End rmm_win7
+
+// Start rmm8745: Default color values
+#ifndef ismac
+	const qcol GDI_DEFAULT_COLOR_OMNIS_CLIENT_EXEC = 0x00ff46ff;	// Client executed method
+#else
+	const qcol GDI_DEFAULT_COLOR_OMNIS_CLIENT_EXEC = GDI_COLOR_QMAGENTA;	// Client executed method
+#endif
+const qcol GDI_DEFAULT_COLOR_OMNIS_INHERITED = GDI_COLOR_QBLUE;	// Inherited
+const qcol GDI_DEFAULT_COLOR_OMNIS_NOSET_PROPERTY = 0x00000080;	// No set property
+const qcol GDI_DEFAULT_COLOR_OMNIS_RUNTIME_PROPERTY = GDI_COLOR_QDKGREEN;	// Runtime property
+const qcol GDI_DEFAULT_COLOR_OMNIS_SET_PROPERTY = 0x00800000;	// Set property
+const qcol GDI_DEFAULT_COLOR_OMNIS_TOOLOBJ_SELECT = GDI_COLOR_QRED;	// Selected tool object
+#ifndef ismacosx
+	const qcol GDI_DEFAULT_COLOR_OMNIS_HEADER_HOT = GDImakeQcol(217, 235, 249);
+	const qcol GDI_DEFAULT_COLOR_OMNIS_HEADER_PRESSED = GDImakeQcol(188, 220, 244);
+	const qcol GDI_DEFAULT_COLOR_OMNIS_HEADER_BTN_PRESSED_OSX = 0;			// CR0387 // rmm9180: 0 (black) rather than the constant
+	const qcol GDI_DEFAULT_COLOR_OMNIS_HEADER_SEPARATOR = GDImakeQcol(229, 229, 229);
+	const qcol GDI_DEFAULT_COLOR_OMNIS_HEADER = GDI_COLOR_WINDOW;
+	const qcol GDI_DEFAULT_COLOR_OMNIS_PUSH_PRESSED_TEXT_OSX = GDI_COLOR_QBLACK;
+	const qcol GDI_DEFAULT_COLOR_OMNIS_PUSH_DEFAULT_TEXT_OSX = GDI_COLOR_QBLACK;
+	const qcol GDI_DEFAULT_COLOR_OMNIS_CTRL_EDIT_BORDER = GDImakeQcol(171, 173, 179);
+	const qcol GDI_DEFAULT_COLOR_OMNIS_CTRL_EDIT_BORDER_INSET_OSX = 0;
+	const qcol GDI_DEFAULT_COLOR_OMNIS_CTRL_LIST_BORDER = GDImakeQcol(130, 135, 144);
+	const qcol GDI_DEFAULT_COLOR_CTRL_GROUPBOX_BORDER = GDImakeQcol(220, 220, 220);
+#else
+	const qcol GDI_DEFAULT_COLOR_OMNIS_HEADER_HOT = GDImakeQcol(240, 240, 240);
+	const qcol GDI_DEFAULT_COLOR_OMNIS_HEADER_PRESSED = GDImakeQcol(236, 236, 236);
+	const qcol GDI_DEFAULT_COLOR_OMNIS_HEADER_BTN_PRESSED_OSX = GDImakeQcol(229, 229, 229);			// CR0387
+	const qcol GDI_DEFAULT_COLOR_OMNIS_HEADER_SEPARATOR = GDImakeQcol(212, 212, 212);
+	const qcol GDI_DEFAULT_COLOR_OMNIS_HEADER = GDImakeQcol(240, 240, 240);
+	const qcol GDI_DEFAULT_COLOR_OMNIS_PUSH_PRESSED_TEXT_OSX = GDI_COLOR_QWHITE;
+	const qcol GDI_DEFAULT_COLOR_OMNIS_PUSH_DEFAULT_TEXT_OSX = GDI_COLOR_QWHITE;
+	const qcol GDI_DEFAULT_COLOR_OMNIS_CTRL_EDIT_BORDER = GDImakeQcol(176, 176, 176);
+	const qcol GDI_DEFAULT_COLOR_OMNIS_CTRL_EDIT_BORDER_INSET_OSX = GDImakeQcol(240, 240, 240);
+	const qcol GDI_DEFAULT_COLOR_OMNIS_CTRL_LIST_BORDER = GDImakeQcol(197, 197, 197);
+	const qcol GDI_DEFAULT_COLOR_CTRL_GROUPBOX_BORDER = 0;
+#endif
+const qcol GDI_DEFAULT_COLOR_OMNIS_PREVIEW_PAPER = GDI_COLOR_QWHITE;
+const qcol GDI_DEFAULT_COLOR_OMNIS_PREVIEW_FOUND_HIGHLIGHT = GDI_COLOR_QRED;
+const qcol GDI_DEFAULT_COLOR_OMNIS_PREVIEW_FOUND_TEXT_BACK = GDI_COLOR_QYELLOW;
+const qcol GDI_DEFAULT_COLOR_OMNIS_PREVIEW_FOUND_TEXT_TEXT = GDI_COLOR_QRED;
+const qcol GDI_DEFAULT_COLOR_OMNIS_CHROMA_BRACKET = GDI_COLOR_QRED;
+const qcol GDI_DEFAULT_COLOR_OMNIS_CHROMA_KEYWORD = GDImakeQcol(153, 102, 0); // rmm_emat: Same as control keyword
+const qcol GDI_DEFAULT_COLOR_OMNIS_CHROMA_COMMENT = GDI_COLOR_QRED;
+const qcol GDI_DEFAULT_COLOR_OMNIS_CHROMA_VARIABLE = GDImakeQcol(0, 128, 0);
+const qcol GDI_DEFAULT_COLOR_OMNIS_CHROMA_CTRLKEYWORD = GDImakeQcol(153, 102, 0);
+const qcol GDI_DEFAULT_COLOR_OMNIS_CHROMA_STRING = GDImakeQcol(128, 0, 0);
+const qcol GDI_DEFAULT_COLOR_OMNIS_CHROMA_CURRENT_BLOCK = GDImakeQcol(153, 102, 0);
+const qcol GDI_DEFAULT_COLOR_OMNIS_REPORTDESIGN_POSN_SECTION_TEXT = GDI_COLOR_QDKRED;
+const qcol GDI_DEFAULT_COLOR_OMNIS_TABPANE_SELECTED_TAB_TEXT_OSX = GDI_COLOR_QWHITE;	// rmm9588
+// Start rmm_emat
+const qcol GDI_DEFAULT_COLOR_OMNIS_CHROMA_OPTION = GDImakeQcol(136, 136, 255);
+const qcol GDI_DEFAULT_COLOR_OMNIS_CHROMA_CONSTANT = GDImakeQcol(51, 204, 0);
+const qcol GDI_DEFAULT_COLOR_OMNIS_CHROMA_EVPARM = GDImakeQcol(0, 119, 119);
+const qcol GDI_DEFAULT_COLOR_OMNIS_CHROMA_FUNCTION = GDImakeQcol(160, 160, 0);
+const qcol GDI_DEFAULT_COLOR_OMNIS_CHROMA_HASHVAR = GDImakeQcol(128, 128, 128);
+const qcol GDI_DEFAULT_COLOR_OMNIS_CHROMA_LOCALVAR = GDImakeQcol(255, 102, 102);
+const qcol GDI_DEFAULT_COLOR_OMNIS_CHROMA_PARAMETER_VAR = GDImakeQcol(255, 102, 102);
+const qcol GDI_DEFAULT_COLOR_OMNIS_CHROMA_INSTANCE_VAR = GDImakeQcol(102, 102, 255);
+const qcol GDI_DEFAULT_COLOR_OMNIS_CHROMA_CLASS_VAR = GDImakeQcol(102, 102, 255);
+const qcol GDI_DEFAULT_COLOR_OMNIS_CHROMA_TASK_VAR = GDImakeQcol(102, 255, 102);
+const qcol GDI_DEFAULT_COLOR_OMNIS_CHROMA_NOTATION = GDImakeQcol(187, 0, 187);
+const qcol GDI_DEFAULT_COLOR_OMNIS_CHROMA_BAD_SYNTAX = GDI_COLOR_QRED;
+const qcol GDI_DEFAULT_COLOR_OMNIS_HIGHLIGHT_METHOD = GDImakeQcol(205, 232, 255);
+const qcol GDI_DEFAULT_COLOR_OMNIS_CURRENT_METHOD_LINE_BACKGROUND = GDImakeQcol(243, 250, 255);
+const qcol GDI_DEFAULT_COLOR_OMNIS_HIGHLIGHT_METHOD_NOFOCUS = GDImakeQcol(192, 192, 192);
+// End rmm_emat
+const qcol GDI_DEFAULT_COLOR_OMNIS_CODE_EDITOR_BACKGROUND = GDI_COLOR_QWHITE;	// rmm9658
+const qcol GDI_DEFAULT_COLOR_OMNIS_CODE_EDITOR_SYNTAX_WORD = GDImakeQcol(223, 227, 212);	// rmm9808
+// End rmm8745
+
+/*** returned by GDIcreateBitmapMask when masks are not required ***/
+#define HBITMAP_NONE			0x01
+
+
+// ############################# include dependent stuff ####################################
+
+// mpm_uni moved here from strclass.he
+// rmmuni: these string functions are used in platform independent code.  They are not defined for the mac or unix
+// On windows, they are defined in tchar.h
+#if defined(isunix) || defined(ismac)
+	#if defined(ismacosx) // rmm_iphone2
+		// rmmuni_osx
+		#if defined(ismach_o) || defined(ismobile) // rmm_iphone2
+			// rmm_macho
+			#ifndef _tcstoul // rmm_iphone2
+				#define _tcstoul	OMstrtoul
+			#endif
+			#ifndef _tcstoul // rmm_iphone2
+				#define _tcslen		OMstrlen
+			#endif
+			#ifndef _tcstoul // rmm_iphone2
+				#define _tcscat		OMstrcat
+			#endif
+			#ifndef _tcstoul // rmm_iphone2
+				#define _tcscmp		OMstrcmp
+			#endif
+		#else
+			#define _tcstoul	wcstoul
+			#define _tcslen		wcslen
+			#define _tcscat		wcscat
+			#define _tcscmp		wcscmp
+		#endif
+	#else
+		#define _tcstoul	strtoul
+		#define _tcslen		strlen
+		#define _tcscat		strcat
+		#define _tcscmp		strcmp
+	#endif
+#endif
+
+#ifndef _XGDI_HE_
+#	include "xgdi.he"
+#endif
+
+//#if defined(ismobile) && defined(ismacosx)		// pkiphone
+//#else
+extern HBITMAPMASK HBITMAP_ISALPHA;	// pkisalpa5
+//#endif
+
+#ifndef ismobile	// rmm_mobile: avoid packing on mobile devices as alignment issues cause crashes
+	GCC_SET_BYTE_PACKING_ON // MHMACH
+	#pragma	SET_BYTE_PACKING_ON
+#endif
+
+// ############################# qpen ####################################
+
+class qpen
+{
+	public:
+	  qdim			mWidth;
+	  qpat			mPat;
+	  qcol			mColor;
+	  qbool			mIsHairLine;
+	  
+	public:
+	  qpen();
+	  qpen( qpen* pPen );
+	  qpen( qdim pWidth, qcol pColor = colBlack, qpat pPat = patFill, qbool pIsHairLine = qfalse );
+	  
+	  qdim getWidth() { return mWidth; }
+	  qpat getPat() { return mPat; }
+	  qcol getColor() { return mColor; }
+	  qbool isHairLine() { return mIsHairLine; }
+
+	  void setWidth( qdim pWidth ) { mWidth = pWidth; }
+	  void setPat( qpat pPat ) { mPat = pPat; }
+	  void setColor( qcol pColor ) { mColor = pColor; }
+		void setHairline( qbool pHairLine ) { mIsHairLine = pHairLine; }
+
+};
+
+// ############################# gdi structures ####################################
+
+// MHADRAG begins
+// rmm5745: export gAntiAlias from OSX orfcgui
+#if defined(ismacosx) && defined(isGDIHWNDLIB)
+	GCC_EXPORT_ON
+	#pragma export on
+#endif
+extern qbool gAntiAlias;
+#if defined(ismacosx) && defined(isGDIHWNDLIB)
+		GCC_EXPORT_OFF
+		#pragma export off
+#endif
+
+class GDIdisableAA
+{
+	public:
+	#if defined(ismacosx) && !defined(isXCOMPLIB)
+		GDIdisableAA() {gAntiAlias = qfalse;}
+		~GDIdisableAA() {gAntiAlias = qtrue;}
+	#elif defined(isunixgui) // rmmheadless
+		// rmmunilnx:
+		GDIdisableAA() { SetDisableAntiAlias(TRUE); }
+		~GDIdisableAA() { SetDisableAntiAlias(FALSE); }
+	#else
+		// Modify the following if this class is to be used to manage AA on other platforms.
+		// rmm5745: removed gAntiAlias references from here (they are not currently used for Win32)
+		GDIdisableAA() {}
+		~GDIdisableAA() {}
+	#endif
+};
+// MHADRAG ends
+
+// PK6466
+#define GDI_DT_FLAGS_ISASCII			0x01
+#define GDI_DT_FLAGS_NOELLIPSIS		0x02
+#define GDI_DT_FLAGS_NOCLIP				0x04	// rmm5676: prevents GDIdrawTextJst from setting the clipping
+#define GDI_DT_FLAGS_NODPISCALE		0x08	// AE6829
+#define GDI_DT_FLAGS_WILLREPEAT		0x10	// rmm8666: If set,restores the font to the initial font after drawing (used with the first call of two when drawing twice to highlight text)
+#define GDI_DT_FLAGS_SHOWCC				0x20	// rmm9053: If set,show control characters (must be used with GDI_DT_FLAGS_ISASCII)
+#define GDI_DT_FLAGS_NOADJBMP			0x40	// rmm9117: If set,do not adjust bitmap rectangle when drawing columns
+
+// PK4622
+class tqappfile;
+struct GDIdrawTextStruct
+{
+#if defined(isiphone)		// pkiphone
+#else
+	HDC									mHdc;
+	qdim								mX;
+	qdim								mY;
+	qchar*							mText;
+	qshort							mTextLen;
+	GDItextSpecStruct*	mTextSpec;
+	qshort*							mColumnArray;
+	qshort							mColumnCount;
+	qint1								mFlags; // mIsAscii;			// PK6466
+	tqappfile*					mApp;
+	qint1*							mColumnJsts;	// rmm2645
+	HDC									mFontHdc;			// rmm2797
+
+	GDIdrawTextStruct( HDC pHdc, qdim pX, qdim pY, qchar* pText, qshort pTextLen, GDItextSpecStruct* pTextSpec, tqappfile* pApp );
+	GDIdrawTextStruct( HDC pHdc, qdim pX, qdim pY, qchar* pText, qshort pTextLen, GDItextSpecStruct* pTextSpec, 
+										 qshort* pColumnArray=0, qshort pColumnCount=0, qint1 pFlags = 0 /* PK6466 qbool pIsAscii = qfalse*/, tqappfile* pApp = 0, qint1 *pColumnJsts = 0); // rmm2645
+#endif
+};
+
+#ifndef ismobile
+	GCC_SET_BYTE_PACKING_OFF // MHMACH
+	#pragma	SET_BYTE_PACKING_OFF
+#endif
+
+// ############################# gdi functions ####################################
+
+/******** DC functions *********/
+
+#pragma SET_RETURN_REGISTER_ON
+
+GDIAPI void		OMNISAPI	GDIflushDC				( HDC pHdc ); // mpmCarbon40
+#ifdef ismacosx
+	GDIAPI void OMNISAPI GDIcgContextFlush(HDC pHdc);	// rmm4922
+#endif
+GDIAPI void		OMNISAPI	GDIsetFlush				( qbool pEnable ); // mpmCarbon57
+GDIAPI void		OMNISAPI 	GDIcreateScreenDC	( HDC* pHdc, HRESERVED* pPalette );
+#if !defined(isunix) && !defined(ismobile)
+	// Start rmm_nc
+	// Create Alpha HDC suitable for drawing into an alpha bitmap; creates alpha bitmap with specified dimensions and attaches it to the alpha HDC
+	GDIAPI void	OMNISAPI	GDIcreateAlphaDC( HDC* pHdc, qdim pWidth, qdim pHeight );	
+	// Delete the Alpha HDC created with GDIcreateAlphaDC; sets *pReturnedAlphaBitmap  to the alpha bitmap created using the alpha HDC
+	GDIAPI void OMNISAPI	GDIdeleteAlphaDC( HDC pHdc, HBITMAP *pReturnedAlphaBitmap );
+	// Get and set flags for the Alpha HDC
+	GDIAPI qulong OMNISAPI GDIgetFlagsForAlphaDC( HDC pHdc );
+	GDIAPI qulong OMNISAPI GDIsetFlagsForAlphaDC( HDC pHdc, qulong pFlags );	// Returns previous flag values
+	// Alpha HDC flags: lower 16 bits are a blend mode; upper 16 bits are reserved for individual bit flags
+	const qulong	GDI_ADC_BLENDMODE_COPY = 1,		// Copy from source when drawing
+								GDI_ADC_BLENDMODE_BLEND = 2;	// Blend source with alpha bitmap for HDC when drawing
+	const qulong	GDI_ADC_FLAG_WIN32_INSET_PEN = 0x80000000,	// Align pens along the inside of the edge of shapes on Win32
+								GDI_ADC_FLAG_WIN32_TEXT_RENDERING_DEFAULT = 0x40000000,	 // rmm8441: when set uses TextRenderingHintSystemDefault rather than TextRenderingHintAntiAliasGridFit
+								GDI_ADC_FLAG_WIN32_TEXT_RENDERING_CLEARTYPE = 0x20000000;// rmm_cai7: when set uses TextRenderingHintClearTypeGridFit rather than TextRenderingHintAntiAliasGridFit (takes priority over GDI_ADC_FLAG_WIN32_TEXT_RENDERING_DEFAULT)
+								
+#ifdef isCOCOA	//CRCOCOA
+  const qulong  GDI_ADC_BLENDMODE_XOR = 3;    // Mac supports XOR (Inverted blend)
+#endif
+								
+	GDIAPI void *OMNISAPI GDIgetNativeGraphicsObjectForAlphaDC(HDC pHdc);		// Returns Graphics * to GDI+ object on Win32, or CGContextRef on MacOSX; returns NULL if the HDC is not an alphaDC
+	// End rmm_nc
+#endif
+GDIAPI void		OMNISAPI	GDIdrawDragDropBackgroundAlphaDC(HDC pHdc, qrect &pRect, qbool pCocoa = qfalse);	// rmm_win7: present for Unix and Mobile devices, but only implemented for Win32 and OSX // rmm8860: Removed shadow width // rmm9170: pCocoa
+GDIAPI void		OMNISAPI 	GDIdeleteScreenDC	( HDC pHdc, HRESERVED pPalette );
+void						 				GDIsetViewportOrg	( HDC pHdc, qdim pX, qdim pY );		// mpm4046
+void						 				GDIgetViewportOrg	( HDC pHdc, qdim* pX, qdim* pY );	// mpm4046
+GDIAPI void		OMNISAPI	GDIgetDeviceDPI		( HDC pHdc, qdim* pHorz, qdim* pVert ); // mpmPRI
+GDIAPI void		OMNISAPI	GDIsetDeviceDPI		( HDC pHdc, qdim pHorz, qdim pVert ); // mpmPRI
+GDIAPI void		OMNISAPI	GDIscaleRect(qrect* pRect,qshort pOriginDPI); // AE6540
+GDIAPI qdim		OMNISAPI	GDIscale(qdim pSize,qshort pOriginDPI,qbool pIsFont=qfalse); // AE6540
+GDIAPI void		OMNISAPI	GDIscaleFont(qfnt*,qshort pOriginDPI); // AE6540
+#ifdef isCOCOA	// Start CRHIRES
+GDIAPI qreal	OMNISAPI	GDIsetDeviceScale	( HDC pHdc, qreal pScale );
+GDIAPI qreal	OMNISAPI	GDIgetDeviceScale	( HDC pHdc );
+#else
+inline GDIAPI qreal	OMNISAPI	GDIsetDeviceScale	( HDC pHdc, qreal pScale ) { return 1; }
+inline GDIAPI qreal	OMNISAPI	GDIgetDeviceScale	( HDC pHdc ) { return 1; }
+#endif					// End CRHIRES
+
+// CR0244 : GDIdeviceScale is now available to xcomps
+// Start CRHIRES
+
+#ifndef iswin32
+	struct HWNDstruct;
+	typedef HWNDstruct* HWND;
+#endif
+
+#ifdef isCOCOA
+	class GDIdeviceScale
+	{
+		public:
+			GDIdeviceScale(qreal pScale);
+			GDIdeviceScale(HDC pHdc);
+			GDIdeviceScale(HWND pHwnd);
+			~GDIdeviceScale();
+		private:
+			qreal mOldScale;
+	};
+#else
+	class GDIdeviceScale
+	{
+	public:
+		GDIdeviceScale(qreal pScale)
+		{
+			mOldScale = 1;
+			#ifdef iswin32
+				mRestoreScalingDisabled = qfalse;
+				if (pScale == 1)
+				{
+					mOldScalingDisabled = GDIsetScalingDisabled(qtrue);
+					mRestoreScalingDisabled = qtrue;
+				}
+			#endif
+		}
+		#ifdef iswin32
+			GDIdeviceScale(HANDLE pHandle)
+			{
+				mOldScale = 1;
+				mRestoreScalingDisabled = qfalse;
+			}
+		#else
+			GDIdeviceScale(HDC pHdc)
+			{
+				mOldScale = 1;
+			}
+			GDIdeviceScale(HWND pHwnd)
+			{
+				mOldScale = 1;
+			}
+		#endif
+		~GDIdeviceScale()
+		{
+			#ifdef iswin32
+				if (mRestoreScalingDisabled)
+					GDIsetScalingDisabled(mOldScalingDisabled);
+			#endif
+		}
+	private:
+		qreal				mOldScale;
+		#ifdef iswin32
+			qbool mRestoreScalingDisabled;
+			qbool mOldScalingDisabled;
+		#endif
+	};
+#endif
+// End CRHIRES
+
+/******** object functions *********/
+
+GDIAPI HFONT	OMNISAPI 	GDIcreateFont			( qfnt* pFnt, qsty pSty );
+GDIAPI HFONT	OMNISAPI 	GDIcreateFont			( qfnt* pFnt, qsty pSty, eThemeTextMode pThemeTextMode ); // mpmCarbon11
+GDIAPI HFONT	OMNISAPI 	GDIcreateDcFont		( qfnt* pFnt, qsty pSty, HDC pHdc ); // rmm2797: create a font suitable for a specific DC
+GDIAPI HFONT	OMNISAPI 	GDIcreateDcFont		( qfnt* pFnt, qsty pSty, HDC pHdc, eThemeTextMode pThemeTextMode ); // mpmCarbon11
+GDIAPI HFONT  OMNISAPI	GDIcreateDcFont		( qfnt* pFnt, qsty pSty, HDC pHdc, qdim pDPI ); // rmmhdpi: create a font suitable for a specific DC using a specific DPI to calculate its size
+GDIAPI void		OMNISAPI	GDIdeleteFontsCachedForDc(HDC pHdc);	// rmm8306
+GDIAPI HPEN		OMNISAPI 	GDIcreatePen			( qpen* pPen );
+GDIAPI HPEN		OMNISAPI 	GDIcreatePen			( qdim pWidth = 1, qcol pCol = GDI_COLOR_QFRAME, qpat pPat = patFill );
+GDIAPI HBRUSH	OMNISAPI 	GDIcreateBrush		( qpat pPat );
+
+// pkgradient
+GDIAPI qbool	OMNISAPI	GDIvalidPatternID(qlong x);			// rmm6798: exported
+// pkgradient2
+GDIAPI qbool	OMNISAPI	GDIvalidGradPatternID(qlong x); // rmm6798: exported
+
+// MHUX001 begins
+#if defined(iswin32) || defined(iswin16)
+GDIAPI void		OMNISAPI 	GDIdeleteObject		( HGDIOBJ pObject );
+#else
+GDIAPI void		OMNISAPI 	GDIdeleteObject		( HFONT pObject );
+GDIAPI void		OMNISAPI 	GDIdeleteObject		( HPEN pObject );
+GDIAPI void		OMNISAPI 	GDIdeleteObject		( HBRUSH pObject );
+GDIAPI void		OMNISAPI 	GDIdeleteObject		( HBITMAP pObject ); // MHn0237
+#endif
+// MHUX001 ends.
+
+// PK4901
+#ifdef isXCOMPLIB
+void		OMNISAPI 	GDIdeleteRgn			( qrgn* pRgn );
+#else
+GDIAPI void		OMNISAPI 	GDIdeleteRgn			( qrgn* pRgn );
+#endif
+
+// MHUX001 begins.
+#if defined(iswin32) || defined(iswin16)
+GDIAPI HGDIOBJ	OMNISAPI 	GDIselectObject		( HDC pHdc, HGDIOBJ pObject );
+#else
+GDIAPI HFONT	OMNISAPI 	GDIselectObject		( HDC pHdc, HFONT pObject );
+GDIAPI HPEN		OMNISAPI 	GDIselectObject		( HDC pHdc, HPEN pObject );
+GDIAPI HBRUSH	OMNISAPI 	GDIselectObject		( HDC pHdc, HBRUSH pObject );
+#endif
+// MHUX001 ends.
+
+GDIAPI HBRUSH	OMNISAPI 	GDIgetStockBrush	( qlong pObject );
+GDIAPI HPEN		OMNISAPI 	GDIgetStockPen		( qlong pObject );
+
+/******** general functions ****************/
+
+#if !defined(isiphone)		// pkiphone
+GDIAPI qdmd OMNISAPI GDIsetDrawingMode( HDC pHdc, qdmd pMode );
+#endif
+
+/******** GDI option click support *********/
+typedef void (*GDIoptionClickFunc)( HDC pHdc, qdim pX, qdim pY, qchar* pText, qshort pTextLen );
+
+GDIAPI void			OMNISAPI 	GDIsetOptionClick			( GDIoptionClickFunc pGDIoptionClickFunc, qbool pOn );
+GDIAPI FARPROC 	GDImakeOptionClickProc(GDIoptionClickFunc pGDIoptionClickFunc, HINSTANCE pInstance);	// mt40295	mt40310
+GDIAPI void			GDIdisposeOptionClickProc(FARPROC pProc);		// mt40295
+GDIAPI void			OMNISAPI 	GDIgetOptionClick			( GDIoptionClickFunc& pGDIoptionClickFunc, qbool& pOn ); // PK4625
+GDIAPI qbool		OMNISAPI	GDIisOptionClick			( ); // PK4625
+
+void						GDIcheckPort					( HDC pHdc );
+
+
+/******** clipping functions *********/
+GDIAPI void		OMNISAPI 	GDIsetClipRect				( HDC pHdc, qrect* pRect );
+GDIAPI void		OMNISAPI 	GDIgetClipRect				( HDC pHdc, qrect* pRect );
+GDIAPI void		OMNISAPI 	GDIexcludeClipRect		( HDC pHdc, qrect* pRect );
+GDIAPI void		OMNISAPI 	GDIunionClipRect			( HDC pHdc, qrect* pRect );
+GDIAPI void		OMNISAPI 	GDIintersectClipRect	( HDC pHdc, qrect* pRect );
+
+GDIAPI void		OMNISAPI 	GDIsetClipRgn					( HDC pHdc, qrgn* pRgn );
+GDIAPI void		OMNISAPI 	GDIgetClipRgn					( HDC pHdc, qrgn* pRgn );
+GDIAPI void		OMNISAPI 	GDIexcludeClipRgn			( HDC pHdc, qrgn* pRgn );
+GDIAPI void		OMNISAPI 	GDIunionClipRgn				( HDC pHdc, qrgn* pRgn );
+GDIAPI void		OMNISAPI 	GDIintersectClipRgn		( HDC pHdc, qrgn* pRgn );
+
+void							GDIclearClip					( HDC pHdc );
+
+// rmm_mobile: New class to save and restore clipping - avoids scaling issues
+// rmmhdpi: Added option to construct without HDC
+class GDIsaveClipping
+{
+private:
+	qrgn		mSavedClipRgn;
+	HDC			mHdc;
+	qbool		mSaved;
+public:
+	GDIsaveClipping(HDC pHdc) { save(pHdc); }
+	GDIsaveClipping()
+	{
+		mSaved = qfalse;
+		mHdc = 0;
+	}
+	void save(HDC pHdc)
+	{
+		GDIgetClipRgn(pHdc, &mSavedClipRgn); 
+		mSaved = qtrue; 
+		mHdc = pHdc;
+	}
+	void restore() 
+	{ 
+		if (mSaved) 
+		{ 
+			GDIsetClipRgn(mHdc, &mSavedClipRgn); 
+			mSaved = qfalse; 
+		} 
+	}
+	~GDIsaveClipping() 
+	{ 
+		restore(); 
+	}
+};
+
+/******** cursor/line functions ***************/
+void							GDImoveTo					( HDC pHdc, qdim pXPos, qdim pYPos );
+void							GDImoveTo					( HDC pHdc, qpoint* pPoint );
+GDIAPI void				OMNISAPI 	GDIlineTo					( HDC pHdc, qdim pXPos, qdim pYPos );
+void		OMNISAPI 	GDIlineTo					( HDC pHdc, qpoint* pPoint );
+
+
+/******** rect manipulation **********/
+GDIAPI void		OMNISAPI 	GDIcopyRect				( qrect* pDestRect, qrect* pSrcRect );
+void		OMNISAPI 	GDIinflateRect		( qrect* pRect, qdim pXAmt, qdim pYAmt );
+void		OMNISAPI 	GDIinsetRect			( qrect* pRect, qdim pXAmt, qdim pYAmt );
+void		OMNISAPI 	GDIoffsetRect			( qrect* pRect, qdim pXAmt, qdim pYAmt );
+void		OMNISAPI 	GDIsetRect				( qrect* pRect, qdim pLeft, qdim pTop, qdim pRight, qdim pBottom );
+GDIAPI void			OMNISAPI 	GDIsetRectEmpty		( qrect* pRect );
+GDIAPI qbool		OMNISAPI 	GDIintersectRect	( qrect* pDestRect, qrect* pSrcRect1, qrect* pSrcRect2 );
+GDIAPI qbool		OMNISAPI 	GDIunionRect			( qrect* pDestRect, qrect* pSrcRect1, qrect* pSrcRect2 );
+
+
+/******** rect testing **********/
+GDIAPI qbool							GDIequalRect			( qrect* pRect1, qrect* pRect2 );
+GDIAPI qbool							GDIisRectEmpty		( qrect* pRect );
+GDIAPI qbool							GDIptInRect				( qrect* pRect, qpoint* pPoint );
+
+
+/******** rect drawing ***************/
+GDIAPI void		OMNISAPI 	GDIframeRect			( HDC pHdc, qrect* pRect );
+GDIAPI void 	OMNISAPI 	GDIframeRoundRect	( HDC pHdc, qrect* pRect, qdim pWidthEllipse, qdim pHeightEllipse );
+GDIAPI void		OMNISAPI 	GDIfillRect				( HDC pHdc, qrect* pRect, HBRUSH pBrush );
+GDIAPI void 	OMNISAPI 	GDIfillRoundRect	( HDC pHdc, qrect* pRect, qdim pWidthEllipse, qdim pHeightEllipse, HBRUSH pBrush );
+GDIAPI void		OMNISAPI 	GDIinvertRect			( HDC pHdc, qrect* pRect );
+GDIAPI void		OMNISAPI 	GDIhiliteRect			( HDC pHdc, qrect* pRect );
+
+GDIAPI void		OMNISAPI 	GDIdrawFocusRect	( HDC pHdc, qrect* pRect );
+
+/******** ellipse drawing ************/
+GDIAPI void		OMNISAPI 	GDIframeEllipse		( HDC pHdc, qrect* pRect );
+GDIAPI void		OMNISAPI 	GDIfillEllipse		( HDC pHdc, qrect* pRect, HBRUSH pBrush );
+
+/******** rmm2894: rect drawing - use this for filling rectangles with patterns on printers ********/
+GDIAPI void		OMNISAPI 	GDIfillRectEx			( HDC pHdc, qrect* pRect, HBRUSH pBrush );
+
+/******** region manipulation ********/
+GDIAPI void							GDIrgnAnd									( qrgn* pRgnDest, qrgn* pRgnSrc1, qrgn* pRgnSrc2 );
+GDIAPI void							GDIrgnCopy								( qrgn* pRgnDest, qrgn* pRgnSrc1 );
+GDIAPI void							GDIrgnDiff								( qrgn* pRgnDest, qrgn* pRgnSrc1, qrgn* pRgnSrc2 );
+GDIAPI void							GDIrgnOr									( qrgn* pRgnDest, qrgn* pRgnSrc1, qrgn* pRgnSrc2 );
+GDIAPI void							GDIrgnXor									( qrgn* pRgnDest, qrgn* pRgnSrc1, qrgn* pRgnSrc2 );
+qrgn*										GDIcreateRectRgn					( qdim pLeft, qdim pTop, qdim pRight, qdim pBottom ); // MHn0051 removed GDIAPI.
+qrgn*										GDIcreateRectRgn					( qrect* pRect ); // MHn0051 removed GDIAPI.
+GDIAPI qrgn*						GDIcreateRoundRectRgn			( qdim pLeft, qdim pTop, qdim pRight, qdim pBottom, qdim pWidthEllipse, qdim pHeightEllipse );
+GDIAPI qrgn*						GDIcreatePolyRgn					( qpoint* pPoints, qshort pNumPoints );
+GDIAPI void							GDIgetRgnBox							( qrgn* pRgn, qrect* pRect );
+GDIAPI void							GDIoffsetRgn							( qrgn* pRgn, qdim pXAmt, qdim pYAmt );
+GDIAPI void							GDIsetRectRgn							( qrgn* pRgn, qdim pLeft, qdim pTop, qdim pRight, qdim pBottom );
+GDIAPI void							GDIsetRectRgn							( qrgn* pRgn, qrect* pRect );
+
+
+/******** region testing *************/
+GDIAPI qbool							GDIequalRgn								( qrgn* pRgn1, qrgn* pRgn2 );
+GDIAPI qbool							GDIptInRegion							( qrgn* pRgn, qdim pXPos, qdim pYPos );
+GDIAPI qbool							GDIptInRegion							( qrgn* pRgn, qpoint* pPoint );
+GDIAPI qbool		OMNISAPI 	GDIrectInRegion						( qrgn* pRgn, qrect* pRect );
+
+
+/******** region drawing *************/
+GDIAPI void		OMNISAPI 	GDIframeRgn								( HDC pHdc, qrgn* pRgn, HBRUSH pBrush );
+GDIAPI void		OMNISAPI 	GDIfillRgn								( HDC pHdc, qrgn* pRgn, HBRUSH pBrush );
+GDIAPI void							GDIinvertRgn							( HDC pHdc, qrgn* pRgn );
+GDIAPI void		OMNISAPI 	GDIhiliteRgn							( HDC pHdc, qrgn* pRgn );
+
+/******** polygon drawing *************/
+GDIAPI void		OMNISAPI 	GDIframePoly							( HDC pHdc, qpoint* pPoints, qshort pNumPoints );
+GDIAPI void		OMNISAPI 	GDIfillPoly								( HDC pHdc, qpoint* pPoints, qshort pNumPoints );
+
+//pkcocoa_1194
+/******** alpha based arcs and clips *************/
+GDIAPI void OMNISAPI GDIclipEllipse(HDC pHdc, qrect pClipR);
+GDIAPI void OMNISAPI GDIdrawArc(HDC pHdc, qdim x, qdim y, qdim radius, qreal start_angle, qreal end_angle, qdim penWid, qcol color, qbyte alpha );
+
+/******** color functions ***********/
+GDIAPI qcol		OMNISAPI 	GDIgetRealColor			( qcol pCol );							// gdi.cp
+GDIAPI void		OMNISAPI 	GDIsetBkColor				( HDC pHdc, qcol pColor );
+GDIAPI qcol		OMNISAPI 	GDIgetBkColor				( HDC pHdc );
+GDIAPI void		OMNISAPI 	GDIsetTextColor			( HDC pHdc, qcol pColor );
+GDIAPI qcol		OMNISAPI 	GDIgetTextColor			( HDC pHdc );
+// Start rmm_nc: calls which only apply to HDC's created using GDIcreateAlphaScreenDC
+GDIAPI qbyte OMNISAPI	GDIgetTextColorAlpha( HDC pHdc );								// Get alpha component of text color
+GDIAPI qbyte OMNISAPI	GDIsetTextColorAlpha( HDC pHdc, qbyte pAlpha );	// Set alpha component of text color; returns previous text alpha
+GDIAPI qbyte OMNISAPI	GDIgetBkColorAlpha( HDC pHdc );									// Get alpha component of background color
+GDIAPI qbyte OMNISAPI	GDIsetBkColorAlpha( HDC pHdc, qbyte pAlpha );		// Set alpha component of background color; returns previous background alpha
+// End rmm_nc
+qcol		OMNISAPI 	GDIgetLighterShade	( qcol pCol ); 							// gdi.cp
+qcol		OMNISAPI 	GDIgetDarkerShade		( qcol pCol ); 							// gdi.cp
+
+/******** pixel functions ***********/									// PK4200
+#ifdef isCOCOA  //CRCOCOA : allow fractional points for HIRes and option to set all pixels at point
+GDIAPI void 		OMNISAPI 	GDIsetPixel( HDC pHdc, qreal pX, qreal pY, qcol pCol, qbool fillPoint = qtrue);
+GDIAPI qcol 		OMNISAPI 	GDIgetPixel( HDC pHdc, qreal pX, qreal pY );
+GDIAPI void 		OMNISAPI 	GDIfloodFill(HDC pHdc, qreal pX, qreal pY, qcol pCol );
+#endif
+
+// CRCOCOA3 : enabled these for backward compatibility
+GDIAPI void 		OMNISAPI 	GDIsetPixel( HDC pHdc, qdim pX, qdim pY, qcol pCol);
+GDIAPI qcol 		OMNISAPI 	GDIgetPixel( HDC pHdc, qdim pX, qdim pY );
+GDIAPI void 		OMNISAPI 	GDIfloodFill(HDC pHdc, qdim pX, qdim pY, qcol pCol );
+
+/******** push button functions **************/
+GDIAPI void		OMNISAPI 	GDIinflateButtonRect( qrect* pRect, qshort pFaceType ); // mpm4016
+GDIAPI void		OMNISAPI 	GDIinsetButtonRect( qrect* pRect, qshort pFaceType ); // mpm4028c
+
+GDIAPI void		OMNISAPI 	GDIdrawSystemPushButton( HDC pHdc, qrect* pRect, qcol pBorderColor, qpat pFacePat, qcol pFaceFColor, qcol pFaceBColor, qcol pTextColor, qulong pDrawFlags );
+GDIAPI void		OMNISAPI 	GDIdrawSystem3dPushButton( HDC pHdc, qrect* pRect, qcol pBorderColor, qcol pFaceColor, qulong pDrawFlags );
+GDIAPI void		OMNISAPI 	GDIdraw3dPushButton( HDC pHdc, qrect* pRect, qcol pBorderColor, qcol pFaceColor, qulong pDrawFlags );
+GDIAPI void		OMNISAPI 	GDIdrawHeadingButton( HDC pHdc, qrect* pRect, qcol pBorderColor, qcol pFaceColor, qulong pDrawFlags );
+GDIAPI void		OMNISAPI 	GDIdrawComboButton( HDC pHdc, qrect* pRect, qulong pDrawFlags ); 
+GDIAPI void		OMNISAPI 	GDIdrawSystemPopup( HDC pHdc, qrect* pRect, qcol pDeadColor, qulong pDrawFlags ); // PK4625
+
+
+/******** font functions ****************/
+GDIAPI void		OMNISAPI 	GDIsetFontName	( qfnt* pFnt, qchar *pFontName, qshort pLen );	// mtStyle // mt40244
+GDIAPI qshort	OMNISAPI	GDIgetFontName 	( qfnt* pFnt, qchar *pBuffer, qshort pMaxLen );	// mt40224
+
+GDIAPI void							GDIsetFontNumber	( qfnt* pFnt, qshort pFontNumber ); // mpmPRI
+GDIAPI qshort						GDIgetFontNumber	( qfnt* pFnt );											// mpmPRI
+
+GDIAPI qbool		OMNISAPI 	GDIfontDecSize		( qfnt* pFnt );
+GDIAPI qbool		OMNISAPI 	GDIfontIncSize		( qfnt* pFnt );
+
+GDIAPI void							GDIfontSetSize		( qfnt* pFnt, qshort pSize );
+GDIAPI void							GDIfontSetExtra		( qfnt* pFnt, qshort pExtra );
+
+GDIAPI qshort						GDIfontGetSize		( qfnt* pFnt );
+GDIAPI qshort						GDIfontGetExtra		( qfnt* pFnt );
+
+GDIAPI qbool	OMNISAPI 	GDIfontIsTrueType	( qfnt* pFnt, qbool pIsPrinter );
+GDIAPI qbool	OMNISAPI 	GDIfontIsReal			( qfnt* pFnt );
+GDIAPI qdim		OMNISAPI 	GDIfontHeight			( qfnt* pFnt );
+
+GDIAPI qbool	OMNISAPI 	GDIfontIsTrueType	( HDC pHdc, qbool pIsPrinter );
+GDIAPI qbool	OMNISAPI 	GDIfontIsReal			( HDC pHdc );
+GDIAPI qdim		OMNISAPI 	GDIfontHeight			( HDC pHdc, qshort pExtra = 0 );
+
+GDIAPI qdim 	OMNISAPI 	GDIfontPart				( HDC pHdc, eGDIfontPart pFontPart );
+GDIAPI qdim 	OMNISAPI 	GDIfontPart				( qfnt* pFnt, qsty pSty, eGDIfontPart pFontPart );
+
+GDIAPI void		OMNISAPI	GDIgetGenFont(qfnt *pFnt);	// rmm_mobile: retrieve the standard general font for the system
+
+/******** text functions ****************/
+GDIAPI qdim		OMNISAPI 	GDIcharWidth			( HDC pHdc, qchar pChar );
+GDIAPI qdim		OMNISAPI 	GDItextWidth			( HDC pHdc, qchar *pText, qshort pTextLen );
+
+GDIAPI qdim							GDIcharWidth			( qchar pChar );
+GDIAPI qdim							GDItextWidth			( qchar *pText, qshort pTextLen );
+
+#if !defined(isiphone)		// pkiphone
+GDIAPI qdim		OMNISAPI 	GDIcharWidth			( qchar pChar, GDItextSpecStruct* pTextSpec );
+GDIAPI qdim		OMNISAPI 	GDItextWidth			( qchar *pText, qshort pTextLen, GDItextSpecStruct* pTextSpec );
+#endif
+
+GDIAPI void		OMNISAPI 	GDIdrawText				( HDC pHdc, qchar* pText, qshort pTextLen );
+GDIAPI void		OMNISAPI 	GDIdrawText				( HDC pHdc, qdim pX, qdim pY, qchar* pText, qshort pTextLen, qjst pJst );
+GDIAPI qbool	OMNISAPI 	GDIdrawTextJst		( GDIdrawTextStruct* pTextStruct ); // mpm4080b // rmm1890a	PK4622
+GDIAPI qbool	OMNISAPI	GDIdrawTextJstAlpha( GDIdrawTextStruct* pTextStruct, qbool pSupIcons = 0, qbool pSupText = 0, qbool* pHasAlpha = 0 ); // pkisalpha7a // rmm6484
+GDIAPI qdim 	OMNISAPI 	GDItextWidthJst		( GDIdrawTextStruct* pTextStruct );	// AE5246
+#if !defined(isiphone)		// pkiphone
+GDIAPI void		OMNISAPI	GDIstartText( HDC pHdc, GDItextSpecStruct* pTextSpec, HDC pFontHdc = 0 ); // rmm2797	// rmm6736: now exported
+GDIAPI void		OMNISAPI	GDIendText( HDC pHdc,GDItextSpecStruct* pTextSpec);																		// rmm6736: now exported
+GDIAPI qdim		OMNISAPI	GDIcalcJstEscLen(qchar* pText,qlong pLen,qbool pIsAscii);															// rmm6736: now exported
+GDIAPI qlong	OMNISAPI	GDIstripAsciiEscapes(qchar *pText, qlong pLen);	// rmm_rd
+GDIAPI qdim 	OMNISAPI 	GDItextWidthTS(qchar* pText, qshort pTextLen, GDItextSpecStruct* pTextSpec, HDC pFontHdc = 0); // AE6341 // rmmhdpi: added pFontHdc
+#endif
+GDIAPI qlong	OMNISAPI	GDIaddDataToJstText(qbyte *pData, qlong pDataLen, qchar *pOutputText);
+GDIAPI qshort	OMNISAPI 	GDItextBox				( HDC pHdc, qrect *pRect, qchar *pText, qshort *pTextLen, qshort pBufLen, qjst pJst, qbool pDraw = qtrue );	// rmm1429
+
+GDIAPI void		OMNISAPI 	GDIhiliteTextStart( HDC pHdc, qrect* pRect, qcol pTheTextColor );
+GDIAPI void		OMNISAPI 	GDIhiliteTextStartEx( HDC pHdc, qrect* pRect, qcol pTheTextColor, qcol pHiliteTextColor ); // rmm4487
+GDIAPI void 	OMNISAPI 	GDIhiliteTextEnd	( HDC pHdc, qrect* pRect, qcol pTheTextColor );
+
+/******** bitmap/icon functions *******/
+GDIAPI HBITMAP				OMNISAPI GDIcreateBitmap				( qdim pWidth, qdim pHeight, qbyte pDepth, HDC pHdc = 0 ); // rmm1534
+GDIAPI void						OMNISAPI GDIdeleteBitmap				( HBITMAP pBitmap );
+GDIAPI HBITMAP				OMNISAPI GDIselectBitmap				( HDC pHdc, HBITMAP pBitmap );
+GDIAPI HBITMAP				OMNISAPI GDIcreateBitmapEx			( qdim pWidth, qdim pHeight, qbyte pDepth, HDC pHdc = 0 ); // pkalpha
+
+// Start CRHIRES : add scale for source bitmaps ( currently only used for COCOA )
+#if defined(isCOCOA) || defined(isXCOMPLIB)	// CRHIRES
+GDIAPI void					OMNISAPI GDIdrawBitmapChisel		( HDC pHdc, HBITMAPMASK pBitmapChisel, qrect* pSrcRect, qrect* pDestRect, qbool pStretch, qreal pSrcScale = 0 );
+#elif !defined(isGDIPLUS)	// Not needed by xgdiplus.cpp (will not compile as xgdiplus.cpp undefs NO_STRICT)
+GDIAPI void					OMNISAPI GDIdrawBitmapChisel		( HDC pHdc, HBITMAPMASK pBitmapChisel, qrect* pSrcRect, qrect* pDestRect, qbool pStretch );
+
+inline GDIAPI void					OMNISAPI GDIdrawBitmapChisel		( HDC pHdc, HBITMAPMASK pBitmapChisel, qrect* pSrcRect, qrect* pDestRect, qbool pStretch, qreal pSrcScale) { GDIdrawBitmapChisel(pHdc, pBitmapChisel, pSrcRect, pDestRect, pStretch); }
+#endif
+
+#if defined(isCOCOA) || defined(isXCOMPLIB) || defined(iswin32)	// CRHIRES // rmmhdpi
+GDIAPI void					OMNISAPI GDIdrawBitmap					( HDC pHdc, HBITMAP pBitmap, HBITMAPMASK pBitmapMask, qrect* pSrcRect, qrect* pDestRect, qbool pStretch, qreal pSrcScale = 0 );
+GDIAPI qbool				OMNISAPI GDIdrawAlphaBitmap			( HDC pHdc, HBITMAP pBitmap, qrect* pSrcRect, qrect* pDestRect, qbool pFlags, qreal pSrcScale = 0 ); // rmm_nc
+#elif !defined(isGDIPLUS)	// Not needed by xgdiplus.cpp (will not compile as xgdiplus.cpp undefs NO_STRICT)
+GDIAPI void					OMNISAPI GDIdrawBitmap					( HDC pHdc, HBITMAP pBitmap, HBITMAPMASK pBitmapMask, qrect* pSrcRect, qrect* pDestRect, qbool pStretch );
+GDIAPI qbool				OMNISAPI GDIdrawAlphaBitmap			( HDC pHdc, HBITMAP pBitmap, qrect* pSrcRect, qrect* pDestRect, qbool pFlags ); // rmm_nc
+inline GDIAPI void	OMNISAPI GDIdrawBitmap					( HDC pHdc, HBITMAP pBitmap, HBITMAPMASK pBitmapMask, qrect* pSrcRect, qrect* pDestRect, qbool pStretch, qreal pSrcScale ) { GDIdrawBitmap(pHdc, pBitmap, pBitmapMask, pSrcRect, pDestRect, pStretch); }
+inline GDIAPI qbool	OMNISAPI GDIdrawAlphaBitmap			( HDC pHdc, HBITMAP pBitmap, qrect* pSrcRect, qrect* pDestRect, qbool pFlags, qreal pSrcScale ) { return GDIdrawAlphaBitmap(pHdc, pBitmap, pSrcRect, pDestRect, pFlags); }
+#endif
+// End CRHIRES
+// Start rmm_nc: flags for GDIdrawAlphaBitmap and GDIdrawBitmap
+const qbool GDI_DRAW_ALPHA_BITMAP_FLAG_STRETCH	= 0x1,
+						GDI_DRAW_BITMAP_FLAG_STRETCH = 0x1,		// rmm_win7
+						GDI_DRAW_ALPHA_BITMAP_FLAG_ALREADY_PREMULTIPLIED = 0x2,
+						GDI_DRAW_BITMAP_FLAG_NOMASK = 0x4;		// rmm_win7
+// End rmm_nc
+GDIAPI void					OMNISAPI GDIcopyBits						( HDC pSrcDC, HDC pDestDC, qrect* pSrcRect, qrect* pDestRect, qbool pStretch );
+
+// Start CRHIRES : add scale for source bitmaps ( currently only used for COCOA )
+#if defined(isCOCOA) || defined(isXCOMPLIB)	// CRHIRES
+GDIAPI void						OMNISAPI GDIhiliteBitmap				( HDC pHdc, HBITMAPMASK pBitmapMask, qrect* pSrcRect, qrect* pDestRect, qcol pHiliteCol, qbool pStretch=qfalse, qreal pSrcScale = 0 );
+#elif !defined(isGDIPLUS)	// Not needed by xgdiplus.cpp (will not compile as xgdiplus.cpp undefs NO_STRICT)
+GDIAPI void						OMNISAPI GDIhiliteBitmap				( HDC pHdc, HBITMAPMASK pBitmapMask, qrect* pSrcRect, qrect* pDestRect, qcol pHiliteCol, qbool pStretch=qfalse );	// rmm1345 mt40270
+inline GDIAPI void		OMNISAPI GDIhiliteBitmap				( HDC pHdc, HBITMAPMASK pBitmapMask, qrect* pSrcRect, qrect* pDestRect, qcol pHiliteCol, qbool pStretch, qreal pSrcScale) { GDIhiliteBitmap(pHdc, pBitmapMask, pSrcRect, pDestRect, pHiliteCol, pStretch); }
+#endif
+// End CRHIRES
+
+GDIAPI HBITMAPMASK		OMNISAPI GDImaskFromBitmap			( HDC pHdc, qdim pWidth, qdim pHeight, qcol pTransColor = colWhite );	// rmm1347	mt40261
+GDIAPI void						OMNISAPI GDImakeMask 						( HDC pHdc, qrect *pSrcRect, HBITMAPMASK pBitmapMask, qrect *pDestRect, qcol pTransColor = colWhite );	// mt40368
+GDIAPI qbool					OMNISAPI GDIdrawIcon						( HDC pHdc, qshort pIconId, qrect* pRect, qbool pStretch, qbool pCanDraw ); // mpm4086
+
+GDIAPI qbool					OMNISAPI GDIhasAlphaSupport();	// pkisalpha
+
+GDIAPI void						GDIgetBitmapBounds( HBITMAP pBitmap, qrect* pBounds ); // mpmPRI
+
+/********* screen functions ********/
+GDIAPI qdim	OMNISAPI 	GDIrestrictScreenRect( qshort pEdge, qdim pWidth );
+GDIAPI qdim	OMNISAPI 	GDIgetScreenRestriction( qshort pEdge );
+GDIAPI void	OMNISAPI 	GDIgetScreenRect( qulong pFlags, qrect* pRect );
+#ifdef isCOCOA        //CRCOCOA : added DC to get resolution of associated screen/display
+GDIAPI void						GDIgetScreenResolution( qdim* pHorz, qdim* pVert, HDC pHdc = NULL);
+#else
+GDIAPI void						GDIgetScreenResolution( qdim* pHorz, qdim* pVert );
+#endif
+GDIAPI qbool	OMNISAPI 	GDIptInScreen( qulong pFlags, qpoint* pPoint );
+qdim						GDIgetMenubarHeight();
+qdim						GDIgetDockHeight();	// rmm9737: Returns height of dock on main screen for macOS (always returns zero for other platforms)
+
+GDIAPI void OMNISAPI 	GDIdragBitmapMove( HBITMAP pDragBitmap , HBITMAPMASK pDragMask, HBITMAP pScreenBitmap, qrect *pSrcRect, qrect *pDestRect );
+GDIAPI void OMNISAPI 	GDIdragBitmapToScreen( HBITMAP pDragBitmap , HBITMAPMASK pDragMask, qrect *pDestRect );
+GDIAPI void OMNISAPI 	GDIdragBitmapFromScreen( HBITMAP pScreenBitmap, qrect *pSrcRect );
+
+GDIAPI void*	OMNISAPI	GDIoffscreenPaintBeginOS9( void* pOffscreenPaintInfo, HDC *pHdc, qrect *pRect, qrect *pUpdateRect ); // mpmCarbon3 // MHn0368
+GDIAPI void*	OMNISAPI	GDIoffscreenPaintBegin( void* pOffscreenPaintInfo, HDC& pHdc, qrect& pRect, qrect& pUpdateRect, qbool pDisableDefault=qfalse ); // pkcocoa_1084 mpmCarbon3
+GDIAPI void		OMNISAPI	GDIoffscreenPaintEnd( void* pOffscreenPaintInfo, qbool pDisableDefault=qfalse ); // mpmCarbon3
+/************ Cursor Functions ************/
+
+GDIAPI HCURSOR OMNISAPI 		GDIcreateCursor ( qpoint *pHotSpot, HBITMAP pColor, HBITMAPMASK pMask, HDC pHdc=NULL );	// mt40338
+GDIAPI void OMNISAPI				GDIdeleteCursor ( HCURSOR pCursor ); // rmm2758
+// Start rmm_mobile
+class GDIdisableScaling
+{
+private:
+	qbool		mOldValue;
+	qbool		mDone;
+public:
+	// Start rmmhdpi
+	#ifdef iswin32
+		GDIdisableScaling() { mOldValue = GDIsetScalingDisabled(qtrue); mDone = qfalse;  }
+		~GDIdisableScaling() { done(); }
+		void done() 
+		{
+			if (!mDone)
+			{
+				GDIsetScalingDisabled(mOldValue);
+				mDone = qtrue;
+			}
+		}
+	#else
+		GDIdisableScaling() {}
+		~GDIdisableScaling() {}
+		inline void done() {;}
+	#endif
+	// End rmmhdpi
+};
+// End rmm_mobile
+
+// Start rmmhdpi
+#ifdef isOMNISCORE
+	class GDIpreferOnscreenPaint
+	{
+	public:
+		GDIpreferOnscreenPaint()
+		{
+			mSaved = smOnscreenPaintPreferred;
+			smOnscreenPaintPreferred = qtrue;
+		}
+		~GDIpreferOnscreenPaint()
+		{
+			smOnscreenPaintPreferred = mSaved;
+		}
+		static qbool onScreenPaintPreferred() 
+		{ 
+			return smOnscreenPaintPreferred;
+		}
+	private:
+		qbool mSaved;
+		static qbool smOnscreenPaintPreferred;
+	};
+#endif
+// End rmmhdpi
+
+// Start rmm8714: Base class for color configuration items
+#ifdef isOMNISCORE
+	class GDIcolorBase
+	{
+	public:
+		enum eColorSet // rmm9688: Added eColorSet, and added a parameter of this type to various methods in GDIcolor
+		{
+			eTopLevel,	// Used for window options (where there is no grouping)
+			eSetSystem,
+			eSetDropList,
+			eSetEdit,
+			eSetIDE,
+			eSetGroupBox,
+			eSetHeader,
+			eSetList,
+			eSetGeneralButton,
+			eSetMenu,
+			eSetPagePreview,
+			eSetTabPane,
+			eSetToolbar,
+			eSetTooltip,
+			eSetMethodSyntax,
+			eSetMethodEditor,
+			eSetPushButton,
+			eSetCheckRadio,
+			eSetTree,
+			eSetScrollbar,
+			eSetCount,							// The number of sets
+			eSetFirst = eSetSystem	// The first set (used when converting old theme files)
+		};
+
+		GDIcolorBase()
+		{
+			mColor = mDefaultColor = 0;
+		}
+		virtual ~GDIcolorBase() {}
+		virtual void set(eColorSet pOptionSet, const char *pOptionName, qcol pDefaultColor) = 0;
+		qcol color()
+		{
+			return (GDI_COLOR_QDEFAULT == mColor) ? mDefaultColor : mColor;
+		}
+		qcol defaultColor()
+		{
+			return mDefaultColor;
+		}
+
+		qbool isOption(const char *pOptionName);
+	protected:
+		qcol				mColor;
+		const char	*mOptionName;
+		qcol				mDefaultColor;
+	};
+
+	// GDI color configuration item
+	class str255;
+	struct fldval; // rmm9018
+	// rmm8745: information about value to draw when picker value is GDI_COLOR_QDEFAULT
+	struct PUSHdefaultPickerValue
+	{
+		qbool		mIsSet;		// qtrue when the values in this structure are significant
+		qbool		mValueIsTheme;
+		// Used when mValueIsTheme is qfalse
+		qcol		mColor;
+		// The remaining fields are used when mValueIsTheme is qtrue
+		qulong	mThemeType;
+		qulong	mThemeFlags;
+	};
+
+	typedef std::unordered_map<int, std::vector<std::string> *> GDIcolorSetMap;
+	class GDIcolor : public GDIcolorBase
+	{
+	public:
+		GDIcolor() : GDIcolorBase()
+		{
+			mIsSet = qfalse;
+		}
+		virtual ~GDIcolor() {}
+		virtual void set(eColorSet pOptionSet, const char *pOptionName, qcol pDefaultColor);
+		qbool getColor(qcol &pColor);
+		qbool isDefault();	// rmm8745
+
+		static qcol getColorFromOptions(eColorSet pOptionSet, const char *pOptionName);
+		static void getDefaultValue(const char *pOptionName, PUSHdefaultPickerValue &pDefaultValue); // rmm8745
+		static void getAppearanceJsonPath(str255 &pPath);
+		static qbool setColors(str255 *pPath = 0); // rmm_emat
+		static qbool setColors(lsttype *pColorsRow);
+		#if !defined(isunix)
+			static qbool setColors(qbool pDefault);
+		#endif
+		static void	 setColorsToDefaultTheme();	// rmm_emat
+		static qbool getColor(int pIndex, qcol &pColor);
+		static qbool getColorsRow(fldval &pFval);
+		static void	 restoreColorsRow(lsttype *pRow);	// rmm_emat
+		static void	 setColorsFromAppearanceRowWithoutRedrawing() { doSetColors(qfalse); }	// rmm_emat
+		// Start rmm8745
+		static void setOmnisColorsToDefault();
+		static qcol getRealDefaultColor(qcol pColor);
+		static qcol getOmnisColor(qcol pOmnisColor);
+		static qbool allColorsAreDefault(qcol *pColors);
+		static qbool isDefault(qcol pCol);
+		static fldval *getOptionFvalp(eColorSet pOptionSet, const char *pOptionName);
+		static qlong getIconIdFromOptions(eColorSet pOptionSet, const char *pOptionName, qlong pDefaultIconId);
+		static qbool getBooleanFromOptions(eColorSet pOptionSet, const char *pOptionName, qbool pDefaultValue);
+		static qsty getStyleFromOptions(eColorSet pOptionSet, const char *pOptionName, qsty pDefaultValue = styPlain);
+		#ifdef iswin32
+			// Control drawing when not using the default operating system theme
+			static qbool drawThemeTabPane(HDC pHdc, qulong pFlags, RECT &pRect);
+			static qbool drawThemeExplorerListView(HDC pHdc, qulong pFlags, RECT &pRect);
+			static qbool drawThemeHeader(HDC pHdc, qulong pFlags, RECT &pRect, qcol pArrowColor = colNone, qbool pSmallArrow = qtrue, qbool pSharpArrow = qfalse); // rmm8816
+			static qbool drawThemePushButton(HDC pHdc, qulong pFlags, RECT &pRect, qbool pIsComboBox, qbool pFill = qtrue, qcol pBorderColor = GDI_COLOR_QDEFAULT, qbool IsBorderFill = qfalse, qbool pBorderTopLeft = qfalse); // rmm9790
+			static qbool drawThemePushButtonBorder(HDC pHdc, qulong pFlags, RECT &pRect);
+			static qbool drawThemeCheckRadio(HDC pHdc, qulong pFlags, RECT &pRect, qbool pIsCheckBox);
+			static qbool drawThemeTree(HDC pHdc, qulong pFlags, RECT &pRect);
+			static qbool drawThemeBorder(HDC pHdc, RECT &pRect, qcol pColor);
+			static qbool drawThemeToolbarButton(HDC pHdc, qulong pFlags, RECT &pRect);
+			static qbool drawHierarchicalMenuIndicator(HDC pHdc, RECT &pMenuLineRect, qbool pEnabled);	// rmm8828 // rmm8841
+		#else
+			static qbool drawThemeTabPane(HDC pHdc, qulong pType, qulong pFlags, qrect &pRect);
+			static void drawThemePushButton(HDC pHdc, qulong pFlags, CGRect &pRect, qcol pBorderColor = 0, qpat pFacePat = patFill, qcol pFaceFColor = 0, qcol pFaceBColor = 0, qbool pForComboBox = qfalse, qbool pCanInset = qtrue, qbool pDownArrow = qfalse, qbool pBevelAllowed = qtrue); // rmm8805
+			static void drawThemeCheckRadio(HDC pHdc, qulong pFlags, qrect &pRect, qbool pIsCheckBox);
+			static void drawThemeComboBox(HDC pHdc, qrect &pRect, qbool pButtonDown, qbool pDisabled, qbool pShowFocus, qbool pIsDropList);
+			static void drawArrows(HDC pHdc, CGRect &pRect, qbool pDisabled, qbool pIsDropList, qbool pUseRectDirectly = qfalse, qcol pEnabledArrowColor = GDI_COLOR_QDEFAULT);
+			static void drawThemeTree(HDC pHdc, qulong pFlags, CGRect &pRect);
+		#endif
+		// Start rmm8841
+		static HBITMAP getTabPaneLeftArrow(qbool pEnabled) { return pEnabled ? smTabPaneLeftArrowEnabled : smTabPaneLeftArrowDisabled; }
+		static HBITMAP getTabPaneRightArrow(qbool pEnabled) { return pEnabled ? smTabPaneRightArrowEnabled : smTabPaneRightArrowDisabled; }
+		#if defined(iswin32) && !defined(isunix)
+			static HBITMAP getToolbarOverflow(qbool pEnabled) { return pEnabled ? smToolbarOverflowEnabled : smToolbarOverflowDisabled; }
+		#endif
+		#ifndef isunix
+			static void drawAlphaBitmapCentered(HDC pHdc, HBITMAP pAlphaBitmap, qrect &pRect, qdim pWidth = 16, qdim pHeight = 16);
+		#endif
+		// End rmm8841
+		static void buildBitmaps();	// rmm8841 // rmm8879: Made public
+		static void freeAppearanceList();	// rmm9123
+
+		static qbool smSettingAppearance;
+		
+		static qbool smDefaultTabPane;
+		static qbool smDefaultListLine;
+		static qbool smDefaultHeader;
+		static qbool smDefaultPushButton;
+		static qbool smFlashPushButtonInDefaultState;
+		static qbool smDefaultCheckRadio;
+		static qbool smDefaultTree;
+		static qbool smDefaultScrollBar;	// rmm8816
+		static qbool smDisableDockingAreaGradient;	// rmm9272
+		static qbool smDisableWindowsDroplistThemeForUserWindows;	// rmm9287
+		// Start rmm9712
+		static qbool smUseAlternateLineColorsOnMac;
+		static qbool smUseAlternateLineColorsOnWindows;
+		// End rmm9712
+		// End rmm8745
+		static void buildArrowBitmap(HBITMAP &pBitmap, qpoint *pPts, qshort pPtCount, qcol pColor); // rmm8841 // rmm8941: Made public
+		static qbool maybeConvertThemeFile(fldval &pPath);	// rmm9688
+	protected:
+		static GDIcolor smGDIcolors[COLOR_MAX + 1]; // rmm8745: +1 to match GDIsysColArr
+		static lsttype *smAppearance;
+		// Start rmm9688
+		static lsttype *smSetRows[eSetCount];							// Array indexed by eColorSet. Each member is the row containing values for the set
+		static std::vector<std::string> smSetNames;				// Vector of set names, indexed by eColorSet
+		static GDIcolorSetMap smSetMap;										// Map used when converting theme file
+		static qbool smBuildingSetMap;										// qtrue when building the set map
+		// End rmm9688
+	private:
+		static void doSetColors(qbool pCanRedraw = qtrue); // rmm_emat
+		static void doSetColor(eColorSet pOptionSet, const char *pOptionName, qcol pColor);
+		static void setRows();	// rmm9688
+		qbool mIsSet;
+
+		// Start rmm8841
+		static HBITMAP smTabPaneLeftArrowEnabled;			
+		static HBITMAP smTabPaneRightArrowEnabled;		
+		static HBITMAP smTabPaneLeftArrowDisabled;
+		static HBITMAP smTabPaneRightArrowDisabled;
+		#if defined(iswin32) && !defined(isunix)
+			static HBITMAP smToolbarOverflowEnabled;
+			static HBITMAP smToolbarOverflowDisabled;
+			static void buildToolbarOverflowBitmap(HBITMAP &pBitmap, qcol pColor);
+		#endif
+		// End rmm8841
+	};
+
+	// rmm_emat: Class to switch colors to their default values while printing classes
+	class GDIswitchColorsToDefault
+	{
+	public:
+		GDIswitchColorsToDefault();
+		~GDIswitchColorsToDefault();
+
+		lsttype *mSavedColorsRow;
+	};
+#endif	// #ifdef isOMNISCORE
+// End rmm8714
+
+//pkcocoa_1205
+//pkcocoa_1212
+const qshort GDI_COLOR_NOALPHA              = -1;
+inline qshort GDI_GETALPHA(qshort alpha) { return alpha==GDI_COLOR_NOALPHA ? 255 : alpha; }
+
+#ifdef isOMNISCORE
+	void GDIsetFldvalColorAndAlpha(fldval& fval1, qcol pColor, qlong pAlpha);
+	qbool GDIgetFldvalColorAndAlpha(fldval& fval1, qcol& col, qlong& alpha);
+#else
+	void GDIsetFldvalColorAndAlpha(EXTfldval& fval1, qcol pColor, qlong pAlpha);
+	qbool GDIgetFldvalColorAndAlpha(EXTfldval& fval1, qcol& col, qlong& alpha);
+#endif
+qbool GDIcolorAndAlphaFromLong64(qulong64& col64,qcol& col,qlong& alpha);
+const qulong GDI_COLOR_HAS_ALPHA = 0x10000000;	// rmm_rd
+
+#ifdef iswin32
+	GDIAPI qrgn * OMNISAPI GDIallocQRGN();	// rmm6409
+#endif
+
+#pragma SET_RETURN_REGISTER_OFF
+
+//############################ Inlines #################################
+
+// include inlines for functions
+#if defined(isiphone)		// pkiphone
+	inline void   GDIignore(const void* a1) 	// used to avoid 'unused parameter' warnings	//CR0037
+	{
+		#pragma unused (a1)
+	}
+#else
+#include "xgdiinl.hi"
+#endif
+
+/******** color functions ***********/
+
+#pragma SET_RETURN_REGISTER_ON
+
+inline qcol OMNISAPI GDIgetLighterShade( qcol pCol )
+{
+	pCol = GDIgetRealColor( pCol );	 // PK4039
+	return ((pCol << 1) | 0x00010101L) & 0x00FFFFFFL;
+}
+
+
+inline qcol OMNISAPI GDIgetDarkerShade( qcol pCol )
+{
+	pCol = GDIgetRealColor( pCol );	 // PK4039
+	return (pCol >> 1) & 0x007F7F7FL;
+}
+
+
+#pragma SET_RETURN_REGISTER_OFF
+
+
+/******** qpen ******************************/
+
+inline qpen::qpen() : mWidth(1), mPat(patFill), mColor(colBlack), mIsHairLine(qfalse)
+{
+}
+
+
+inline qpen::qpen( qpen* pPen ) : mWidth(pPen->mWidth), mPat(pPen->mPat), mColor(pPen->mColor), mIsHairLine(pPen->mIsHairLine)
+{
+}
+
+inline qpen::qpen( qdim pWidth, qcol pColor, qpat pPat, qbool pIsHairLine )
+						: mWidth(pWidth), mPat(pPat), mColor(pColor), mIsHairLine(pIsHairLine)
+{
+}
+
+
+#pragma SET_RETURN_REGISTER_ON
+
+inline void OMNISAPI GDIinflateRect( qrect* pRect, qdim pXAmt, qdim pYAmt )
+{
+	pRect->top -= pYAmt;
+	pRect->bottom += pYAmt;
+	pRect->left -= pXAmt;
+	pRect->right += pXAmt;
+}
+
+
+inline void OMNISAPI GDIinsetRect( qrect* pRect, qdim pXAmt, qdim pYAmt )
+{
+	pRect->top += pYAmt;
+	pRect->bottom -= pYAmt;
+	pRect->left += pXAmt;
+	pRect->right -= pXAmt;
+}
+
+
+inline void OMNISAPI GDIoffsetRect( qrect* pRect, qdim pXAmt, qdim pYAmt )
+{
+	pRect->top += pYAmt;
+	pRect->bottom += pYAmt;
+	pRect->left += pXAmt;
+	pRect->right += pXAmt;
+}
+
+
+inline void OMNISAPI GDIsetRect( qrect* pRect, qdim pLeft, qdim pTop, qdim pRight, qdim pBottom )
+{
+	pRect->left = pLeft;
+	pRect->top = pTop;
+	pRect->right = pRight;
+	pRect->bottom = pBottom;
+}
+
+
+#ifndef isGDIPICTLIB
+inline void OMNISAPI GDIlineTo( HDC pHdc, qpoint* pPoint ) // mpm4040
+{
+	GDIlineTo( pHdc, pPoint->h, pPoint->v );
+}
+#endif
+
+#pragma SET_RETURN_REGISTER_OFF
+
+extern qpoint qpointnone;
+
+// Start rmm_thindl: Web Client uncompress function
+// Pass pUncompressedLen in as the length of the buffer to receive the uncompressed data
+// On successful return (qtrue) pUncompressedLen returns the length of the uncompressed data
+#if defined(isGDIHWNDLIB) || defined(isRCCLIB)
+	GDIAPI qbool OMNISAPI GDIuncompress(qbyte *pUncompressedData, qlong &pUncompressedLen, qbyte *pCompressedData, qlong pCompressedLen);
+	GDIAPI qshort OMNISAPI GDIreadVersion(qchar *pVersion, qshort pMaxLen);	// rmm_cldl
+#endif
+// End rmm_thindl
+
+// rmm3489:
+#if defined(isGDIHWNDLIB) || defined(isRCC)
+	GDIAPI void OMNISAPI GDIuseStyledTextColors(qbool pUseColors);
+#endif
+
+// PK6270
+#if !defined(isiphone)		// pkiphone
+
+#ifdef ismac
+enum
+{
+	GDIBmpCallbackProcFunc_ProcInfo = kThinkCStackBased
+		 | STACK_ROUTINE_PARAMETER(1, SIZE_CODE(sizeof(HDC)))
+		 | STACK_ROUTINE_PARAMETER(2, SIZE_CODE(sizeof(qlong)))
+		 | STACK_ROUTINE_PARAMETER(3, SIZE_CODE(sizeof(qrect*)))
+		 | STACK_ROUTINE_PARAMETER(4, SIZE_CODE(sizeof(qjst)))
+		 | STACK_ROUTINE_PARAMETER(5, SIZE_CODE(sizeof(qjst)))
+		 | STACK_ROUTINE_PARAMETER(6, SIZE_CODE(sizeof(qbool)))
+};
+#endif
+
+typedef void (*GDIcallbackFunc) ( HDC pHdc, qlong pBmpId, qrect* pRect, qjst pJstHoriz, qjst pJstVert, qbool pClip, qbool pCanDraw ); // PK6270 // rmm6736: pCanDraw
+
+#endif	// pkiphone
+
+// Start rmm5224: design DPI constants
+#define DESIGNDPI_ACTIVE				0x4000		// Active
+#define DESIGNDPI_FONTSCALE 		0x2000		// Scale fonts also
+#define DESIGNDPI_DPIMASK				0x9fff
+#define DESIGNDPI_MINDPI				12
+#define DESIGNDPI_MAXDPI				0x1fff
+
+// roundx and norm functions
+GDIAPI void OMNISAPI GDInormReal(qreal& x, qshort dp1, qshort dp0);					// multiply or divide number by factor of 10
+GDIAPI qreal OMNISAPI GDIroundReal(qreal x, qshort pDp = -1);								// round to nearest integer (xx.5 always rounded up)
+// End rmm5224
+
+// Start rmm9347: flags passed to GDIbuildMultiLineTextLineIndex (OR these together)
+const qlong GDI_MLT_FLAG_USE_HDC_FONT = 1,										// Use the font already selected into the HDC
+						GDI_MLT_FLAG_SET_FONT_HDC_FOR_STYLED_TEXT = 2;		// Set mFontDc in GDIdrawTextStruct for styled text
+// End rmm9347
+// Start rmm6736: API calls to draw and measure multi-line text
+// Note: tqappfile *pApp is only used for styled text, to obtain icons from #ICONS.  In a component, use ECOgetApp(pEci->mInstLocp) to get the tqappfile *
+GDIAPI void * OMNISAPI GDIbuildMultiLineTextLineIndex(HDC pHdc, GDItextSpecStruct *pTextSpec, qchar *pText, qlong pTextLen, qdim pPixelsPerLine, qbool pWordWrap, qbool pStyledText, tqappfile *pApp = 0, qlong pFlags = 0); // rmm9347
+GDIAPI void * OMNISAPI GDIbuildMultiLineTextLineIndex(GDItextSpecStruct *pTextSpec, qchar *pText, qlong pTextLen, qdim pPixelsPerLine, qbool pWordWrap, qbool pStyledText, tqappfile *pApp = 0);
+GDIAPI void OMNISAPI GDIfreeMultiLineTextLineIndex(void *pLineIndex);
+GDIAPI void OMNISAPI GDIdrawMultiLineText(HDC pHdc, GDItextSpecStruct *pTextSpec, qchar *pText, qlong pTextLen, void *pLineIndex, qrect *pRect, qlong pFirstLine = 1); // Line numbers (pFirstLine) start at 1
+GDIAPI void OMNISAPI GDIgetMultiLineTextLineOffsetAndLength(void *pLineIndex, qlong pLineNumber, qlong *pLineOffset, qlong *pLineLength);	// Line numbers start at 1
+GDIAPI qlong OMNISAPI GDIgetMultiLineTextLineCount(void *pLineIndex);
+GDIAPI qlong OMNISAPI GDIgetMultiLineTextMaxTextWidth(void *pLineIndex);	// rmm8441
+GDIAPI void OMNISAPI GDIsetMultiLineTextLineHeight(void *pLineIndex, qdim pLineHeight);	// rmm8441: If not called, GDIdrawMultiLineText uses eFontLineHeight
+// End rmm6736
+
+// rmm_win7: Moved this to here
+// rmm6661: Class to enable use of GDI+ on Win32 when drawing shapes, to get nicer shapes with anti-aliasing
+class GDIshapeContext
+{
+	private:
+		qrect			mOriginalRect;
+		qrect			mDrawRect;
+		HDC				mHdc;
+		HDC				mAdc;
+		qbool			mIsAlpha;
+	public:
+		GDIshapeContext(HDC pHdc, qrect &pRect);
+		~GDIshapeContext();
+		qrect *drawRect() { return &mDrawRect; }
+		HDC drawHdc() { return mAdc; }
+
+		#if defined(isunix) || defined(ismobile)
+			qbool isAlpha() { return mIsAlpha; }
+		#else		
+			qbool isAlpha() { return mIsAlpha || GDIgetNativeGraphicsObjectForAlphaDC(mHdc); } // rmm_pdf
+		#endif
+};
+
+// rmm7649: Default point size for non-theme fonts on the Mac which have zero point size specified in qfnt
+#define GDI_ZERO_SIZE_POINTSIZE_MAC 12
+
+// rmm8745: Added GDIalphaBlendColor
+inline int GDIalphaBlendComponent(int pAlpha, int pSourceVal, int pDestVal)
+{
+	// D[x] = (S[A] * (S[x] - D[x]))/255 + D[x]
+	return (pAlpha * (pSourceVal - pDestVal))/255 + pDestVal;
+}
+// Alpha blend algorithm - applies alpha (0-255) to the colors
+// pSourceColor is the color to be blended onto the pDestColor background
+inline qcol GDIalphaBlendColor(int pAlpha, qcol pSourceColor, qcol pDestColor)
+{
+  // For x = R, G, B:
+  // D[x] = (S[A] * (S[x] - D[x]))/255 + D[x]
+  pSourceColor = GDIgetRealColor(pSourceColor);
+  pDestColor = GDIgetRealColor(pDestColor);
+
+  int sr = pSourceColor & 0xff;
+  int sg = (pSourceColor >> 8) & 0xff;
+  int sb = (pSourceColor >> 16) & 0xff;
+
+  int dr = pDestColor & 0xff;
+  int dg = (pDestColor >> 8) & 0xff;
+  int db = (pDestColor >> 16) & 0xff;
+
+  dr = GDIalphaBlendComponent(pAlpha, sr, dr);
+  dg = GDIalphaBlendComponent(pAlpha, sg, dg);
+  db = GDIalphaBlendComponent(pAlpha, sb, db);
+
+  return (qcol) ((db << 16) | (dg << 8) | dr);
+}
+
+// rmm9053: Class to temporarily override text render mode
+#ifdef isOMNISCORE
+	class threadGMvars;
+	class GDIoverrideTextRenderMode
+	{
+		public:
+			GDIoverrideTextRenderMode(qbyte pRenderMode);
+			~GDIoverrideTextRenderMode();
+		private:
+			qbyte						mOldTextRenderMode;
+			threadGMvars		*mGMvars;
+	};
+#endif
+
+// Start rmm9092: returns tick count since system startup in 1/60th second units
+inline qlong OMgetTics()
+{
+	#ifdef iswin32
+		return MulDiv(GetTickCount(), 6L, 100L);
+	#else
+		return[[NSProcessInfo processInfo] systemUptime] * 60;
+	#endif
+}
+#ifdef isOMNISCORE
+	#define gettics OMgetTics
+#endif
+// End rmm9092
+// Start rmm9650: Return the number of milliseconds since system startup
+inline qulong64 OMgetMillis()
+{
+#ifdef isunix
+	return GetTickCount();
+#elif defined(iswin32)
+	return GetTickCount64();
+#else
+	return [[NSProcessInfo processInfo] systemUptime]*1000;
+#endif
+}
+// End rmm9650
+
+// Start rmm9347: Construct this class in order to delete fonts cached for HDC at the end of the block containing this class
+// Can be constructed with null HDC, meaning it does nothing when it destructs
+class GDIhdcFontCacheHelper
+{
+public:
+	GDIhdcFontCacheHelper(HDC pHdc)
+	{
+		mHdc = pHdc;
+	}
+	~GDIhdcFontCacheHelper()
+	{
+		if (mHdc)
+			GDIdeleteFontsCachedForDc(mHdc);
+	}
+protected:
+	HDC			mHdc;
+};
+
+// Construct this subclass of GDIhdcFontCacheHelper to provide the ability to create fonts for a DPI
+// HDC must be non-null; dpi can be zero
+class GDIfontCreator : public GDIhdcFontCacheHelper
+{
+public:
+	GDIfontCreator(HDC pHdc, qdim pDpi, qbool pDpiInScreenUnits = qfalse) : GDIhdcFontCacheHelper(pDpi ? pHdc : 0)
+	{
+		mDpi = pDpi;
+		mDpiInScreenUnits = pDpiInScreenUnits;
+	}
+	// Create font - caller must delete it with GDIdeleteObject before GDIfontCreator destructs
+	HFONT createFont(qfnt *pFnt, qsty pSty)
+	{
+		return mDpi ? GDIcreateDcFont(pFnt, pSty, mHdc, mDpiInScreenUnits ? mDpi : GDIconvToScreen(mDpi, qtrue)) : GDIcreateFont(pFnt, pSty);
+	}
+	qbool usingDcFonts() { return mDpi != 0; }
+private:
+	qdim		mDpi;
+	qbool		mDpiInScreenUnits;
+};
+
+// Class used to override DPI used for a particular HDC (to enable fonts to be created for the HDC at the specified DPI)
+// Has no affect if dpi supplied is zero
+class GDIoverrideHDCDPI
+{
+public:
+	GDIoverrideHDCDPI(HDC pHdc, qdim pDpi);	// pDpi is in screen units
+	~GDIoverrideHDCDPI();
+private:
+	qdim			mDpi;
+	HDC				mOldHdc;
+	qdim			mOldResolution;
+	qreal			mOldZoom;
+};
+// End rmm9347
+
+#if defined(isOMNISCORE)
+	// rmm_emat: Reworked text found highlight class for page preview window to also work with code editor
+	#ifdef ismacosx
+		typedef qlongptr UINT_PTR;
+	#endif
+	class GDIhighlightLayeredWNDprocClass;
+	class GDItextFoundHighlight
+	{
+	public:
+		GDItextFoundHighlight(HWND mOwner, UINT_PTR pFirstTimerId, UINT_PTR pLastTimerId, UINT_PTR *pNextTimerId, GDIhighlightLayeredWNDprocClass *pHighlightField);
+		virtual ~GDItextFoundHighlight();
+		void startHighlightFoundRect(qrect &pRect);
+		qbool nextHighlightFoundRect();
+		void stopTimer();
+		virtual void finished() {}
+
+		HWND														mOwner;
+		GDIhighlightLayeredWNDprocClass	*mHighlightField;
+		UINT_PTR												mFirstTimerId;
+		UINT_PTR												mLastTimerId;
+		UINT_PTR												*mNextTimerId;
+		UINT_PTR												mOpenTimerId;
+		HWND														mHighlightHwnd;
+		qrect														mRect;
+		qlong														mCurrentSizePercentage;
+		qlong														mCurrentAlpha;
+		qbool														mNeedShow;
+		qbool														mDecreaseAlpha;
+
+		static qlong										smSizePercentageIncrement;
+		static qlong										smAlphaIncrement;
+		static qlong										smAlphaMax;
+	};
+#endif
+
+#endif
+// End of file

@@ -1,0 +1,509 @@
+/* $Header: svn://svn.omnis.net/trunk/Studio/O7EXE/COCOA/xhwnd.he 20932 2018-09-17 09:32:36Z bmitchell $ */
+
+//Q4 XHWND.HE
+//Mac HWND interface
+//Copyright (C) Blyth Holdings Inc 1996
+
+/**************** Changes ******************
+Date			Edit				Bug					Description
+12-Jan-18 pkcocoa_1179						Per pixel alpha supporting windows
+19-Dec-17	rmm_emat								Text editor for Omnis language.
+24-Jan-17	rmm9205									Cursor sometimes reverted back to arrow on Cocoa.
+29-Apr-16	rmm8899									Removed old q q qs so we can see what needs to be tidied up.
+20-Apr-16	rmm8875a								FindWindow was locating our windows when they were obscured by other applications.
+22-Oct-15 pkcocoa_1052 ST/BE/1073 cannot open window offscreen
+01-Jun-15	rmmhdpi									High DPI support for Windows.
+08-Jun-15	CR0243			ST/PF/879		Fix crashes when closing/docking floating toolbars and fix drag window on toolbars.
+10-Mar-15	rmm_cwo									Re-implemented Cocoa port top level window ordering.
+21-May-14	rmm8331			ST/JS/987		Added evDragBorder.
+08-Apr-11	rmm7101									JS tab strip component.
+15-Mar-11	rmm7095									JavaScript client - data grid design component.
+14-Jan-11	rmm7067			ST/WT/1714	Progress bar was drawing on incorrect tab on OSX.
+07-Jan-11	rmm7057a		ST/WT/1656	Remote form data grid issues.
+15-Apr-10	rmm_oe									Omnis Eclipse changes.
+15-Jun-09	rmm_nc									New controls and supporting APIs.
+21-May-09 pkgradient							Gradient support
+09-Mar-09	rmm_iphone13						Text field controls.
+14-Aug-07	rmm6216									OSX look and feel improvements (required for Leopard).
+28-Sep-05 MHMACH                  Mach-o changes
+05-Aug-04	rmmuni_mk								Added support for multiple characters received in a single keyboard event on OSX.
+02-Jul-04 MHCW9										CW9 changes.
+22-May-03	rmm4503									Correct borders for group boxes, lists and edit fields with XP themes.
+18 MAR 03 mpmWNE									Changed OSX eventloop to use RunApplicationEventLoop
+27 FEB 02 mpm5065			st/he/421		Various fixes to focus rect drawing
+22 OCT 01 mpmOSX_XWND4						Implements OSX toolbar button
+08 MAR 01 mpmCarbon34							Implements WM_BORDERxxx messages
+12 JAN 01	MHCARBONQT							OSX QuickTime Changes
+18 DEC 00 mpmCarbon18							Webclient paint fixes
+02 NOV 00 MHSERVER								OSX Server Changes
+20 OCT 00 mpmCarbon								OSX Changes NOT MARKED
+18 OCT 99 mpmCarbon								Carbon port
+12 Oct 99 PKOSEvent								Added WNDsetOSEvent
+13 AUG 99 mpmTHINz2								Web Clients should only generate timers based on graf port passed in
+10-Mar-99 PK4900									Problems with timer procs on 68K
+22-Aug-98 PK 											added isOMNISCORE and other thin client changes
+26-Jan-98	mt40428									now have SET_CORE_PACKING && SET_BYTE_PACKING directives
+30 OCT 97 mpm4328									New message when frame has been changed
+07-Oct-97	mt40338									HCURSOR Support
+06-Oct-97	mt40314									System Drag & Drop
+09-Jul-97 PK4625									MacOS8
+04-Jul-97	mt40305									missing packing pragmas
+13-Jun-97	mt40295									fixed WNDenumChildWindows && GDIsetOptionClick thru exteral component interface
+25 FEB 97 mpm4176									Changes to fix updates on Mac (make more like windows)
+07-Feb-97	mt40188 								implementation of WNDgetOS
+05-Feb-97	mt40180 								Grow box now part of HWND module
+22-Jan-97	PK4502 									Added a knob message
+21-Oct-96	mt40029									WM_NCACTIVATE and WM_FLD_ACTIVATE
+26-Sep-96	rmm1812			PR/WC/028FC	Non-client clicks and right button clicks now bring windows to the front correctly.
+11 JUN 96 mpm4029									Added custom borders
+28 MAY 96	rmm1407									Tooltips for Windows platform.
+10 MAY 96 mpm4023									Changed WS_EX_ flags WND_ exFlags
+10 MAY 96	mpm4022									Table/Grid field implementation
+
+********************************************/
+
+#ifndef	_XHWND_HE_
+#define _XHWND_HE_
+
+struct HWNDstruct;
+
+#ifdef isCOCOA
+typedef HWNDstruct* HWND;
+#else
+typedef HWNDstruct* HWND;
+#endif
+
+
+#ifndef _GDI_HE_
+#	include "gdi.he"
+#endif
+
+/*
+#ifdef iscarbon			// iscarboninc
+	#ifndef __CONTROLS__
+		#include <Controls.h>
+	#endif
+	#ifndef __CONTROLDEFINITIONS__
+		#include <ControlDefinitions.h>
+	#endif
+#endif
+*/
+
+/**** pre declerations ************************************************/
+class tqfld;
+class qkey;
+class WNDmultiKey;	// rmmuni_mk
+
+/**** defines and typedefs ********************************************/
+typedef	intptr_t LPARAM;  // rmm8899
+typedef intptr_t WPARAM;  // rmm8899
+typedef unsigned int UINT;
+
+// Start rmm6216
+#define scbarwid WNDgetOSXscrollBarWidth()
+#define WND_SCROLLBAR_WIDTH WNDgetOSXscrollBarWidth()
+#define WND_GROWBOX_WIDTH WNDgetOSXscrollBarWidth()
+HWNDAPI qshort OMNISAPI WNDgetOSXscrollBarWidth();
+// End rmm6216
+
+#ifndef	_xdmconv_ // CRCOCOA : previously defined as macros in xdmconv.h
+inline qword2 LOWORD(qword4 pVal)
+{
+	return qword2(pVal);
+}
+
+inline qword2 HIWORD(qword4 pVal)
+{
+	return qword2(pVal >> 16);
+}
+#endif
+
+
+GCC_SET_BYTE_PACKING_ON // MHMACH
+#pragma	 SET_BYTE_PACKING_ON
+
+struct WNDpaintStruct
+{
+	HDC		hdc;
+	qbool	fErase;
+	qrect	rcPaint;
+	// CGrafPtr	fRestore; // mpmCarbon
+};
+
+struct WINDOWPOS	// rmmhdpi
+{
+	HWND		hwnd;
+	HWND		hwndInsertAfter;
+	qdim		x;
+	qdim		y;
+	qdim		cx;
+	qdim		cy;
+	qulong	flags;
+};
+
+struct WNDminMaxInfo
+{
+	qpoint	ptReserved;
+	qpoint	ptMaxSize;
+	qpoint	ptMaxPosition;
+	qpoint	ptMinTrackSize;
+	qpoint	ptMaxTrackSize;
+	
+	WNDminMaxInfo() {};
+	WNDminMaxInfo( qrect* pMaxRect, qrect* pTrackRect );
+};
+
+GCC_SET_BYTE_PACKING_OFF // MHMACH
+#pragma	 SET_BYTE_PACKING_OFF
+	
+/* Basic window types */
+#define WS_CHILD            0x40000000L
+
+/* Clipping styles */
+#define WS_CLIPSIBLINGS     0x04000000L
+#define WS_CLIPCHILDREN     0x02000000L
+
+/* Generic window states */
+#define WS_VISIBLE          0x10000000L
+#define WS_DISABLED         0x08000000L
+
+/* Main window styles */ // mpm4023 removed WS_EX flags
+#define WS_VSCROLL          0x00200000L
+#define WS_HSCROLL          0x00100000L
+
+/* Reserved style flags */
+#define WS_RESERVED1				0x00000001L
+#define WS_RESERVED2				0x00000002L
+#define WS_RESERVED3				0x00000004L
+#define WS_RESERVED4				0x00000008L
+#define WS_RESERVED5        0x00800000L // (WS_BORDER not supported, hwnds use border spec)
+
+/* Listbox styles (used for disabling the showing and hiding of scroll bars in child windows) */
+#define LBS_DISABLENOSCROLL   0x1000L
+
+/* WNDshowWindow() pCmdShow values */
+#define SW_HIDE             0
+#define SW_SHOWNORMAL       1
+#define SW_NORMAL           1
+#define SW_SHOW             5
+
+/* WNDsetWindowPos() and WINDOWPOS pFlags */
+#define SWP_NOSIZE          0x0001
+#define SWP_NOMOVE          0x0002
+#define SWP_NOZORDER        0x0004
+#define SWP_NOREDRAW        0x0008
+#define SWP_SHOWWINDOW      0x0040
+#define SWP_HIDEWINDOW      0x0080
+#define SWP_FRAMECHANGED		0x0020  // mpm4328 send when showing or hiding scrollbars
+
+/* WNDgetWindow() relationship flags */
+#define GW_CHILD			0x0001
+#define GW_HWNDFIRST	0x0002
+#define GW_HWNDLAST		0x0003
+#define GW_HWNDNEXT		0x0004
+#define GW_HWNDPREV		0x0005
+
+/* the following defines are used when calculating the region of a hwnd ( WNDgetOS ) */ // mpm new components
+#define WND_CLIENT								0x00000001L			// requested area, client area
+#define	WND_FRAME									0x00000002L			// requested area, frame and client area
+#define WND_EXCLUDE_CLIENT				0x00000004L			// subtract client area from requested area
+#define WND_EXCLUDE_SIBLINGS			0x00000008L			// subtract covering siblings from requested area
+#define WND_EXCLUDE_CHILDREN			0x00000010L			// subtract non transparent children from requested area
+#define WND_LOCAL									0x00000020L			// if set the visual region returned will be local the border, frame or client rect as was requested
+#define WND_INTERSECT_MAC_VISUAL	0x00000040L			// intersect with the macintosh windows visual region
+#define WND_EXCLUDE_FOCUS 				0x00000080L 		// exclude external MAC focus rect // mpm5065
+
+/* WNDsetWindowPos() pHwndInsertAfter field values */
+#define HWND_TOP			((HWND)0)
+#define HWND_BOTTOM		((HWND)1)
+
+#define HWND_DESKTOP        ((HWND)1)			// local to most left and most top monitors edge
+#define HWND_MAINWINDOW     ((HWND)2) 		// HWND_MAINWINDOW on the mac is coordinates local to the main monitor
+#define HWND_MACWINDOW			((HWND)3)			// it's the macintosh window which contains the hwnd 
+
+/* Window field offsets for WNDGetWindowLong() */
+#define GWL_STYLE           (-16)
+
+/* supported window messages */
+#define WM_NULL							0x0000
+#define WM_CREATE           0x0001
+#define WM_DESTROY          0x0002
+#define WM_SHOWWINDOW       0x0018
+#define WM_MOVE             0x0003
+#define WM_SIZE             0x0005
+#define WM_NCPAINT          0x0085
+#define WM_PAINT            0x000F
+#define WM_ERASEBKGND       0x0014
+#define WM_TIMER	    			0x0113		// rmm1407
+
+#define WM_NCACTIVATE    		0x0086	// mt40029
+
+
+/* messages send by WNDsetWindowPos and others */
+#define WM_WINDOWPOSCHANGING 	0x0046
+#define WM_WINDOWPOSCHANGED 	0x0047
+#define WM_GETMINMAXINFO			0x0048
+// MHCARBONQT begins
+// PLAY messages
+#define WM_PAUSEPLAY					0x0049
+#define WM_RESUMEPLAY					0x0050
+// MHCARBONQT ends
+
+/* Mouse input messages */
+#define WM_MOUSEMOVE        0x0200
+#define WM_LBUTTONDOWN      0x0201
+#define WM_LBUTTONUP        0x0202
+#define WM_LBUTTONDBLCLK    0x0203
+#define WM_RBUTTONDOWN      0x0204
+#define WM_RBUTTONUP        0x0205
+#define WM_RBUTTONDBLCLK    0x0206
+#define WM_CAPTURECHANGED		0x0215	// rmm_nc: Sent to the window losing the mouse capture - wParam and lParam are both zero on OSX
+#define WM_NCLBUTTONDOWN    0x00A1	// rmm1812
+
+
+/* Key input messages */
+#define WM_KEYDOWN		0x100
+#define WM_KEYUP			0x101
+
+/* scroll messages */
+#define WM_HSCROLL          0x0114
+#define WM_VSCROLL          0x0115
+
+/* cursor messages */
+#define WM_SETCURSOR        0x0020
+
+// mt40314 - start
+
+/* drop file message */
+#define WM_DROPFILES        0x0233
+
+
+// mt40314 - end
+
+/* base id for user generated messages */
+#define WM_USER							0x0400
+
+/* base id for external user defined messages max 0x7000 */
+#define WM_EXUSER						0x2400
+
+/* additional omnis hwnd messages range 0x7001 to 0x7FFF */
+#define WM_GETERASEINFO			0x7001	// send to fld to get information required to erase areas not painted by the border
+#define WM_CHILDPAINT				0x7002  // send to the parent who called WNDredrawChildren when the child is about to be painted // mpm4022
+#define WM_KEYDOWNPREVIEW		0x7003	// send to parent on a WM_KEYDOWN if parent has WND_KEYPREVIEW set
+#define WM_KEYUPPREVIEW			0x7004	// send to parent on a WM_KEYUP if parent has WND_KEYPREVIEW set
+#define WM_BORDCALCRECT			0x7005	// send to field with custom borders when the client rect needs to be calculated ( lParam = qrect* ) // mpm4029
+#define WM_BORDPAINT				0x7006	// send to field with custom borders when the border needs painting ( wParam = HDC, lParam = qrect* ) // mpm4029
+#define WM_SHOWSIZEGRIP			0x7007	// send to field
+#define WM_DRAGBORDER				0x7008	// PK4502 send to field wParam is 1 if it is the vertical drag bar
+#define WM_FOCUSCHANGED			0x7009	// send to field when the input focus changes. wParam = 1 or 0. NOT generated by hwnd module
+#define WM_ERASEBKGNDRECT		0x700A	// special erase message for erasing a specified area // mpmCarbon3
+#define WM_GETSHADOWRECT		0x700B	// special message to return rect for custom OSX shadow local to desktop ( lParam = qrect* ) // mpmCarbon3
+#define WM_BORDERCHANGING		0x700C	// sent by WNDsetBorderSpec // mpmCarbon34
+#define WM_BORDERCHANGED		0x700D	// sent by WNDsetBorderSpec // mpmCarbon34
+#define WM_BORDERASEBACKGROUND 0x700E	// rmm4503: sent when painting WND_BORD_CTRL_GROUPBOX on XP
+#define WM_MULTIKEYDOWNPREVIEW 0x700F	// rmmuni_mk: send to parent on a WM_MULTIKEYDOWN if parent has WND_KEYPREVIEW set
+#define WM_OSXUNIFIEDTOOLBARCLICK				0x7010	// rmm6216: click on OSX unified toolbar
+#define WM_OSXUNIFIEDTOOLBARDOUBLECLICK 0x7011	// rmm6216: double click on OSX unified toolbar
+#define WM_TOOLBARBUTTONCLICK						0x7012	// rmm6216: click on toolbar button in window title bar
+#define WM_IPHONE_ROUNDRECT_TEXTFIELDSTYLE	0x7013	// rmm_iphone13: returns qtrue if the iPhone rounded rectangle border is like that for UITextField
+#define WM_COREPATTERNGRADIENTSUPPORT	0x7014	// pkgradient returns true if the object wants gradients to be shown in the pattern palette in the property inspector
+#define WM_CAPTUREABORT								0x7015	// rmm_nc: sent by WNDabortMouseCapture() before it releases the capture
+#define WM_OSXREPAINTPLUGIN						0x7016	// rmm_nc: tells the OSX browser plugin that it needs to repaint
+#define WM_HASCAPTUREANDABOUTTOSCROLL 0x7017	// rmm7057a: (Win32 only, not Unix): returns qtrue if the window has the capture and is about to scroll
+#define WM_OSXPLUGINHIDDEN						0x7018	// rmm7067: on OSX, tells the top plugin HWND that it is hidden or shown (WPARAM is qtrue for hidden, qfalse for shown)
+#define WM_IPHONE_JS_ERASEBKGND				0x7019	// rmm7095: Special erase background message for some iPhone and JS components
+#define	WM_ALPHABLENDCOLORS						0x701a	// rmm7101: alpha blend the colors passed in a WNDalphaBlendStruct (ptr in wParam) and return the result
+#define WM_JS_ERASEBKGND							0x701b	// rmm7101: Special erase background for JS components
+#define WM_DRAGBORDERFINISHED					0x701c	// rmm8331: Sent when a drag border operation has finished with the mouse in a position to potentially resize the field
+#define WM_LAYEREDCHILDINITIALPAINT   0x701d  // pkcocoa_1179
+#define WM_GETSCROLLBARMARKERS				0x701e	// rmm_emat: Called to get the markers to be drawn on a vertical scrollbar
+#define WM_DRAGBORDERSTARTING					0x701f	// rmm_emat: Sent when drag border is starting to allow the affected HWND to be modified (WPARAM is HWND * you can use to modify the HWND - clear the HWND to prevent drag border, LPARAM value is a value of WNDinDragBorder::eDragSide, UPARAM is pointer to qpoint to override min tracking size)
+
+/* WM_SETCURSOR nHittest values */
+#define HTNOWHERE           0
+#define HTCLIENT            1
+#define HTCAPTION           2
+#define HTHSCROLL           6
+#define HTVSCROLL           7
+#define HTBORDER            18
+#define HTGROWBOX           4					// mt40180
+
+/* WM_H/VSCROLL commands */
+#define SB_LINEUP           0
+#define SB_LINELEFT         0
+#define SB_LINEDOWN         1
+#define SB_LINERIGHT        1
+#define SB_PAGEUP           2
+#define SB_PAGELEFT         2
+#define SB_PAGEDOWN         3
+#define SB_PAGERIGHT        3
+#define SB_THUMBPOSITION    4
+#define SB_THUMBTRACK       5
+#define SB_TOP              6
+#define SB_LEFT             6
+#define SB_BOTTOM           7
+#define SB_RIGHT            7
+#define SB_ENDSCROLL        8
+
+/* Scroll bar selection constants */
+#define SB_HORZ             0
+#define SB_VERT             1
+#define SB_TRACK						2
+
+// mt40188 - Selector Codes for WNDgetOS
+#define GOS_WINDOW			0x00010000
+#define GOS_EVENT				0x00020000
+#define GOS_REGION			0x00030000
+#define GOS_MACOS8			0x00040000		// PK4625
+#define GOS_CURSORINFO	0x00050000		// mt40338
+#define GOS_OFFSETHWNDS	0x00060000		// mpmCarbon18
+#define GOS_CLIPHWNDS		0x00070000		// mpmCarbon18
+#define GOS_PLUGINHIDDEN	0x00080000	// rmm7067
+#define GOS_DEVICE_SCALE	0x00090000	// CRHIRES
+
+// the following function are mac platform specific calls
+// INTERNAL USE ONLY begins
+HWNDAPI void		OMNISAPI WND_init(NSWindow *window);    // cococa
+HWNDAPI void		OMNISAPI WND_term();
+
+HWNDAPI void		OMNISAPI WNDdoSetOSEvent( qlong* pEv ); // PKOSEvent
+HWNDAPI void		OMNISAPI WNDdoSystemUpdates	( HWND pTopHwnd, qbool pRegionDone = qfalse ); 	// mpm4176 // mpmCarbon
+HWNDAPI qbool		OMNISAPI WNDdoKeyMessage			( qkey* pKey, UINT pMessage );
+HWNDAPI qbool		OMNISAPI WNDdoMultiKeyMessage ( WNDmultiKey *pMultiKey, UINT pMessage );		// rmmuni_mk
+HWNDAPI qbool 	OMNISAPI WNDdoPostMessage( HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam ); // MHSERVER
+HWNDAPI void		OMNISAPI WNDdoMouseMessage		( HWND pHwnd, NSPoint pMacPoint, UINT pMessage );
+HWNDAPI void		OMNISAPI WNDdoEnableWind			( HWND pHwnd, qbool pEnable, qbool pIsFirst = qtrue );
+HWNDAPI void		WNDsetMenuRect			( qbool pMenuDown, Rect* pRect );
+HWNDAPI void		OMNISAPI WNDdoToolbarSwitchMode( HWND pHwnd ); // mpmOSX_XWND4
+// INTERNAL USE ONLY ends
+
+// default window procedures. Should be called by tqfld::WndProc function for messages
+// not delt with
+#if defined(isOMNISCORE)
+extern qlong DefWindowProc( HWND pHwnd, UINT pMessage, WPARAM pWParam, LPARAM pLParam );
+#else
+HWNDAPI qlong OMNISAPI DefWindowProc( HWND pHwnd, UINT pMessage, WPARAM pWParam, LPARAM pLParam );
+HWNDAPI void OMNISAPI WND_HWNDtimer_deleteAll( HWND pHwnd);
+HWNDAPI qbool OMNISAPI WND_HWNDtimer_trySend( CGrafPtr pThisPortOnly = 0 ); // mpmTHINz2
+HWNDAPI qbool OMNISAPI WND_HWNDtimer_haveTimer();
+#endif
+
+#if defined(isXCOMPLIB)
+extern id WNDgetContentView( HWND pHwnd);
+#endif
+
+
+
+// mt40295
+enum
+{
+	WNDenumChildWindows_ProcInfo = kThinkCStackBased
+		 | RESULT_SIZE(SIZE_CODE(sizeof(qbool)))	
+		 | STACK_ROUTINE_PARAMETER(1, SIZE_CODE(sizeof(HWND)))
+		 | STACK_ROUTINE_PARAMETER(2, SIZE_CODE(sizeof(LPARAM))),
+		 
+	WNDtimerProc_ProcInfo = kThinkCStackBased
+		 | STACK_ROUTINE_PARAMETER(1, SIZE_CODE(sizeof(HWND)))
+		 | STACK_ROUTINE_PARAMETER(2, SIZE_CODE(sizeof(UINT)))
+		 | STACK_ROUTINE_PARAMETER(3, SIZE_CODE(sizeof(UINT)))
+		 | STACK_ROUTINE_PARAMETER(4, SIZE_CODE(sizeof(qlong))),		// PK4900
+
+	WNDsetCanSetCursorProc_ProcInfo = kThinkCStackBased							// AE4762
+		 | RESULT_SIZE(SIZE_CODE(sizeof(qlong)))				
+		 | STACK_ROUTINE_PARAMETER(1, SIZE_CODE(sizeof(qlong)))
+};
+
+
+// The following are message parameter constants for WNDpostMessage() messages. // mpmWNE
+#define kOmnisEvent 'OO$$'			
+#define kOmnisPostEvent 'POST'
+#define kevMessage 'MSG ' // MHCW9
+#define kevMessageType 'UINT'
+#define kevHwnd 'HWND'
+#define kevHwndType 'HWND'
+#define kevWparam 'WPAR'
+#define kevWparamType 'WPAR'
+#define kevLparam 'LPAR'
+#define kevLparamType 'LPAR'
+
+// Start rmm_cwo: we maintain two orderings for top level windows: one for floating, the other for normal windows
+@class WND_NSWindow;
+
+// Set the z-order of a top level window in either the normal or floating group
+void WNDcocoaSetWindowPos(qbool pFloating, WND_NSWindow *pWindow, eWNDOrder pPos, WND_NSWindow *pWindowAbove = 0, qbool pMakeTopLevelVisible = qfalse);
+
+// Remove a window from the z-order of either the normal or floating group
+void WNDcocoaRemoveWindowPos(qbool pFloating, WND_NSWindow *pWindow);
+
+// Apply the Omnis defined window ordering for either the normal or floating group
+void WNDcocoaApplyWindowOrdering(qbool pFloating);
+
+// Hide all windows in either the normal or floating group
+void WNDcocoaHideAll(qbool pFloating);
+
+// Start CR0243
+qbool WNDcocoaDragIsTopWindow();
+qbool WNDcocoaIsDragWindow(NSWindow* pWindow);  //WND_NSWindow
+// End CR0243
+NSInteger WNDcocoaLastNonMouseMessageWindow();	// rmm8875a: returns the floating window (if any) immediately above the top window that can receive mouse messages (and which therefore needs to be located by FindWindow)
+
+// Base class for NSWindows used in conjunction with the WNDcocoa... calls above
+@interface WND_NSWindow : NSWindow
+{
+}
+
+@property (nonatomic, assign) BOOL mOmnisIsCallingMakeMainWindow;
+@property (nonatomic, assign) BOOL mOmnisIsCallingMakeKeyWindow;
+@property (nonatomic, assign) BOOL mOmnisIsCallingAPI;
+@property (nonatomic, assign) BOOL mIsVisible;
+
+-(BOOL)isIconic;
+
+// Use these APIs rather than calling the NSWindow APIs directly, so we have control over when they occur
+- (void)doOrderOut:(id)sender;
+- (void)doOrderFront:(id)sender;
+- (void)doOrderBack:(id)sender;
+- (void)doOrderWindow:(NSWindowOrderingMode)orderingMode relativeTo:(NSInteger)otherWindowNumber;
+- (void)doOrderFrontRegardless;
+- (void)doClose;	// CR0243
+- (void)doMakeMainWindow;
+- (void)doMakeKeyWindow;
+- (NSRect)constrainFrameRect:(NSRect)frameRect toScreen:(NSScreen *)screen; //pkcocoa_1052
+
+@end
+
+// rmm8875a: Wrapper class that allows us to identify layered windows
+@interface WND_OmnisLayeredWindow : WND_NSWindow
+{
+}
+@end
+
+void WNDcocoaGetWindowMetrics(NSWindow *pWindow, float &pTitleHeight, float &pToolbarHeight);
+// End rmm_cwo
+void HWNDupdateColorTable(); // rmm8745
+
+// rmm9205:
+class COCOAfixedCursor
+{
+public:
+	COCOAfixedCursor()
+	{
+		mOldFixedCursor = smFixedCursor;
+		smFixedCursor = qtrue;
+	}
+	~COCOAfixedCursor()
+	{
+		smFixedCursor = mOldFixedCursor;
+	}
+	static qbool isFixed()
+	{
+		return smFixedCursor;
+	}
+private:
+	qbool mOldFixedCursor;
+	static qbool smFixedCursor;
+};
+
+#endif
+
+/* eof */

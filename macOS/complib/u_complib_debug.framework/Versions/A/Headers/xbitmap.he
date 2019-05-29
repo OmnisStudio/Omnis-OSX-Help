@@ -1,0 +1,47 @@
+/* $Header: svn://svn.omnis.net/trunk/Studio/O7EXE/COCOA/xbitmap.he 16574 2017-01-26 13:52:21Z bmitchell $ */
+//
+//  xbitmap.he
+//Cocoa BITMAP implementation
+//Copyright (C) Omnis Software Ltd 2017
+
+/**************** Changes ************************************************************************
+Date			Edit				Bug					Description
+01-Dec-15	CR0290									Created to allow rawBitmap format to be altered directly in XCOMP.
+**************************************************************************************************/
+
+#ifndef	_XBITMAP_HE_
+#define _XBITMAP_HE_
+
+// 32 bit RGBA
+typedef struct PIXELMEM_RGB {
+	unsigned char    rgbRed;
+	unsigned char    rgbGreen;
+	unsigned char    rgbBlue;
+	unsigned char    rgbAlpha;
+
+	BOOL operator==(PIXELMEM_RGB op2)
+	{ return (rgbRed == op2.rgbRed && rgbGreen == op2.rgbGreen && rgbBlue == op2.rgbBlue && rgbAlpha == op2.rgbAlpha);}
+
+} PIXELMEM_RGB;
+
+// 16 bit XRGB
+typedef struct PIXELMEM_RGBPACKED {
+	uint16_t  rgbPacked;
+
+	BOOL operator==(PIXELMEM_RGBPACKED op2)
+	{ return (rgbPacked == op2.rgbPacked);}
+
+} PIXELMEM_RGBPACKED;
+
+// 8 bit gray
+typedef struct PIXELMEM_GRAY {
+	unsigned char gray;
+
+	BOOL operator==(PIXELMEM_GRAY op2)
+	{ return (gray == op2.gray);}
+
+} PIXELMEM_GRAY;
+
+enum eBitmapFormat { eBitmapFormatRGB32, eBitmapFormatRGBA32, eBitmapFormatRGB16, eBitmapFormatGray8 };
+
+#endif

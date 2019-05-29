@@ -1,0 +1,423 @@
+/* $Header: svn://svn.omnis.net/trunk/Studio/EXTCOMP/CALLBACK/strclass.he 21632 2018-11-26 07:43:45Z bmitchell $ */
+
+/**
+ @file
+ The Omnis platform independent string classes header file.
+ Declarations of strxxx, str15, str31, str80 and str255.
+ */
+
+/* Q4 strclass.he
+The Omnis platform independent string classes header file
+Copyright (C) Blyth Holdings Inc 1996
+
+Changes
+Date			Edit				Bug					Description
+15-Nov-18	rmm9834									Conversion from signed integer to string did not handle the minimum value of the integer type correctly.
+10-Aug-18	rmm9760									Debug logging for core and components.
+10-Oct-17	crDOXY									Doxygen comments and tidy ( not marked ).
+04-Sep-17	rmm9474									Removed csettype and hptrlock (many changes, not marked).
+02-Jun-17	rmm9400									New JS component to allow controls to be added using just a JSON definition, PNG images and JavaScript implementation.
+15-May-17	jmg0580									Added set() methods to EXTcomp strxxx class.
+25-Aug-16	rmm9018									Miscellaneous tidying up - removed some non-Unicode code for example.
+17-Apr-12	rmm64bit1								First set of changes for 64 bit support: 64 bit Omnis data type.
+27-Feb-06 MHMACH13                Added CFString constructor support
+26-Oct-05 MHMACH2                 Mach-o changes
+05-Mar-04	rmmuni_osx9							Mac OSX Unicode port.
+18-Feb-04	rmmuni_osx6							Mac OSX Unicode port.
+16-Dec-99	rmm3568									Added convcase method.
+05 DEC 97 mpmPRIv									New crb and pri api callbacks
+
+*/
+#ifndef _STRCLASS_HE_
+#define _STRCLASS_HE_
+
+#ifdef isunix
+	#include <limits.h>	// rmm64bit1
+#endif
+#include <string>	// rmm9760
+#include <limits>	// rmm9834
+
+GCC_SET_BYTE_PACKING_ON // MHMACH2
+#pragma SET_BYTE_PACKING_ON
+
+/**
+ The base string class.
+ The str15, str31, str80 and str255 classes are derived from this class.
+ Characters are indexed using a range 1 to n. Index 0 is used to store the real length of the string.
+ */
+class strxxx {             //general string class
+	protected:
+		qlong  		maxlen;			/**< The maximum character length of the string. */ //rmm9474: Use qlong rather than qbyte, so character values are aligned on 32 bit boundaries
+		qchar  		strp[2];    /**< The Unicode Pascal style string. This has one spare character for a NULL terminator when converting to a C string. */
+		
+		strxxx(qlong maxlen1) { maxlen = maxlen1; strp[0] = 0; }	/**< Construct an empty string. */
+		strxxx(qlong maxlen1, const strxxx& s1);									/**< Construct a string from a copy of another string. */
+
+		strxxx(qlong maxlen1, const qchar* a);										/**< Construct a string from a NULL terminated C string. */
+		strxxx(qlong maxlen1, const qchar ch);										/**< Construct a string from a character. */
+		strxxx(qlong maxlen1, const qchar* a, qshort len);				/**< Construct a string from a C string with length. */
+		strxxx(qlong maxlen1, const qoschar* a);									/**< Construct a string from a NULL terminated OS encoded C string. */
+		strxxx(qlong maxlen1, const qoschar* a, qshort len);			/**< Construct a string from a NULL terminated OS encoded C string with length. */
+		void      assign(const strxxx& s2);     									/**< Make this string a copy of another string. */
+ 
+	public:
+		qchar&    operator [](qshort pPos) const //indexing in string chars, must generate an lvalue // mpm_cw
+								{
+									return (qchar&)strp[pPos];
+								} 																						/**< Return the character at the index in this string. */
+		void      operator =(const strxxx& s1) { assign(s1); }    /**< Assign a string to this string. */
+		qbool     operator !() const { return strp[0]==0; }       /**< Test if this string is empty. */
+		void      operator =(qniltype qnil1) {  GDIignore(&qnil1); strp[0]=0; }  /**< Empty this string. */ // mpm_cw
+		qshort    maxLength() { return maxlen; }									/**< Get the maximum length of this string. */
+		void			convcase (qbool toupper = qtrue);								/**< Convert all characters in this string to uppercase or lowercase. */				// rmm3568
+
+		qshort    length() const  { return qshort(this->strp[0]); }	/**< Get the length of this string in characters. */
+		qshort		dataLength() const { return qshort(QBYTELEN(this->strp[0])); }	/**< Get the data size in bytes of this string. */
+		qshort		dlength() const { return dataLength(); }				/**< Get the data size in bytes of this string. */
+		void      concat(const strxxx& s2);												/**< Concatenate a string onto this string. */
+		void      concat(qchar ch);																/**< Concatenate a single character onto this string. */
+		void      concat(const strxxx& s2, const strxxx& s3) { concat(s2); concat(s3); }	/**< Concatenate two strings onto this string. */
+		void      concat(const strxxx& s2, const strxxx& s3, const strxxx& s4) { concat(s2); concat(s3); concat(s4); }	/**< Concatenate three strings onto this string. */
+		void      concat(const strxxx& s2, const strxxx& s3, const strxxx& s4, const strxxx& s5) { concat(s2); concat(s3); concat(s4); concat(s5); }	/**< Concatenate four strings onto this string. */
+		void      deleet(qshort pos, qshort len);                 /**< Delete a range of characters from a starting point in this string. */
+		void      insert(const strxxx& s1 ,qshort pos);           /**< Insert a string at an index position in this string. */
+		void      insert(qchar ch ,qshort pos);                   /**< Insert a single character at an index position in this string. */
+		void      justify(const strxxx& s1, qshort pos, qbool rjst, qbool usetabch); /**< Insert a string at an index position in this string and right justify if required. */
+		void      insertStr(const strxxx& s1);                    /**< Insert a string at the position of a '$' marker in this string. */
+		void      insertStr0(const strxxx& s1);                   /**< Insert a string at the position of a NULL marker in this string. */ //DRSxDAT
+		void      repWith0();                                     /**< Replace all '$' characters in this string with a NULL (0x0) character. */ //DRSxDAT
+		void      copy(const strxxx& s1, qshort pos, qshort len); /**< Copy all or part of a string to set the contents of this string. */
+		qshort 		pos(const strxxx& s1);													/**< Get the position of a string within this string. */
+		qshort 		pos(qchar ch1);																	/**< Get the position of a character within this string. */
+
+		// Start jmg0580
+		void			set(const qchar* add);													/**< Set this string from a NULL terminated Unicode C string. */
+		void			set(qchar ch);																	/**< Set this string to a single Unicode character. */
+		void			set(const qchar* add, qshort len);							/**< Set this string from a Unicode C string with length. */
+		void			set(const strxxx& s1);													/**< Set this string from another string. */
+
+		void			set(const qoschar* add);						 						/**< Set this string from a NULL terminated OS encoded C string. */
+		void			set(const qoschar* add, qshort len); 						/**< Set this string from an OS encoded C string with length. */
+
+		#ifdef isCOCOA
+			void			set(CFStringRef pCFStringRef);								/**< Set this string from a Core Foundation string ( macOS only ). */
+		#endif
+		// End jmg0580
+		// Start rmm9760
+		void			set(const std::string &pString)									/**< Set this string from a std::string */
+		{
+			setUtf8((qbyte *)pString.c_str(), (qlong)pString.length());
+		}
+		void			getStdString(std::string &pString) const;				/**< Get a std::string with the same contents as this string */
+		// End rmm9760
+
+		qshort    compare(const strxxx& s2) const;    						/**< Compare this string with another string. */
+		qshort    uprCmp(const strxxx& s2) const;     						/**< Compare this string with another string ignoring case. */ //DRS2073
+		qbool     operator ==(const strxxx& s2) const { return qbool (!compare(s2)); }		/**< Test if two strings are equal. */
+		qbool     operator !=(const strxxx& s2) const { return qbool (compare(s2)); }			/**< Test if two strings are not equal. */
+		qbool     operator >=(const strxxx& s2) const { return qbool (compare(s2)>=0); }	/**< Test if this string is greater than or equal to another string. */
+		qbool     operator <=(const strxxx& s2) const { return qbool (compare(s2)<=0); }	/**< Test if this string is less than or equal to another string. */
+		qbool     operator >(const strxxx& s2)  const { return qbool (compare(s2)>0); }		/**< Test if this string is greater than another string. */
+	qbool     operator <(const strxxx& s2)  const { return qbool (compare(s2)<0); }			/**< Test if this string is less than another string. */
+
+
+		qchar*    pString()   { return strp; }                /**< Get the address of the Pascal string data used by this string. */
+		qchar*    cString();                                  /**< Get the address of the C style string data used by this string. */
+		void 			upps();																			/**< Convert all characters in this string to uppercase. */
+		void			setUtf8(qbyte *add, qlong len);						 	/**< Set this string from a UTF-8 encoded C string. */ // rmmuni_osx6
+		#ifdef isCOCOA
+			strxxx(qshort maxlen1, CFStringRef pCFStringRef);   /**< Create a string from a Core Foundation string ( macOS only ). */ // MHMACH13
+			CFStringRef getCFStringRef();												/**< Get a Core Foundation string from this string ( macOS only ). */ // rmmuni_osx9
+		#endif
+		friend class CHRconvFromOs;
+};
+
+/**
+ The str255 class.
+ 
+ For storing strings with a maximum length of 255 characters.
+ */
+class str255: public strxxx {                 //str[255] class
+	private:
+		qchar strp1[256];																										/**< This is added to the 2 bytes in the base strxxx storage. */
+	public:
+		str255():strxxx(255) {}																							/**< Construct an empty string. */
+		str255(const str255& s1):strxxx(255,s1) {}													/**< Construct a copy of another str255 string. */	// ACJ0091
+		str255(const strxxx& s1):strxxx(255,s1) {}													/**< Construct a copy of a strxxx string. */	// ACJ0091
+		str255(const qchar* a):strxxx(255,a) {}															/**< Construct a string from a NULL terminated C string. */ // ACJ0091
+		str255(const qchar ch):strxxx(255,ch) {}														/**< Construct a string from a character. */ // ACJ0091
+		str255(const qchar* a, qshort len):strxxx(255,a,len) {}							/**< Construct a string from a C string with length. */
+		str255(qshort len, const qchar* a):strxxx(255,a,len) {}							/**< Construct a string from a C string with length. */	// ACJ0091
+		str255(const qoschar* a):strxxx(255,a) {}														/**< Construct a string from a NULL terminated OS encoded C string. */
+		str255(const qoschar* a, qshort len):strxxx(255,a,len) {}						/**< Construct a string from a NULL terminated OS encoded C string with length. */
+		str255(qshort len, const qoschar* a):strxxx(255,a,len) {}						/**< Construct a string from a NULL terminated OS encoded C string with length. */
+	#ifdef isCOCOA
+		str255(CFStringRef pCFStringRef):strxxx(255, pCFStringRef) {}				/**< Create a string from a Core Foundation string ( macOS only ). */	// MHMACH13
+	#endif
+		void operator =(const str255& s1) { assign(s1); }										/**< Assign a string to this string. */
+};
+
+/**
+ The str31 class.
+ 
+ For storing strings with a maximum length of 31 characters.
+ */
+class str31: public strxxx {   //str[31] class // mpmPRIv
+	private:
+		qchar strp1[31];																										/**< This is added to the 2 bytes in the base strxxx storage. */
+	public:
+		str31():strxxx(31) {}																								/**< Construct an empty string. */
+		str31(const str31& s1):strxxx(31,s1) {}															/**< Construct a copy of a str31 string. */
+		str31(const strxxx& s1):strxxx(31,s1) {}														/**< Construct a copy of a strxxx string. */
+		str31(const qchar* a):strxxx(31,a) {}																/**< Construct a string from a NULL terminated C string. */
+		str31(const qchar ch):strxxx(31,ch) {}															/**< Construct a string from a character. */
+		str31(const qchar* a, qshort len):strxxx(31,a,len) {}								/**< Construct a string from a C string with length. */
+		str31(qshort len, const qchar* a):strxxx(31,a,len) {}								/**< Construct a string from a C string with length. */
+		str31(const qoschar* a):strxxx(31,a) {}															/**< Construct a string from a NULL terminated OS encoded C string. */
+		str31(const qoschar* a, qshort len):strxxx(31,a,len) {}							/**< Construct a string from a NULL terminated OS encoded C string with length. */
+		str31(qshort len, const qoschar* a):strxxx(31,a,len) {}							/**< Construct a string from a NULL terminated OS encoded C string with length. */
+	#ifdef isCOCOA
+		str31(CFStringRef pCFStringRef):strxxx(31, pCFStringRef) {}					/**< Construct a string from a Core Foundation string ( macOS only ). */ // MHMACH13
+	#endif
+		void operator =(const str31& s1) { assign(s1); }										/**< Assign a string to this string. */
+};
+
+/**
+ The str15 class.
+ 
+ For storing strings with a maximum length of 15 characters.
+ */
+class str15: public strxxx {                  //str[15] class
+private:
+	qchar strp1[15];																										/**< This ia added to the 2 bytes in the base strxxx storage. */
+public:
+	str15():strxxx(15) {}																								/**< Construct an empty string. */
+	str15(const str15& s1):strxxx(15,s1) {}															/**< Construct a copy of a str15 string. */
+	str15(const strxxx& s1):strxxx(15,s1) {}														/**< Construct a copy of a strxxx string. */
+	str15(const qchar* a):strxxx(15,a) {}																/**< Construct a string from a NULL terminated C string. */
+	str15(const qchar ch):strxxx(15,ch) {}															/**< Construct a string from a character. */
+	str15(const qchar* a, qshort len):strxxx(15,a,len) {}								/**< Construct a string from a C string with length. */
+	str15(qshort len, const qchar* a):strxxx(15,a,len) {}								/**< Construct a string from a C string with length. */
+	str15(const qoschar* a):strxxx(15,a) {}															/**< Construct a string from a NULL terminated OS encoded C string. */
+	str15(const qoschar* a, qshort len):strxxx(15,a,len) {}							/**< Construct a string from a NULL terminated OS encoded C string with length. */
+	str15(qshort len, const qoschar* a):strxxx(15,a,len) {}							/**< Construct a string from a NULL terminated OS encoded C string with length. */
+#ifdef isCOCOA
+	str15(CFStringRef pCFStringRef):strxxx(15, pCFStringRef) {}					/**< Construct a string from a Core Foundation string ( macOS only ). */ // MHMACH13
+#endif
+	void operator =(const str15& s1) { assign(s1); }										/**< Assign a string to this string. */
+};
+
+/**
+ The str80 class.
+ 
+ For storing strings with a maximum length of 80 characters.
+ */
+class str80: public strxxx {
+private:
+	qchar strp1[80];																										/**< This ia added to the 2 bytes in the base strxxx storage. */
+public:
+	str80():strxxx(80) {}																								/**< Construct an empty string. */
+	str80(const str80& s1):strxxx(80,s1) {}															/**< Construct a copy of a str80 string. */
+	str80(const strxxx& s1):strxxx(80,s1) {}														/**< Construct a copy of a strxxx string. */
+	str80(const qchar* a):strxxx(80,a) {}																/**< Construct a string from a NULL terminated C string. */
+	str80(const qchar ch):strxxx(80,ch) {}															/**< Construct a string from a character. */
+	str80(const qchar* a, qshort len):strxxx(80,a,len) {}								/**< Construct a string from a C string with length. */
+	str80(qshort len, const qchar* a):strxxx(80,a,len){}								/**< Construct a string from a C string with length. */
+	str80(const qoschar* a):strxxx(80,a) {}															/**< Construct a string from a NULL terminated OS encoded C string. */
+	str80(const qoschar* a, qshort len):strxxx(80,a,len) {}							/**< Construct a string from a NULL terminated OS encoded C string with length.*/
+	str80(qshort len, const qoschar* a):strxxx(80,a,len) {}							/**< Construct a string from a NULL terminated OS encoded C string with length.*/
+#ifdef isCOCOA
+	str80(CFStringRef pCFStringRef):strxxx(80, pCFStringRef) {}					/**< Construct a string from a Core Foundation string ( macOS only ). */ // MHMACH13
+#endif
+	void operator =(const str80& s1) { assign(s1); }										/**< Assign a string to this string. */
+};
+
+#pragma SET_BYTE_PACKING_OFF
+GCC_SET_BYTE_PACKING_OFF // MHMACH2
+
+#ifndef isGDIPLUS	// rmm9834
+	// Start rmm64bit1: integer conversion functions now work with more than just qlong
+	/**
+	 rmm9834: Convert an unsigned integer to a string.
+ 
+	 @tparam 			OMlong 	The integer type.
+	 @param[in] 	x 			The signed integer to convert.
+	 @param[out] 	s 			The result string.
+	 */
+	template <class OMlong> void ECOunsignedIntegerToString(OMlong x, strxxx& s)
+	{
+		if (x==0) { s[0]=1; s[1]='0'; }
+		else {
+			qshort l=0; qchar a[32];
+			qshort n=0; do { a[++n]=qchar(x % 10); x=x/10; } while (x!=0);
+			for (qshort i=n; i>0; i--) s[++l]='0'+a[i];
+			s[0]=(qchar)l;
+		}    
+	}
+
+	/**
+	 Convert a signed integer to a string.
+ 
+	 @tparam 			OMlong 	The integer type.
+	 @param[in] 	x 			The signed integer to convert.
+	 @param[out] 	s 			The result string.
+	 */
+	template <class OMlong> void ECOsignedIntegerToString(OMlong x, strxxx& s)
+	{
+		qshort l; qchar a[32];	
+		if (x==0) { s[0]=1; s[1]='0'; }
+		else {
+			if (x<0) 
+			{ 
+				// Start rmm9834: Cannot just negate if the value is the smallest value for the type
+				if (x == std::numeric_limits<OMlong>::min())
+				{
+					OMlong px = -(x + 1);
+					qulong64 pux = (qulong64)px;
+					++pux;
+					str255 s1;
+					ECOunsignedIntegerToString(pux, s1);
+					s.set('-');
+					s.concat(s1);
+					return;
+				}
+				// End rmm9834
+				l=1;
+				s[1]='-'; 
+				x=-x; 
+			} 
+			else l=0;
+			qshort n=0; do { a[++n]=qchar(x % 10); x=x/10; } while (x!=0);
+			for (qshort i=n; i>0; i--) s[++l]='0'+a[i];
+			s[0]=(qchar)l;
+		}    
+	}
+#endif	// #ifndef isGDIPLUS
+
+qchar ECOgetCoch(); // rmm8896
+/**
+ Convert a string to an integer.
+ 
+ @tparam 			OMlong	The integer type.
+ @param[in] 	s 			The string to convert.
+ @param[out] 	x 			The result signed integer.
+ @return							A value of qtrue if the string could be converted and qfalse if it could not be converted.
+ */
+template <class OMlong> qbool	ECOstringToSignedInteger(const strxxx& s,	OMlong& x)
+{
+	qchar coch = ECOgetCoch();	// rmm8896
+	
+	x=0; qbool neg=qfalse;
+	qshort len = 0;
+	#if (defined(isunix) && defined(is64bit)) || defined(isCOCOA) // rmm8543: isCOCOA
+		// rmm64bitux:
+		OMlong longMax = (sizeof(OMlong) == 4) ? INT_MAX : ((sizeof(OMlong) == 2) ? SHRT_MAX : LLONG_MAX);
+	#else
+		OMlong longMax = (sizeof(OMlong) == 4) ? LONG_MAX : ((sizeof(OMlong) == 2) ? SHRT_MAX : LLONG_MAX);	// Prevent warnings on Win32
+	#endif
+	int digMax = (sizeof(OMlong) == 4) ? 10 : ((sizeof(OMlong) == 2) ? 5 : 19);
+	for	(qshort	i=1; i<=s.length();	i++) {
+		qchar	ch=s[i];
+		if (ch=='-')
+		{
+			if (neg) return	qfalse;
+			else neg=qtrue;
+		}
+		else if	(ch>='0' &&	ch<='9')
+		{
+			if ((++len)>=digMax) { 
+				if (len>digMax)	{	x=0; return	qfalse;	}
+				if (x>longMax/10L)
+				{
+					x=0; return	qfalse;
+				}
+				x	*= 10L;
+				if(OMlong(longMax-OMlong(ch-'0'))<x)
+				{
+					x=0; return	qfalse;
+				}
+				x	+= (ch-'0');
+			}
+			else x=(x*10L)+(ch-'0');
+		}
+		else if	(	!(ch<=' '	|| ch==coch	|| ch=='+')	)	 { x=0;	return qfalse; } // rmm5461 // rmm8896
+	}
+	if (neg) x=-x;
+	return qtrue;
+}
+
+#define qlongToString ECOsignedIntegerToString              /**< Convert an integer value to a string. */
+#define stringToQlong ECOstringToSignedInteger							/**< Convert a string to an integer. */
+// End rmm64bit1
+
+void  qrealToString(qreal x, qshort dp, strxxx& s, qshort hashfdp=12);	/**< Convert a real value to a string. */
+qbool stringToQreal(const strxxx& s, qreal& x, qshort& dp);							/**< Convert a string value to a real. */
+
+qchar lowC(qchar ch);																/**< Convert a character to lower case. */
+qchar uppC(qchar ch);                               /**< Convert a character to upper case. */
+void 	uppC(qchar* add, qlong len);									/**< Convert a string to upper case. */ //DRS3004
+qshort uprCmp(qchar* add1, qchar* add2, qlong len); /**< Case insensitive string comparison. */ //DRSxDAT
+
+// Start rmm9400: hash and equal structs for std::unordered_map with str255 as a key
+/**
+ Structure implementing hash function for std::unordered_map using strxxx as a key
+ */
+struct strxxxMapHash
+{
+	
+	/**
+	 Calculate the hash value of a strxxx key.
+
+	 @param[in]	name	key
+	 @return 		hash	value
+	 */
+	size_t operator()(const strxxx &name) const
+	{
+		if (name.length() <= 1)
+			return name.length() ? name[1] : 0;
+		else
+			return name[1] + name[2];
+	}
+};
+
+
+/**
+ Structure implementing case sensitive equivalence function for std::unordered_map using strxxx as key arguments.
+ */
+struct strxxxMapEqualCaseSensitive
+{
+	
+	/**
+	 Case sensitive comparison of two key values.
+
+	 @param[in]	t1	String.
+	 @param[in]	t2	String to compare against t1.
+	 @return 				true if equal otherwise false.
+	 */
+	bool operator() (strxxx const& t1, strxxx const& t2) const
+	{
+		return !t1.compare(t2);
+	}
+};
+
+/**
+ Structure implementing case insensitive equivalence function for std::unordered_map using strxxx as key arguments.
+ */
+struct strxxxMapEqualCaseInsensitive
+{
+	/**
+	 Case insensitive comparison of two key values.
+
+	 @param[in]	t1	String.
+	 @param[in]	t2	String to compare against t1.
+	 @return 				true if equal otherwise false.
+	 */
+	bool operator() (strxxx const& t1, strxxx const& t2) const
+	{
+		return !t1.uprCmp(t2);
+	}
+};
+// End rmm9400
+
+// _STRCLASS_HE_:
+#endif

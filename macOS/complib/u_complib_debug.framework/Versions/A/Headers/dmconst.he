@@ -1,0 +1,1759 @@
+/*      $Header: svn://svn.omnis.net/trunk/Studio/O7EXE/INDY/dmconst.h 21619 2018-11-23 12:20:43Z gashford $ */
+
+//Q4 data manager dmconst.h
+//predefined constants for notation,etc.
+//Copyright (C) Blyth Holdings Inc 1992
+				 
+
+/* Changes
+Date			Edit				Bug					Description
+23-Nov-18	gra1167									Added kDAMNoClientLibrary for dynamic client loading
+15-Nov-18 pkcocoa_1233 ST/GR/352  issues with mouse over and tables
+26-Sep-18	rmm9799			ST/DB/1015	Added library preference $errorprocessing to control how unhandled errors are processed.
+23-Jul-18	bjw0057									Accessibility - Added $landmark property to JS Paged Pane.
+25-Jun-18	CR0525			ST/DC/672		Rationalise file operation errors ( kerr.. and kFileOps.. ).
+28-Nov-17	rmm9577			ST/RC/1270	Added save to PDF button to page preview toolbar.
+07-Aug-17	rmm9444									Remote object class.
+11-Apr-17	rmm9320			ST/NT/717		Added line-through font style.
+05-Apr-17	rmm9306			ST/RC/1260	Problems with paper sizes A7-A10 - these are not supported by Windows, so I have removed them.
+09-Mar-17	rmm9283			ST/CT/032		Added A6-A10 paper sizes.
+21-Dec-16	jmg0527			ST/JS/1505	Added kSFSflagPreventDrag Subform Set Add constant.
+25-Oct-16	rmm9123									Implemented $exportjson() and $importjson().
+19-Oct-16	rmm9117									Added option to have a footer for the fat client headed list box.
+18-Jul-16	rmm8982									Responsive design for JS client remote forms.
+20-Jun-16	rmm8946			ST/HE/1433	Changed OSX etc to macOS.
+29-Dec-15	rmm8700			ST/JS/464		JS client drag and drop.
+22-Jul-15	rmm_cai2								Coding assistance improvements - item reference subtype.
+02-Feb-15	rmm8497			ST/JS/1093	Added kEFruntimeLeftRightCenter, kEFruntimeTopBottomCenter and kEFruntimeAllCenter.
+05-Jun-14	jmg0114									Made $defaultappearance a form property. (Replaces much of jmg0113)
+21-May-14	rmm8331			ST/JS/987		Added evDragBorder.
+08-May-14	rmm8318									New and improved page preview - text searching.
+19-May-14	jmg0107									Added prePlatformXXX constants.
+22-Apr-14	rmm8306									New and improved page preview.
+28-Jun-13	rmm8026			OE-1701			Problems with linestyle and backpattern properties.
+07-Mar-13	gra0874									Added kDAMSqlError
+06-Aug-12	rmm7592									Flush justification for report text fields.
+08-May-12	rmm_sfs									JS client subform set implementation.
+25-Apr-12	gra0846									Added constants for worker errors
+17-Apr-12	rmm64bit1								First set of changes for 64 bit support: 64 bit Omnis data type.
+03-Feb-12	gra0838									Modified Worker constants
+18-Jul-11	rmm7186									JavaScript client date formatting and parsing.
+27-Jun-11	rmm7169									Animation support for JavaScript client.
+06-Jan-11	rmm7052									Added SQL wizard component store type.
+09-Dec-10	rmm7023									JavaScript client fonts and styles.
+09-Sep-10	rmm_jsc									JavaScript client core changes.
+08-Jan-10	rmm6853			ST/WO/2051	More DPI scaling issues.
+02-Sep-09	gra0670			ST/*A/075		Removed preSessionCharSetLatin & preSessionCharSetRoman
+13-Aug-09	rmm6734									Improvements to iPhone paged pane support.
+07-Aug-09	rmm6720									Added code page for OEM character set (CP 437).
+04-Aug-09	rmm6710			ST/WT/1464	evAnimationsComplete event for iPhone.
+04-Jun-09	rmm_iphone29						iPhone animation support.
+02-Jun-09	rmm_iphone25						Removed iphonedesign conditional compile checks. Core iPhone support is now enabled by the presence of the ipcomp folder.
+21-May-09 pkgradient							Gradient support
+16-Apr-09	rmm_iphone24						Navigation bar field.
+20-Mar-09	rmm_iphone18						Label field.
+09-Mar-09	rmm_iphone13						Text field controls.
+19-Feb-09	pkiphone9								Form transitions.
+10-Feb-09	rmm_iphone6							Sorted out core support for iPhone font table etc.
+19-Dec-08	rmm_ssl									Added OpenSSL support to WebEnabler: added ISO-8859 character conversion.
+07-Nov-08	rmm6490			ST/PF/604		Implemented $root.$prefs.$collectperformancedata.
+03-Nov-08	rmm6489									Added mobile device screen size configuration.
+28-Oct-08	gra0579									Added kSessionCharSetLatin and kSessionCharSetRoman
+20-Oct-08	rmm6484			ST/BE/259		Headed list columns can now be dragged to change column ordering.
+08-Sep-08	rmm6461									Iphone component design mode changes.
+18-Aug-08	rmm6397			ST/HI/1499+1500	Added control of screen report/preview copy selection and toolbar.
+02-Jul-08	rmm_rfmenu							Context menus for remote forms.
+19-Jun-08	rmm_mobile							Mobile device support - fonts and styles. Changes related to adding a new table marked rmm_mobile_fonts.
+02-Jun-08	rmm_mobile							Mobile device support.
+30-Nov-07	gra0490									Added constants for clientware Unicode conversion
+14-Aug-07	rmm6216									OSX look and feel improvements (required for Leopard).
+26-Feb-07	rmm6000									Windows Vista changes.
+01-Feb-07	rmm5965			ST/WO/1980	Added constant for radio group object.
+31-Oct-06	PK6773									replaced boolean constant on $movenode with constants
+19-Apr-06	rmm5712			ST/CT/026		Outline and shadow font styles removed - they are not supported by ATSUI.
+20-Mar-06	rmm5681			ST/WO/1861	Problems with round button on OSX.
+06-Dec-05	rmm_wsl									Added Web Services server logging.
+21-Sep-05	rmm_ws2									Web services - remote task instance and method properties.
+25-May-05	rmm5383			ST/NT/528		Added kSp constant for the space character.
+18-Apr-05	rmm5334			UN/IE/092		...continued: $importencoding and $exportencoding.
+14-Apr-05	rmm5333			UN/IE/092		Unicode version import-export now supports different Ansi code pages.
+08-Mar-05	rmm5296			ST/WO/1783	Send selection change event after deleting fields via keyboard.
+																	Added evSelectionDelete message for report modify fields.
+21-Feb-04	PK6460			ST/WO/1781:	New column header resize message
+10-Dec-04	AE6540			ST/HE/593: 	Added $designdpi & $designdpimode
+22-Nov-04	AE6535			ST/EC/866: 	Added OLE drag&drop
+31-Aug-04	rmm5078									Added uniconv() function.
+12-May-04	AE6458			ST/GR/224: 	Enhanced $canresizerows to allow either row/header or both to be sized
+12-Feb-04 MHn0311			ST/HE/675		Added paper sizes for the STAR TSP600 receipt printer.
+25-Sep-03	rmm4731									Added some more system key constants.
+16-Sep-03 MHPRT										OSX Printing Enhancements
+08-Sep-03 pk6309			ST/WO/1546	User palette control constants
+16-Jun-03	rmm4553									Added constant for color palette control.
+16-Jun-03	AE6261			ST/HE/574		Added 'change prt no msg' option to $printernotify
+12-Jun-03	rmm4547			ST/WC/325		Problems with push button, checkbox, and radio button backgrounds.
+30-May-03	rmm4524									$hottree property, to enable XP-like tree behaviour.
+22-May-03	rmm4503									Correct borders for group boxes, lists and edit fields with XP themes.
+19-May-03	rmm4493									Added evDragFinished event.
+07-May-03	rmm4483									In toolbar variable text width mode, display icons beside the text on Windows and Unix.
+																	Also, make toolbars look more like XP on XP.
+14 APR 03	mpmStatus								Adds top/center aligned status bar options
+02-Apr-03	rmm4404									Added kCursFinger.
+19 FEB 02 mpmToolbars							Re-write of large part of toolbar code for new large icon and variable width modes
+10 DEC 02 mpmSheets								Implements sheets on OSX
+03-Oct-02	rmm4273			ST/PC/344		Added kSq and kDq.
+16-Sep-02	rmmv4obj								Added support for pointer-style objects (object reference variables).
+11 SEP 02 mpmBackPic							Implements $backpicture for reports
+31 JUL 02 mpmSecFill							Implements borders and background fill for section objects and page
+24 JUL 02	gra0091									Added kSessionNoDriverManager
+03 JUL 02 mpmFitonpage						Implements kFitonpage section positioning mode
+17-Jun-02	AE6100									V4: Added Skins
+10-Jun-02	AE6098									Added rotated text to GDIdrawTextJst
+28 may 02 PKv40a									v0 browser
+14-Jan-02 PK6254									Added new mouseover constant
+05-Jun-01	rmm4132			ST/WO/1289	Obsolete styles did not work.
+25-Mar-01	rmm4074									mvDesigner part 2.
+27-Feb-01	rmm4068									MV Designer.
+06 FEB 01 mpmCarbon24							Implements round button
+14 NOV 00 mpmCarbon								OSX changes
+20 OCT 00 mpmCarbon								OSX Changes NOT MARKED
+25-Aug-00	cr1137									Add serialisation error code for DAMs
+14-Jul-00	cr1129									Add error when statement has no session						
+13-Jul-00	cr1126									Add more codes for $maptable errors and $begin
+27-Jun-00	cr1115			ST/*B/008		Added error code when DAM does not support transactions									
+21-Jun-00	cr1111									DAM SQL separator and map table errors
+08-Jun-00	cr1105									More DAM error codes
+05-May-00	AE5049									Added Context key to Classic & Studio
+03-Apr-00	rmm3693									RPCs for new DAMs.
+13-Mar-00	rmm3679									$sessions
+13-Mar-00	cr1030									Added NVD character mapping errors
+06-Mar-00 PK6009									Datagrid 
+29-Feb-00	cr1028									Added NVD errors & execdirect state
+14-Feb-00	rmm3624									Added evFormToTop event to remote form, to support multiple forms.
+08-Feb-00	cr1012									Non-Visual DAM errors
+21-Dec-99	rmm3573			ST/CT/018		Added kTab, kCr and kLf.
+15-Dec-99	rmm3568									Added meta-data methods to new ODBC DAM
+10-Dec-99	cr0003									DAM session and statement objects
+09-Dec-99	rmm3554									Added ability to specify that tree nodes are initially expanded.
+06-Dec-99	rmm3551									Added $picturealign and $keepaspectratio picture field properties.
+05-Nov-99	pkstartup								Added another welcome tool constant
+05-Nov-99	rmm3514									New... and Open... added to file menu.
+22-Jul-99	rmm3457			ST/SC/045		Added kFetchAll.
+21-Jan-99	rmm3315									Improved support for Wizards.
+15 JAN 99 MHn0015			ST/WT/002		Removed THIN_CLIENT symbol.
+03 NOV 98	mpmTHINd								Thin client implementation
+14 OCT 98 mpmTHINa								Thin client implementation
+18-Aug-98	rmm3199									24 Bit Colour Shared Pictures.
+07-Jan-98	rmm2910			ST/WO/741FC	$columnalignmode for the headed list box.
+17-Dec-97	rmm2885			ST/NT/180		Small Improvement to $remove for lists.
+04 DEC 97 mpmPRIt									Implements constants for standard devices
+17-Nov-97	rmm2783			ST/WO/686		Can now place color/pattern/line-style picker control directly on a window.
+11 NOV 97 mpmPRIo									Renamed ePosMargin and mMarginBounds
+07-Nov-97	rmm2758									Better handling of cursor properties.
+05 NOV 97	mpmPRIk									New report class properties
+03 NOV 97 mpmPRIi									Device preferences
+03-Nov-97	rmm2744									Reorganised anums and constants, and made some performance improvements to them.
+25 OCT 97 mpmPRIf									New report pos notation
+17-OCT-97	mpmPRI									New print manager implementation.
+06-Oct-97	mt40314									System Drag & Drop
+30-Sep-97	rmm2683									Query class implementation.
+09-Jul-97 PK4625									MacOS8
+27 JUN 97 mpmPRI									Implementation of new print manager
+17-Jun-97	rmm2541			PR/HI/165		Taskbar.
+23-May-97	rmm2511									Single pixel embossed and inset effects.
+21-May-97	rmm2506			PR/IE/012FC	Implemented user delimited import/export type.
+05-Mar-97	rmm2327									Welcome library support.
+14-Jan-97	rmm2173			PR/RC/029		$exportformat was not available in report design mode.
+11 NOV 96 mpm4086									New toolbar controls
+31-Oct-96	rmm1924			PR/SC/005		kDatetime sub-type had disappeared!
+25-Oct-96	rmm1899									Tools menu integration for environment.
+16 OCT 96 mpm4085									New report design user field
+18-Oct-96	rmm1890									Heading list user control.
+14-Oct-96	AE4222									Page control
+08-Oct-96	AE4211									Removed graph constants
+01 OCT 96 mpm4080									style function implementation
+01-Oct-96	PK4297									Tree List
+01-Oct-96	rmm1826									Icon array as a user control - stage 1.
+30-Sep-96	DRS4132									Object variables
+04-Sep-96	rmm_hlp									Prometheus help implementation: Context help method command
+27-Aug-96	mtGroupBox							Group-box control
+09-Aug-96	rmm1626									Added component ids to floating attributes.
+29-Jul-96	AE4105									Tabpane - Styles & positions
+26 JUL 96	mtToolEdit							Toolbar Editor
+22 JUL 96	rmm1576									Palette mode for component store.
+19-Jul-96	AE_STY									Cross platform styles for V4
+10-Jul-96	rmm_ni2									Notation inspector fixes.
+06-Jul-96	DRS4069									Event parameter variables
+03-Jul-96	rmm1519									$canfocusbuttons now works again.
+29-Jun-96	DRS4068									Drag and drop for user windows
+01-Jul-96	mtMenuEdit							Menu editor constants
+24-Jun-96	rmm1481									Table instance notation.
+15-Jun-96 PK4085									Formatting consts
+10-Jun-96	rmm_st									Initial implementation of schemas and tables.
+07-Jun-96	PK4050									More color constants
+06-Jun-96	rmm1431									More F9 improvements.
+01-Jun-96	PK4016									added pre3DSystemButtonF,pre3DSystemButtonL
+29-Apr-96	DRS4056									v4 event handling
+12-Mar-96	DRS4051									Smart lists
+26-Jan-96	rmm1293									Open window command changes.
+13-Dec-95	C4_PRI_002							report interval breaks (ported from Agate by DRS)
+29-Nov-95	DRS4000...DRS4038				v4 OO changes
+31/8/95 PK3755 gr/tb/104fc added extra constant
+18-Apr-95	AE_WCO	Window components (statusbars,menubars and toolbars) implementation
+23-Feb-94 AE0055	Date func constants.
+17-Feb-94 AE0049  Further graphit constants 
+16-Feb-94 AE0049	GraphIt constants.
+07-2-94	 rmm0655	Implemented $totalmode.
+28-1-93 PKG313 3d button support
+25-1-94	 rmm0627	Implemented $clib.$prefs.$canfocusbuttons
+11-1-94  PKA305-1 added toolbar controls constants
+
+20-12-93 PKA305 Toolbar implementation.
+
+8-10-93			PKG308 GRCG308 color changes for granite
+
+15-3-93 PK2104 added missing key constants
+
+12 JAN 1993		mpmG025 Table field implementation
+15-Dec-1992		PK increase kConstFinal
+
+19-Nov-1992		PKL03 increase kConstFinal and added a few more groups
+
+29-Oct-1992		PKL03 added keyboard consts.  Added start/end const for F9 List.
+
+*/
+
+
+#ifndef _dmconst_
+#define _dmconst_
+
+const qshort rnumPreconst0=31000; // rmm2744
+
+const qshort 
+
+				preNone=0,
+				preFirst=1,
+					preBoolFalse=1,
+					preBoolTrue=2,
+					preBoolUnknown=3,							// rmm3568
+				preEventreturnF=5,							//first and last event handler return values //DRS4056
+					preEventreturnHandle=5,
+					preEventreturnDiscard=6,
+				preEventreturnL=6,
+//#ifdef THIN_CLIENT MHn0015
+				preFormattypeF=12,              //PKv40a first and last $formattype values (fXxxx) // mpmTHINa rmm_st DRS4132 // rmm2683 // rmm_rfmenu // rmm9444
+					preFormattypeRemoteObject = 12,		//9444
+					preFormattypeRemoteMenu=13,				//rmm_rfmenu
+					preFormattypeFolder=14,						//PKv40a
+					preFormattypeRemoteTask=15,
+					preFormattypeRemoteForm=16,
+//#else MHn0015
+//				preFormattypeF=17, MHn0015
+//#endif MHn0015
+					preFormattypeQuery=17,				// rmm2683
+					preFormattypeObject=18,
+					preFormattypeTable=19,
+					preFormattypeFile=20,
+					preFormattypeWindow=21,
+					preFormattypeReport=22,
+					preFormattypeSearch=23,
+					preFormattypeMenu=24,
+					preFormattypeTask=25,
+					preFormattypeCode=26,
+					preFormattypeToolbar=27,
+					preFormattypeSchema=28,
+					preFormattypeSysTable=29,
+				preFormattypeL=29,
+				preFfttypeF=30,									//first and last field types (fftXxxx)
+					preFfttypeCharacter=30,
+					preFfttypeInteger=31,
+					preFfttypeNumber=32,
+					preFfttypeDate=33,
+					preFfttypeBoolean=34,
+					preFfttypeSeq=35,
+					preFfttypePic=36,
+					preFfttypeList=37,
+					preFfttypeBin=38,
+					preFfttypeIRef=39,
+					preFfttypeFldName=40,
+					preFfttypeRow=41,
+					preFfttypeObject=42,
+					preFfttypeObjref=43,					// rmmv4obj
+				preFfttypeL=47,									// rmm9123
+				preWrobjBackComponent = 48,			// rmm9123
+				preCharsubF=50,									//first and last character field subtypes
+					preCharsubSimple=50,
+					preCharsubNat=51,
+				preCharsubL=54,
+				preIntsubF=55,									//first and last integer field subtypes
+					preIntsub32BitInt=55,					// rmm64bit1: Renamed from longint
+					preIntsubShortInt=56,
+					preIntsub64BitInt=57,					// rmm64bit1
+				preIntsubL=59,
+				preNumbsubF=60,									//first and last number field subtypes
+					preNumbsubFloat=60,
+					preNumbsub0DP=61,
+					preNumbsub1DP=62,
+					preNumbsub2DP=63,
+					preNumbsub3DP=64,
+					preNumbsub4DP=65,
+					preNumbsub5DP=66,
+					preNumbsub6DP=67,
+					preNumbsub8DP=69,
+					preNumbsub10DP=71,
+					preNumbsub12DP=73,
+					preNumbsub14DP=75,
+					preNumbsub0DPshortNum=78,
+					preNumbsub2DPshortNum=79,
+				preNumbsubL=79,
+				preDatesubF=80,									//first and last date field subtypes
+					preDatesubDate1900=80,
+					preDatesubDate1980=81,
+					preDatesubDate2000=82,
+					preDatesubTime=83,
+					preDatesubDateTime=84,				// rmm1924
+				preDatesubL=84,                 //PK4168
+				preWrobjF=86,										//first and last window/report object types (ftXxxx) // mpm4085 // mtGroupBox mpm4028o // rmm1826 AE4222 // rmm1890 // rmm4553 // rmm5965
+					preWrobjRadioGroup=86,				// rmm5965
+					preWrobjColorPalette=87,			// rmm4553
+					preWrobjHeadedListBox=88,			// rmm1890
+					preWrobjScreenRep=89,
+					preWrobjRepMod=90,
+					preWrobjPagePane=91,
+					preWrobjDataGrid=92,
+					preWrobjIconArray=93,
+					preWrobjTabPane=94,
+					preWrobjGroupBox=95,
+					preWrobjCheckBoxList=96,
+					preWrobjStringGrid=97,
+					preWrobjTreeList=98,
+					preWrobjTabStrip=99,
+					preWrobjEntry=100,
+					preWrobjCheckBox=101,
+					preWrobjRadio=102,
+					preWrobjPushButton=103,
+					preWrobjButtonArea=104,
+					preWrobjListBox=105,
+					preWrobjPicture=106,
+					preWrobjPopMenu=107,
+					preWrobjPopList=108,
+					preWrobjDropList=109,
+					preWrobjCombo=110,
+					preWrobjGrid=112,
+					preWrobjComponent=113,
+					preWrobjText=116,
+					preWrobjRect=117,
+					preWrobjRoundRect=118,
+					preWrobjOval=119,
+					preWrobjLine=120,
+					preWrobjBackPicture=121,
+					preWrobjSection=122,
+					preWrobjSubWindow=123,
+					preWrobjMaskEdit=124,
+					preWrobjMultiLineEdit=125,
+					preWrobjScrollBox=126,
+					preWrobjRect3D=127,
+					preWrobjBObj=128,
+					preWrobjLabel=129,
+				preWrobjL=129,
+				preWstyleF=130,									//first and last window styles
+					preWstyleTitle=130,
+					preWstyleDialog=131,
+					preWstyleSimple=133,
+					preWstyleNoFrame=134,
+					preWstylePalette=135,
+				preWstyleL=139,
+				preButtmodeF=140,								//first and last pushbutton modes
+					preButtmodeUser=140,
+					preButtmodeOk=141,
+					preButtmodeCancel=142,
+					preButtmodeNext=143,
+					preButtmodePrev=144,
+					preButtmodeFind=145,
+					preButtmodeEdit=146,
+					preButtmodeInsert=147,
+					preButtmodeInsertCV=148,
+					preButtmodeDelete=149,
+					preButtmodeClear=150,
+					preButtmodeMainFile=151,
+					preButtmodeColorPicker=152,				// rmm2783
+					preButtmodeLinestylePicker=153,		// rmm2783
+					preButtmodePatternPicker=154,			// rmm2783
+				preButtmodeL=159,
+				preFontstyleF=160,							//first and last font styles
+						preFontstylePlain=160,
+						preFontstyleBold=161,
+						preFontstyleItalic=162,
+						preFontstyleUnderline=163,
+						preFontstyleLineThrough=164,			// rmm9320: was outline
+						preFontstyleL=164,								// rmm5712 // rmm9320
+						preFontstyleShadowObsolete=165,		// rmm5712: not supported by ATSUI
+				preFontstyleL2=169,										// rmm5712: end of range reserved for font styles - currently the code only uses preFontstyleF to preFontstyleL
+				preJstF=170,										//first and last justifications
+					preJstLeft=170,
+					preJstRight=171,
+					preJstCenter=172,
+					preJstExtending=173,
+					preJstJustified=174,	// rmm7592
+				preJstLPropList=172,	// rmm7592: exclude justified from most justification droplists
+				preJstL=174, // rmm_cai2
+				preSBJstF=preJstLeft,			// mpmStatus
+				preSBJstL=preJstCenter,		// mpmStatus
+				preEdgefloatF2 = 176,							// Start rmm8497
+					preEdgefLeftRightCenter = 176,
+					preEdgefTopBottomCenter = 177,
+					preEdgefAllCenter = 178,																				
+				preEdgefloatL2 = 178,							// End rmm8497
+				preEdgefloatF = 180,							//first and last edge float modes
+					preEdgefNone=180,
+					preEdgefRight=181,
+					preEdgefLeft=182,
+					preEdgefBottom=183,
+					preEdgefTopBottom=184,
+					preEdgefRightBottom=185,
+					preEdgefRightTopBottom=186,
+					preEdgefLeftRightBottom=187,
+					preEdgefAll=188,
+				preEdgefloatLastBack=188,				//rmm1626: last floating mode for background objects
+					preEdgefMenubar=189,
+					preEdgefTopToolbar=190,
+					preEdgefBottomToolbar=191,
+					preEdgefLeftToolbar=192,
+					preEdgefRightToolbar=193,
+					preEdgefStatusbar=194,
+					preEdgefMainHeader=195,
+					preEdgefHorzHeader=196,
+					preEdgefVertHeader=197,
+					preEdgefJoinHeaders=198,
+					preEdgefClient=199,
+				preEdgefloatL=199,							//rmm1626
+				preSectypeF=200,								//first and last section header types
+					preSectypeHeading=200,
+					preSectypeRecord=201,
+					preSectypeSubTotalHead=202,
+					preSectypeTotals=203,
+					preSectypePositioning=204,
+					preSectypeEndReport=205,
+					preSectypeSubTotal1=206,
+					preSectypeSubTotal2=207,
+					preSectypeSubTotal3=208,
+					preSectypeSubTotal4=209,
+					preSectypeSubTotal5=210,
+					preSectypeSubTotal6=211,
+					preSectypeSubTotal7=212,
+					preSectypeSubTotal8=213,
+					preSectypeSubTotal9=214,
+					preSectypeSubTotalHead1=215,
+					preSectypeSubTotalHead2=216,
+					preSectypeSubTotalHead3=217,
+					preSectypeSubTotalHead4=218,
+					preSectypeSubTotalHead5=219,
+					preSectypeSubTotalHead6=220,
+					preSectypeSubTotalHead7=221,
+					preSectypeSubTotalHead8=222,
+					preSectypeSubTotalHead9=223,
+					preSectypeReportHead=224,
+					preSectypeFooter=225,
+				preSectypeL=229,
+				prePagemodeF=230,								//first and last section header page modes
+					prePagemodeNoBreak=230,
+					prePagemodeNewPage=231,
+					prePagemodeTestSpace=232,
+					prePagemodeFitOnPage=233, // mpmFitonpage
+				prePagemodeL=239,
+				preStartmodeF=240,						  //first and last section start modes
+					preStartmodeFollow=240,
+					preStartmodeFromtop=241,
+					preStartmodeFromend=242,
+					preStartmodeFromtopmarg=243,
+					preStartmodeFrombottommarg=244,
+				preStartmodeL=249,
+				preSearchlineF=250,							//first and last search line types (qytXxxx)
+					preSearchlineGTE=250,
+					preSearchlineLTE=251,
+					preSearchlineEQ=252,
+					preSearchlineNEQ=253,
+					preSearchlineCON=254,
+					preSearchlineBEG=255,
+					preSearchlineNULL=256,
+					preSearchlineNOTNULL=257,
+					preSearchlineAND=258,
+					preSearchlineOR=259,
+					preSearchlineCALC=260,
+					preSearchlineLIKE=261,
+					preSearchlineNOTLIKE=262,
+					preSearchlineCHILD=263,
+					preSearchlineNOTCHILD=264,
+					preSearchlinePARENT=265,
+					preSearchlineNOTPARENT=266,
+					preSearchlineNONE=267,
+				preSearchlineL=269,
+				preExpformF=273,								//first and last export formats // rmm2173
+					preExpformNone=273,						// rmm2173
+					preExpformComma=274,
+					preExpformTabs=275,
+					preExpformOPL=276,
+					preExpformODT=277,
+					preExpformUser=278,						// rmm2506
+				preExpformL=289,
+				preFilemodeF=290,								//first and last file modes (dmdXxxx)
+					preFilemodeReadWrite=290,
+					preFilemodeReadOnly=291,
+					preFilemodeMemory=292,
+					preFilemodeClosed=293,
+				preFilemodeL=299,
+				// Start rmm_sfs:
+				preSFSflagsF = 300,
+				preSFSflagsL = 311, // jmg0527
+				// End rmm_sfs
+				preKeycodesF=312,								//PKL03 first and last keyvalues values  PK2104 ae5049 // rmm4731
+					preKeycodesTabkey=312,				// Start rmm4731
+					preKeycodesReturn=313,
+					preKeycodesEnter=314,
+					preKeycodesEscape=315,				// End rmm4731
+					preKeycodesContext=316,
+					preKeycodesKeyboard=317,
+					preKeycodesInsert=318,
+					preKeycodesClear=319,
+					preKeycodesUp=320,
+					preKeycodesDown=321,
+					preKeycodesLeft=322,
+					preKeycodesRight=323,
+					preKeycodesPageUp=324,
+					preKeycodesPageDown=325,
+					preKeycodesPageLeft=326,
+					preKeycodesPageRight=327,
+					preKeycodesHome=328,
+					preKeycodesEnd=329,
+					preKeycodesBack=330,
+				preKeycodesL=330,
+				preDragModesF=331,							//PKL03 first and last uddrag values
+					preDragModesNoDrag=331,
+					preDragModesDragData=332,
+					preDragModesDragObject=333,
+					preDragModesDragDup=334,
+					preDragModesFiles=335,				// mt40314
+					preDragModesFileData=336,			// AE6535
+				preDragModesL=336,
+				preDropModesF=337,							//PKL03 first and last uddrop values
+					preDropModesNone=337,
+					preDropModesEdit=338,
+					preDropModesButton=339,
+					preDropModesList=340,
+					preDropModesPic=341,
+					preDropModesDropList=342,
+					preDropModesPopMenu=343,
+					preDropModesComboBox=344,
+					preDropModesGrid=345,
+					preDropModesAll=346,
+					preDropModesSystem=347,
+					preDropModesFile=348,				// mt40314		
+					preDropModesFileData=349,				// mt40314		AE6535
+				preDropModesL=349,				
+				preMOverModesF=350,							//PKL03 first and last mouse over modes
+					preMOverModesIRef=350,
+					preMOverModesCharPos=351,
+					preMOverModesLine=352,
+					preMOverModesHorz=353,
+					preMOverModesVert=354,
+					preMOverModesPLine=355,
+					preMOverModesHorzCol=356,	//PK6254
+          preMOverModesComplexGridRow=357,  //pkcocoa_1233
+				preMOverModesL=357,		// pkcocoa_1233 mpmG025	PK6254
+				preDropModesControl=359,	// rmm8700
+				preTabsecF=360,									//DRS2009
+					preTabsecNone=360,
+					preTabsecHeader=361,
+					preTabsecColumnHeader=362,
+					preTabsecRow=363,
+					preTabsecOther=364,
+				preTabsecL=364,				// rmm2758
+				preCursorF=365,									//first and last mouse cursor values //DRS2017 // rmm_ni2 // rmm1576 // rmm2758
+					preCursorCustom=365,		// rmm2758
+					preCursorDefault=366,		// rmm2758
+					preCursorCross=367,
+					preCursorMove=368,
+					preCursorArrowWatch=369,
+					preCursorArrow=370,
+					preCursorWatch=371,
+					preCursorIBeam=372,
+					preCursorLock=373,
+					preCursorHelp=374,
+					preCursorNoGo=375,
+					preCursorDragobject=376,
+					preCursorCopy=377,
+					preCursorMulCopy=378,
+					preCursorVSplit=379,
+					preCursorHSplit=380,
+					preCursorTrash=381, // rmm2758
+					preCursorExamine=382,
+					preCursorSizeVert=383,
+					preCursorSizeHorz=384,
+					preCursorSizeTlBr=385,
+					preCursorSizeBlTr=386,
+					preCursorInsert=387,
+					preCursorDragData=388,
+					preCursorFinger=389,
+				preCursorL=389,
+				preDragRangeF=390,							//first and last drag range values //DRS4068
+					preDragRangeAll=390,
+					preDragRangeTask=391,
+					preDragRangeWindow=392,
+					preDragRangeSubWindow=393,
+				preDragRangeL=393,
+				prerrF=400,
+					prerrCantlock=400,							//DRS2006 all this group
+					prerrDuplock=401,
+					prerrUnqindex=402,
+					prerrNonull=403,
+					prerrBadlibrary=404,
+					prerrBaddata=405,
+					prerrCantopen=406,
+					prerrCantcreate=407,
+					prerrNoaccess=408,
+					prerrCantshare=409,
+					prerrWriteprot=410,
+					prerrDiskfull=411,
+					prerrCantdelete=412,
+					prerrPortinuse=413,
+					prerrPortdriver=414,
+					prerrBadnotation=415,
+					prerrBadproctext=416,
+					prerrSQL=417,
+					prerrTestTool=418,
+					prerrNoInstance=419,
+					prerrTaskVar=420,
+					prerrInheritedVar=421,
+					prerrEventParameter=422,
+					prerrSuperClass=423,
+					prerrListClass=424,
+					prerrObjectClass=425,
+					prerrObjectRecursion=426,
+				prerrL=426,
+				prerrDiskRead=1040,         	// CR0525 Start
+				prerrDiskWrite=1041,
+				prerrNotFound=1042,
+				prerrNotOpen=1043,
+				prerrEOFRead=1044,
+				prerrEOFWrite=1045,
+				prerrAlreadyExists=1046,			// CR0525 End
+				preColorF=430,								// PKG308
+					preColorBlack=430,
+					preColorDarkBlue=431,
+					preColorDarkGreen=432,
+					preColorDarkCyan=433,
+					preColorDarkRed=434,
+					preColorDarkMagenta=435,
+					preColorDarkYellow=436,
+					preColorDarkGray=437,
+					preColorBlue=438,
+					preColorGreen=439,
+					preColorCyan=440,
+					preColorRed=441,
+					preColorMagenta=442,
+					preColorYellow=443,
+					preColorGray=444,
+					preColorWhite=445,
+					preColorTransparent=446,
+				preColorL=446,								// PKG308				
+					preToolbarNone=449,
+				preToolbarF=450,							// PKA305
+					preToolbarTop=450,
+					preToolbarBottom=451,
+					preToolbarLeft=452,
+					preToolbarRight=453,
+					preToolbarFloating=454,
+				preToolbarL=454,							// PKA305  PK3755				
+				preToolControlF=457,					// mpm4086
+					preToolControlColorPicker=457, // mpm4086
+					preToolControlLinestylePicker=458, // mpm4086
+					preToolControlPatternPicker=459, // mpm4086
+					preToolControlSpacer=460,
+					preToolControlCmdButton=461,
+					preToolControlToggle=462,
+					preToolControlRadio=463,
+					preToolControlMenu=464,
+					preToolControlList=465,
+					preToolControlDropList=466,
+					preToolControlCombo=467,
+					preToolControlFontCombo=468, // mpm4086
+					preToolControlFontsizeCombo=469, // mpm4086
+				preToolControlL=469,					// mpm4086		// mtToolEdit		
+				preButtonFocusF=470,					// rmm1519
+					preButtonFocusDefault=470,
+					preButtonFocusNoFocus=471,
+					preButtonFocusFocus=472,
+				preButtonFocusL=472,					// rmm1519
+				pre3DStyleFDefault=1400,
+				pre3DStyleF=1401, // mpmCarbon new group
+					pre3DStyleDefault=1400,
+					pre3DStyleFlat=1401,
+					pre3DStylePlain=1402,
+					pre3DStyleInset=1403,
+					pre3DStyleEmbossed=1404,
+					pre3DStyleBevel=1405,
+					pre3DStyleInsetBevel=1406,
+					pre3DStyleChisel=1407,
+					pre3DStyleEmbossedChisel=1408,
+					pre3DStyleShadow=1409,
+					pre3DStyleSingleInset=1410,
+					pre3DStyleSingleEmbossed=1411,
+					pre3DStyle3DFace=1412,
+					pre3DStyle3DHilite=1413,
+					pre3DStyleCtrlEdit=1414,
+					pre3DStyleCtrlList=1415,
+					pre3DStyleCtrlListCell=1416,
+					pre3DStyleCtrlTabPane=1417,
+					pre3DStyleCtrlShadow=1418,
+					pre3DStyleCtrlShadowEx=1419,
+					pre3DStyleCtrlGroupBox=1420,	// rmm4503
+					pre3DStyleCtrlDropList=1421,	// rmm6000
+					pre3DStyleCtrlComboBox=1422,	// rmm6000
+				pre3DStyleL=1422,								// rmm4503 // rmm6000
+				// Start rmm4132: obsolete styles, needed for backwards compatibility
+				pre3DStyleObsoleteF=473,
+					pre3DStyleObsoleteSingleInset=473,
+					pre3DStyleObsoleteSingleEmbossed=474,
+					pre3DStyleObsoleteFlat=475,
+					pre3DStyleObsoletePlain=476,
+					pre3DStyleObsoleteInset=477,
+					pre3DStyleObsoleteEmbossed=478,
+					pre3DStyleObsoleteBevel=479,
+					pre3DStyleObsoleteInsetBevel=480,
+					pre3DStyleObsoleteChisel=481,
+					pre3DStyleObsoleteEmbossedChisel=482,
+					pre3DStyleObsoleteShadow=483,
+				pre3DStyleObsoleteL=483,
+				pre3DStyleObsoleteDefault=484,
+				// End rmm4132
+				preOrientF=495,									// mpmPRIk begins
+					preOrientDefault=495,
+					preOrientPortrait=496,
+					preOrientLandscape=497,
+					preOrientRotatedPortrait=498, // not supported
+					preOrientRotatedLandscape=499,
+				preOrientL=499,							// mpmPRIk ends
+				prePaperF=500,							// mpmPRI begins
+					prePaDefault=500,
+					prePaUsLetter=501,
+					prePaUsLetterSmall=502,
+					prePaTabloid=503,
+					prePaLedger=504,
+					prePaUsLegal=505,
+					prePaStatement=506,
+					prePaExecutive=507,
+					prePaA3=508,
+					prePaA4=509,
+					prePaA4Small=510,
+					prePaA5=511,
+					prePaB4=512,
+					prePaB5=513,
+					prePaFolio=514,
+					prePaQuarto=515,
+					prePa10X14=516,
+					prePa11X17=517,
+					prePaNote=518,
+					prePaEnv9=519,
+					prePaEnv10=520,
+					prePaEnv11=521,
+					prePaEnv12=522,
+					prePaEnv14=523,
+					prePaCSheet=524,
+					prePaDSheet=525,
+					prePaESheet=526,
+					prePaEnvDL=527,
+					prePaEnvC5=528,
+					prePaEnvC3=529,
+					prePaEnvC4=530,
+					prePaEnvC6=531,
+					prePaEnvC65=532,
+					prePaEnvB4=533,
+					prePaEnvB5=534,
+					prePaEnvB6=535,
+					prePaEnvItaly=536,
+					prePaEnvMonarch=537,
+					prePaEnvPersonal=538,
+					prePaFanfoldUs=539,
+					prePaFanfoldStdGer=540,
+					prePaFanfoldLglGer=541,
+					prePaIsoB4=542,
+					prePaJapPostcard=543,
+					prePa9X11=544,
+					prePa10X11=545,
+					prePa15X11=546,
+					prePaEnvInvite=547,
+					prePaUsLetterExtra=550,
+					prePaUsLegalExtra=551,
+					prePaTabloidExtra=552,
+					prePaA4Extra=553,
+					prePaUsLetterTrans=554,
+					prePaA4Trans=555,
+					prePaUsLetterExtraTrans=556,
+					prePaAPlus=557,
+					prePaBPlus=558,
+					prePaUsLetterPlus=559,
+					prePaA4Plus=560,
+					prePaA5Trans=561,
+					prePaB5Trans=562,
+					prePaA3Extra=563,
+					prePaA5Extra=564,
+					prePaB5Extra=565,
+					prePaA2=566,
+					prePaA3Trans=567,
+					prePaA3ExtraTrans=568,
+					prePaA6 = 570,	// rmm9306
+					prePaReceipt=595, // MHn0311
+					prePaLongReceipt=596, // MHn0311
+					prePaIWComputerPaper=597, // MHn0311
+					prePaIWIntFan=598, // MHn0311
+					prePaCustom=599,
+				prePaperL=599,							// mpmPRI ends
+				prePrtNoteF=610,							 // AE6261
+					prePrtNoteNoMsg=610,
+					prePrtNoteMsg=611,
+					prePrtNoteAuto=612,
+				prePrtNoteL=612,
+				preDateFuncsF=615,		 				// AE0055
+					preDateFuncsYear=615,
+					preDateFuncsMonth=616,
+					preDateFuncsWeek=617,
+					preDateFuncsDayOfYear=618,
+					preDateFuncsQuarter=619,
+					preDateFuncsMonthOfQ=620,
+					preDateFuncsWeekOfQ=621,
+					preDateFuncsDayOfQ=622,
+					preDateFuncsWeekOfMonth=623,
+					preDateFuncsDay=624,
+					preDateFuncsDayOfWeek=625,
+					preDateFuncDayF=626,					// C4_PRI_002
+						preDateFuncsSun=626,
+						preDateFuncsMon=627,
+						preDateFuncsTue=628,
+						preDateFuncsWed=629,
+						preDateFuncsThu=630,
+						preDateFuncsFri=631,
+						preDateFuncsSat=632,
+						preDateFuncsHour=633,
+						preDateFuncsMin=634,
+						preDateFuncsSec=635,
+						preDateFuncsCentiSec=636,
+					preDateFuncDayL=632,					// C4_PRI_002
+				preDateFuncsL=636,		 				// AE0055
+				
+				prePortHandshakeF=637,		// mpmPRIi begins
+					prePortNoHandshake=637,
+					prePortXonXoff=638,
+					prePortHardware=639,
+				prePortHandshakeL=639,
+				prePortParityF=640,
+					prePortNoParity=640,
+					prePortOddParity=641,
+					prePortEvenParity=642,
+				prePortParityL=642,
+				prePortDataBitsF=643,
+					prePort7DataBits=643,
+					prePort8DataBits=644,
+				prePortDataBitsL=644,
+				prePortStopBitsF=645,
+					prePort1StopBit=645,
+					prePort2StopBits=646,
+				prePortStopBitsL=646,		// mpmPRIi ends
+				
+				preStyleplatF=650,						// AE_STY // rmm_mobile_fonts: corrected this block and added Windows Mobile
+					preStyleplatWindows=650,
+					preStyleplatMac=651,
+					preStyleplatUnix=652,
+					preStyleplatmacOS=653,			// mpmCarbon // rmm8946
+					preStyleplatWindowsMobile=654,
+					// rmm_iphone6:
+					preStyleplatiPhone=655,
+					preStyleplatJavaScript=656,	// rmm7023
+				preStyleplatL=656,	// rmm7023
+				preStyleplatMacOSX=657,	// rmm8946
+				
+				preStdmenuF=660,							// DRS4014
+					preStdmenuFile=660,
+					preStdmenuEdit=661,
+					preStdmenuUser=663,
+					preStdmenuNoInstall=664,
+				preStdmenuL=669,							// DRS4014
+				prePositionsF=679,						// AE4105
+					prePositionsTop=679,
+					prePositionsBottom=680,
+				prePositionsL=680,						// AE4105
+				preTabPanesF=674,							// AE4105 PK4625
+					preTabPanesMacOS8=674,			// PK4625
+					preTabPanesDefault=675,
+					preTabPanesSquare=676,
+					preTabPanesRound=677,
+					preTabPanesTriangle=678,
+				preTabPanesL=678,							// AE4105
+				preSizingF=681,								// AE_WCO
+					preSizingFixed=681,
+					preSizingElastic=682,
+				preSizingL=682,								// AE_WCO
+				preSubintervalF=683,					// C4_PRI_002
+					preSubintervalTimeF=683,			// C4_PRI_002
+						preSubintervalChange=683,
+						preSubintervalSec=684,
+						preSubintervalMin=685,
+						preSubintervalQtrHour=686,
+						preSubintervalHlfHour=687,
+						preSubintervalHour=688,
+						preSubintervalHlfDay=689,
+					preSubintervalTimeL=689,			// C4_PRI_002
+						preSubintervalDateF=690,			// C4_PRI_002
+						preSubintervalDay=690,
+						preSubinterval7Days=691,
+						preSubinterval14Days=692,
+						preSubintervalWeek=693,
+						preSubinterval2Weeks=694,
+						preSubintervalMonth=695,
+						preSubintervalQuarter=696,
+						preSubintervalHlfYear=697,
+						preSubintervalYear=698,
+						preSubintervalCentury=699,
+						preSubintervalFisMonth=700,
+						preSubintervalFisQtr=701,
+						preSubintervalFisHlfYear=702,
+						preSubintervalFisYear=703,
+					preSubintervalDateL=703,			// C4_PRI_002
+				preSubintervalL=703,					// C4_PRI_002
+				preWindowPositionsF = 704,		// mpmSheets begins
+					preWindowPosDrwDefault = 704,
+					preWindowPosDrwTop = 705,
+					preWindowPosDrwLeft = 706,
+					preWindowPosDrwBottom = 707,
+					preWindowPosDrwRight = 708,
+					preWindowPosSheet=709,	// mpmSheets ends
+					preWindowPosNormal=710,
+					preWindowPosCenter=711,
+					preWindowPosStack=712,
+					preWindowPosMin=713,
+					preWindowPosMax=714,
+					preWindowPosCenterRelative=715,	// rmm4074
+				preWindowPositionsL = 715,		// rmm1293 // rmm4074
+				preSmartlistF = 720,					// DRS4051
+					preSmartlistRowUnChanged=720,
+					preSmartlistRowUpdated=721,
+					preSmartlistRowDeleted=722,
+					preSmartlistRowInserted=723,
+					preSmartlistRowAll=724,
+				preSmartlistL = 724,          // DRS4051a
+				pre3DSystemButtonF = 730,			// PK4016
+					pre3DSystemNoBorder=730,
+					pre3DSystemStd=731,
+					pre3DSystemNew3D=732,
+					pre3DSystemOld3D=733,
+					pre3DSystemHeading=734,
+					pre3DSystemCombo=735,
+					pre3DSystemRound=736,				// mpmCarbon24
+					pre3DUser=737,							// rmm4547
+					pre3DSystemLargeRound=738,	// rmm5681
+				pre3DSystemButtonL = 738,     // PK4106 PK4043 // rmm5681
+				preSystemColorsF = 740,				// PK4050
+					preSysColScrollbar=740,
+					preSysColBackground=741,
+					preSysColActiveCaption=742,
+					preSysColInActiveCaption=743,
+					preSysColMenu=744,
+					preSysColWindow=745,
+					preSysColWindowFrame=746,
+					preSysColMenuText=747,
+					preSysColWindowText=748,
+					preSysColCaptionText=749,
+					preSysColActiveBorder=750,
+					preSysColInactiveBorder=751,
+					preSysColAppWorkspace=752,
+					preSysColHilight=753,
+					preSysColHilightText=754,
+					preSysColBtnFace=755,
+					preSysColBtnShadow=756,
+					preSysColGrayText=757,
+					preSysColBtnText=758,
+					preSysColInactiveCapText=759,
+					preSysColBtnHilight=760,
+					preSysCol3DDkShadow=761,
+					preSysCol3DLight=762,
+					preSysColInfoText=763,
+					preSysColInfoBk=764,
+					preSysColDefault=765,
+					preSysColDesktop=766,
+					preSysCol3DFace=767,
+					preSysCol3DShadow=768,
+					preSysCol3DHighLight=769,
+					preSysCol3DHilight=770,
+					preSysCol3DBtnHilight=771,
+					preSysColMenuHilight=772,	// rmm4524
+					preSysColHotlight=773,		// rmm4524
+					preSysColorGradientActiveCaption=774,		// rmm6000
+					preSysColorGradientInactiveCaption=775,	// rmm6000
+				preSystemColorsL = 775,     	// PK4050 // rmm4524
+				preSystemKeyModsF = 780,			// mtMenuEdit
+					preSysKeyModsNone=780,
+					preSysKeyModsCtrl=781,
+					preSysKeyModsShift=782,
+					preSysKeyModsAlt=783,
+					preSysKeyModsCmd=784,
+					preSysKeyModsOpt=785,
+				preSystemKeyModsL = 783,     	// mtMenuEdit
+				preDisplayFormatF = 790,			// PK4085
+					preDisplayFormatNumber = 790,
+					preDisplayFormatDate=791,
+					preDisplayFormatBool=792,
+					preDisplayFormatChar=793,
+				preDisplayFormatL = 793,     	// PK4085
+				preDPImodeF = 796,	// ae6540
+				preDPImodeL = 798, 
+				preTableFetchErrorF = 800,		// rmm1481
+					preTableFetchOk=800,
+					preTableFetchFinish=801,
+					preTableFetchError=802,
+				preTableFetchErrorL = 804,		// rmm1481
+				preTableSqlErrorF = 805,			// rmm1481
+					preTableSqlErrSelect = 805,
+					preTableSqlErrFetch = 806,
+					preTableSqlErrInsert=807,
+					preTableSqlErrUpdate=808,
+					preTableSqlErrDelete=809,
+					preTableSqlErrGeneral=810,
+				preTableSqlErrorL = 812,			// rmm1481
+				preTableFetchModesF = 819,		// Start rmm3457
+					preTableFetchAll = 819,
+				preTableFetchModesL = 819,		// End rmm3457
+				preNodeIconPosF = 820,        // PK4118
+					preNodeIconPosLeft=820,
+					preNodeIconPosNode=821,
+					preNodeIconPosSystem=822,
+				preNodeIconPosL = 822,				// PK4118
+				preTreeNodeIcnMdF = 825,  		// PK4297
+					preTreeNodeIcnFixed=825,
+					preTreeNodeIcnExpand=826,
+					preTreeNodeIcnLine=827,
+				preTreeNodeIcnMdL = 827,      // PK4297
+				preIconIDF = 830,							// PK4200
+					preIconDefSize=830,
+					preIcon16x16=831,
+					preIcon32x32=832,
+					preIcon48x48=833,
+				preIconIDL = 833,             // PK4200
+				preHelpCommandF = 836,				// rmm_hlp
+					preHelpCmdMode=836,
+					preHelpCmdContext=837,
+					preHelpCmdPopup=838,
+					preHelpCmdContents=839,
+					preHelpCmdQuit=840,
+				preHelpCommandL = 841,				// rmm_hlp	// rmm2541
+				preTaskbarF=842,							// Start rmm2541
+					preTaskbarNone=842,
+					preTaskbarBottom=843,
+					preTaskbarTop=844,
+				preTaskbarL=844,							// End rmm2541
+				preTreeListMdF = 846,  				// PK4297g
+					preTreeListFlatWithTag=846,
+					preTreeListRelational=847,
+					preTreeListFlat=848,
+					preTreeListColList=849,
+				preTreeListMdL = 849,      		// PK4297g
+				preEscCharsF = 850,						// mpm4080
+					preEscCharsColor=850,
+					preEscCharsStyle=851,
+					preEscCharsLTab=852,
+					preEscCharsCTab=853,
+					preEscCharsRTab=854,
+					preEscCharsIcon=855,
+					preEscCharsNextCol=856,
+					preEscCharsBmp=857,
+					preEscCharsAngle=858,										// rmm6853
+					preEscCharsAdjustPos=859,								// rmm6853
+				preEscCharsL = 861,						// mpm4080 AE6098
+				preWelcomeF = 862,							// Start rmm2327	// rmm3514
+					preWelcomeAddToLibraryList = 862,								// rmm3514
+					preWelcomePromptForLibrary = 863,								// rmm3514
+					preWelcomeRecentLibList = 864,									// rmm3514
+					preWelcomeNewLibrary = 865,
+					preWelcomeLastLibrary = 866,
+					preWelcomeToggleStop = 867,
+					preWelcomeExecTool = 868,		// pkstartup
+					preWelcomeWillWelcomeOpen = 869,	// rmm4068
+				preWelcomeL = 869,							// End rmm2327
+				preEnvToolsF = 870,						// rmm1898
+				preEnvToolsL = 879,						// rmm1898
+				prePosF = 880,						// mpmPRIf begins
+					prePosGlobal = 880,
+					prePosPaper = 881,
+					prePosPrintable = 882,
+					prePosLocal = 883,
+					prePosHeader = 884,
+					prePosFooter = 885,
+					prePosSection = 886,
+					preBndsGlobal = 887,
+					preBndsPaper = 888,
+					preBndsPrintable = 889,
+					preBndsLocal = 890,
+					preBndsHeader = 891,
+					preBndsFooter = 892,
+				prePosL = 899,						// mpmPRIf ends
+				preEventcodeF = 900,					// DRS4056
+					preEventevToTop=901,
+					preEventevBefore = 903,
+					preEventevAfter = 904,
+					preEventevClick = 905,
+					preEventevDoubleClick = 906,
+					preEventevWindowClick = 907,
+					preEventevMouseEnter = 908,
+					preEventevMouseLeave = 909,
+					preEventevMouseDown = 910,
+					preEventevMouseUp = 911,
+					preEventevMouseDouble = 912,
+					preEventevDrag = 913,
+					preEventevRMouseDown = 914,
+					preEventevRMouseUp = 915,
+					preEventevRMouseDouble = 916,
+					preEventevDrop = 918,
+					preEventevHScrolled = 919,
+					preEventevVScrolled = 920,
+					preEventevKey = 921,
+					preEventevCloseBox = 923,
+					preEventevOK = 924,
+					preEventevCancel = 925,
+					preEventevTab = 926,
+					preEventevShiftTab = 927,
+					preEventevCustomMenu = 930,
+					preEventevStandardMenu = 931,
+					preEventevMaximized = 932,
+					preEventevMinimized = 933,
+					preEventevRestored = 934,
+					preEventevMoved = 935,
+					preEventevResized = 936,
+					preEventevSent = 937,
+					preEventevDisabled = 938,
+					preEventevEnabled = 939,
+					preEventevHidden = 940,
+					preEventevShown = 941,
+					preEventevClose = 942,
+					preEventevTabSelected = 943,
+					preEventevWillDrop = 950,
+					preEventevCanDrop = 951,
+					preEventevCellChanging = 952,
+					preEventevCellChanged = 953,
+					preEventevTreeExpand = 954,
+					preEventevTreeCollapse = 955,
+					preEventevExtend = 956,
+					preEventevRowChange = 957,
+					preEventevOpenContextMenu = 958,
+					preEventevTreeExpColFin = 959,
+					preEventevTreeNodeIconClicked = 960,
+					preEventevTreeNodeNameChanging = 961,
+					preEventevTreeNodeNameChanged = 962,
+					preEventevIconDelStarting = 963,
+					preEventevIconDelFinished = 964,
+					preEventevIconEditStarting = 965,
+					preEventevIconEditFinishing = 966,
+					preEventevIconEditFinished = 967,
+					preEventevConnectionIdle = 974, // mpmTHINd
+					preEventevConnectionBusy = 975,	// mpmTHINd
+					preEventevConnectionRejected = 976,	// rmm3624
+					preEventevFormToTop = 977,					// rmm3624
+					preEventevTreeListEditStarting = 978,		// rmm4493
+					preEventevTreeListEditFinishing = 979,	// rmm4493
+					preEventevTreeListEditFinished = 980,		// rmm4493
+					preEventevCellBefore = 981,							// rmm4493
+					preEventevPost = 982,										// rmm4493
+					preEventevDragFinished = 983,						// rmm4493
+					preEventevHeadedListHeadResize = 986,		// pk6460
+					preEventevSelectionDelete = 987,				// rmm5296
+					preEventevToolbarButton = 988,					// rmm6216
+					preEventevScreenOrientationChanged = 989,	// rmm_mobile
+					preEventevExecuteContextMenu = 990,				// rmm_rfmenu
+					preEventevHeadedListDisplayOrderChanged = 991,	// rmm6484
+					preEventevSubFormToTop = 992,	// rmm_iphone24
+					preEventevAnimationsComplete = 993,	// rmm6710
+					preEventevUserChangedPage = 994,		// rmm6734
+					preEventevDragBorder = 995,	// rmm8331
+					preEventevHeadedListColumnVisChanged = 996,	// Start rmm8982
+					preEventevWillMinimize = 997,
+					preEventevReportSearchStatus = 998,
+					preEventevLayoutChanged = 1006,							// End rmm8982
+				preEventcodeL = 1039,         // DRS4056 // rmm2744	// CR0525
+				preDevF = 1050, // mpmPRIt begins
+					preDevPrinter = 1050,
+					preDevPreview = 1051,
+					preDevScreen = 1052,
+					preDevDisk = 1053,
+					preDevMemory = 1054,
+					preDevClipboard = 1055,
+					preDevPort = 1056,
+					preDevFile = 1057,
+					preDevDdePub = 1058,
+					preDevSpare = 1059,
+					preDevFirst = 1060,
+					preDevLast = 1061,
+					preDevCustomFirst = 1062,
+				preDevL = 1062, // mpmPRIt ends
+
+				preListF = 1065,		// Start rmm2885
+					preListDeleteSelected = 1065,
+					preListKeepSelected = 1066,
+				preListL = 1069,		// End rmm2885
+
+				preAlignModeF = 1070,	// Start rmm2910
+					preAlignModeNone = 1070,
+					preAlignModeAll = 1071,
+					preAlignModeBody = 1072,
+					preAlignModeHeading = 1073,
+					preAlignModeFooter = 1074,	// rmm9117
+				preAlignModeL = 1074,	// End rmm2910
+
+				preSharedPicModeF = 1076,	// Start rmm3199
+					preSharedPicModeNone = 1076,
+					preSharedPicMode256Color = 1077,
+					preSharedPicModeTrueColor = 1078,
+				preSharedPicModeL = 1079,	// End rmm3199
+
+				preCompStoreF = 1080,			// Start rmm3315
+					preCompStoreHidden = 1080,
+					preCompStoreNewClassDefault = 1081,
+					preCompStoreTemplate = 1082,
+					preCompStoreWizard = 1083,
+					preCompStoreDesignObjects = 1084,
+					preCompStoreMvDesignerSupport = 1085,	// rmm4068
+					preCompStoreSQLWizard = 1086,	// rmm7052
+				preCompStoreL = 1087,			// End rmm3315
+
+				prePictAlignF = 1088, // Start rmm3551 kPAL... constants used for $picturealign
+					prePALtopLeft = 1088,
+					prePALtopCenter = 1089,
+					prePALtopRight = 1090,
+					prePALcenterLeft = 1091,
+					prePALcenter = 1092,
+					prePALcenterRight = 1093,
+					prePALbottomLeft = 1094,
+					prePALbottomCenter = 1095,
+					prePALbottomRight = 1096,
+					prePALstretch = 1097, // AE6100
+					prePALtile = 1098,
+				prePictAlignL = 1096,	// End rmm3551 ae6100
+				prePictAlignL2 = 1098, // mpmBackPic
+
+				preTreeNodeF = 1100,	// Start rmm3554
+					preTREEnodeExpCollapseAlways = 1100,
+					preTREEnodeExpanded = 1101,
+				preTreeNodeL = 1105,	// End rmm3554
+
+				preSessionTranF = 1106,	// Start cr0003
+					preSessionTranAutomatic = 1106,
+					preSessionTranManual = 1107,
+					preSessionTranServer = 1108,
+				preSessionTranL = 1110,
+
+				preSessionStateF = 1111,
+					preSessionStateLoggedOn = 1111,
+					preSessionStateLoggedOff = 1112,
+				preSessionStateL = 1114,
+
+				preSessionCharMapF = 1115,
+					preSessionCharMapOmnis = 1115,
+					preSessionCharMapNative = 1116,
+					preSessionCharMapTable = 1117,
+				preSessionCharMapL = 1117,
+
+				preSessionCommitF = 1120,
+					preSessionCommitDelete = 1120,
+					preSessionCommitClose = 1121,
+					preSessionCommitPreserve = 1122,
+				preSessionCommitL = 1124,
+
+				preSessionRollbackF = 1125,
+					preSessionRollbackDelete = 1125,
+					preSessionRollbackClose = 1126,
+					preSessionRollbackPreserve = 1127,
+				preSessionRollbackL = 1129,
+
+				preSessionEncodingF = 1130, //gra0490
+					preSessionEncodingUtf32= 1130,
+					preSessionEncodingUtf16 = 1131,
+					preSessionEncodingUtf8 = 1132,
+					preSessionEncodingAnsi = 1133, 
+				preSessionEncodingL = 1133,	// rmm_cai2
+
+				preStatementStateF = 1151,
+					preStatementStateClear = 1151,
+					preStatementStatePrepared = 1152,
+					preStatementStateExecuted = 1153,
+					preStatementStateFetching = 1154,
+					preStatementStateExecDirect = 1155,	// cr1028
+				preStatementStateL = 1156,
+
+				preStatementServerF = 1157,
+					preStatementServerAll = 1157,
+					preStatementServerTable = 1158,
+					preStatementServerView = 1159,
+				preStatementServerL = 1160,
+
+				preStatementIndexF = 1161,
+					preStatementIndexUnique = 1161,
+					preStatementIndexNonUnique = 1162,
+					preStatementIndexAll = 1163,
+				preStatementIndexL = 1166,	// End cr0003 // rmm3693 // rmm8026
+
+				preLineStyleF = 1167,		// rmm8026
+				preLineStyleL = 1189,		// rmm8026
+				
+				preParameterTypeF = 1191,		// rmm3693: added parameter types
+					preParameterInput = 1191,
+					preParameterOutput = 1192,
+					preParameterInputOutput = 1193,
+					preParameterReturnValue = 1194,
+				preParameterTypeL = 1200,
+					
+				// Start rmm3573
+				preSpecialCharF = 1201,
+					preSpecialCharTab = 1201,
+					preSpecialCharLf = 1202,
+					preSpecialCharCr = 1203,
+					preSpecialCharSq = 1204,	// rmm4273
+					preSpecialCharDq = 1205,	// rmm4273
+					preSpecialCharSp = 1206,	// rmm5383
+				preSpecialCharL = 1209,
+				// End rmm3573
+				// Start	cr1012
+				// General
+				preDAMErrorsF = 1210,
+					preDAMNoError = 1210,
+					preDAMUnknownError = 1211,
+					preDAMNativeErrorFailed = 1212,
+					preDAMNoPendingError = 1219,
+					// Parameter
+					preDAMParameterError = 1220,
+					preDAMParameterNumError = 1221,
+					preDAMParameterTypeError = 1222,
+					// Constant
+					preDAMInvalidMapType = 1224,				// cr1111
+					preDAMInvalidTableType = 1225,
+					preDAMInvalidIndexType = 1226,
+					preDAMInvalidTranMode = 1227,
+					preDAMInvalidFileName = 1228,				// cr1105
+					preDAMServerPropertyFailed = 1229,	// cr1105
+					preDAMServerMethodFailed = 1230,		// cr1105
+					preDAMFileOpenFailed = 1231,				// cr1126
+					preDAMFileReadFailed = 1232,				// cr1126
+					preDAMNotSerialised = 1233,					// cr1137
+					preDAMSqlError = 1234,							//gra0874
+					preDAMNoClientLibrary = 1235, 			//gra1167
+				preDAMErrorsL = 1239,
+				// Session 
+				preSessionErrorsF = 1240,
+					// Connection
+					preSessionLogonFailed = 1240,
+					preSessionLogoffFailed = 1241,
+					preSessionNotLoggedOn = 1242,
+					preSessionRegisterFailed = 1243,	// rmm3679
+					preSessionRpcDefineFailed = 1244,	// rmm3693
+					preSessionRpcNotDefined = 1245,		// rmm3693
+					preSessionClearFailed = 1246,			// cr1105
+					preSessionNoDriverManager = 1247,	// gra0091
+					// Transactions
+					preSessionNotTranManual = 1250,
+					preSessionCommitFailed = 1251,
+					preSessionRollbackFailed = 1252,
+					preSessionSetTranModeFailed = 1253,	// cr1105
+					preSessionNoTranSupport = 1254,			// cr1115
+					preSessionUsesAutoBegin = 1255,			// cr1126
+					preSessionBeginFailed = 1256,				// cr1126
+					// Chunking
+					preSessionLobThresholdOutOfRange = 1260,
+					preSessionLobChunkSizeOutOfRange = 1261,
+					// Others
+					preSessionNewStatementFailed = 1270,
+					preSessionColTextFailed = 1271,
+					preSessionBindMarkerFailed = 1272,			// cr1028
+					preSessionSetMapTableFailed = 1273,			// cr1030
+					preSessionSetCharMapFailed = 1274,			// cr1030
+					preSessionNoMapTable = 1275,						// cr1111
+					preSessionInvalidSQLSeparator = 1276,		// cr1111
+				preSessionErrorsL = 1289,
+				// Statement
+				preStatementErrorsF = 1290,
+					preStatementPrepareFailed = 1290,
+					preStatementExecuteFailed = 1291,
+					preStatementDescribeFailed = 1292,
+					preStatementFetchFailed = 1293,
+					preStatementClearFailed = 1294,
+					preStatementCloseFailed = 1295,
+					preStatementDropFailed = 1296,
+					preStatementExecDirectFailed = 1297,			// cr1028
+					preStatementRpcPrepareParamsError = 1298,	// rmm3693
+					preStatementRpcGetParamValuesError = 1299,// rmm3693
+					preStatementHasNoSession = 1300,	// cr1129
+					// Data
+					preStatementInsertRowFailed = 1310,
+					preStatementInputVarFailed = 1311,
+					preStatementResultColFailed = 1312,
+					preStatementBindInputVarFailed = 1313,
+					preStatementSendInputVarFailed = 1314,
+					preStatementBindResultColFailed = 1315,
+					preStatementSendResultVarFailed = 1316,
+					preStatementBufferAllocationFailed = 1317,
+					// Meta-Data
+					preStatementServerTablesFailed = 1330,
+					preStatementServerColumnsFailed = 1331,
+					preStatementServerIndexesFailed = 1332,
+					preStatementServerResultsFailed = 1333,
+					preStatementServerRpcProceduresFailed = 1334,	// rmm3693
+					preStatementServerRpcParametersFailed = 1335,	// rmm3693
+					// Others
+					preStatementNotPrepared = 1340,
+					preStatementNoFetchList = 1341,			// cr1028
+					preStatementNoResults = 1342,				// cr1028
+				preStatementErrorsL = 1346,				// End		cr1012
+
+				//gra0846: worker object errors
+				preWorkerErrorsF = 1347,
+					preWorkerBadPool = 1347,
+					preWorkerPoolFailed = 1348,
+					preWorkerBadSession = 1349,
+					preWorkerMissingParams = 1350,
+					preWorkerAlreadyRunning = 1351,
+					preWorkerNotInitialised = 1352,
+				preWorkerErrorsL = 1360, //gra0846 end
+
+				// PK6009 start
+				preDatagridDTypesF = 1361,
+				preDatagridDTypesL = 1364,
+				// PK6009 start
+				
+				preTblResizeF = 602,	// AE6458
+				preTblResizeL = 605, 
+
+				preBackgroundThemeF = 1370, // mpmCarbon3
+				preBackgroundThemeL = 1378, // mpmCarbon3
+				
+				preJSFormatF = 1380,	// rmm7186
+				preJSFormatL = 1394,	// rmm7186
+				
+				preBordPosF = 1395, // mpmSecFill
+				preBordPosL = 1397, // mpmSecFill
+				
+				preTBoptF = 1430, // mpmToolbars
+				preTBoptL = 1435,	// rmm6216
+				
+				// mpmStatus
+				preSBposF = 1440,
+					preSBposBottom = 1440,
+					preSBposTop = 1441,
+					preSBposPlatform = 1442,
+				preSBposL = 1442,
+
+				// rmm4483
+				preTBvwtF = 1446,
+					preTBvwtMSWindows = 1446,
+					preTBvwtMacOSX = 1447,
+					preTBvwtUnix = 1448,
+					// rmm9123: preTBvwtMacintosh = 1449,
+				preTBvwtL = 1448, // rmm9123: Only need support for the 3 standard platforms - exclude legacy Macintosh
+
+				// rmm4524:
+				preHotF = 1456,
+					preHotPlatformDefault = 1456,
+					preHotNotHot = 1457,
+					preHotHot = 1458,
+				preHotL = 1460,
+				
+				// Start rmm_jsc
+				preJSBorderF=1461,
+				preJSBorderL=1473,
+				preJSBorderLNoDefaultBorder=1472,
+				// End rmm_jsc
+
+				// MHPRT begins
+				preDestF=1474,									
+					preDestPrinter=1474,
+					preDestPDF=1475,
+					preDestPostScript=1476,
+				preDestL=1476,									
+				// MHPRT ends
+				
+				// Start rmm_jscs3
+				preEscJsF = 1480,
+				preEscJsL = 1484, // rmm8472
+				// End rmm_jscs3
+				// Start rmm8472
+				preJSErrorTextPosF = 1485,
+				preJSErrorTextPosL = 1489,
+				// End rmm8472
+				
+				// pk6309
+				prePalStylesF = 1490,
+				prePalStylesL = 1494,
+
+				// Start rmm5078
+				preUniTypeF = 1500,
+					preUniTypeAuto = 1500,
+					preUniTypeUTF8 = 1501,
+					preUniTypeUTF16BE = 1502,
+					preUniTypeUTF16LE = 1503,
+					preUniTypeUTF16 = 1504,
+					preUniTypeUTF32BE = 1505,
+					preUniTypeUTF32LE = 1506,
+					preUniTypeUTF32 = 1507,
+					preUniTypeNativeCharacters = 1508, // rmm5333
+					// Start rmm5333
+					preUniTypeAnsiThai = 1510,
+					preUniTypeAnsiCentralEuropean = 1511,
+					preUniTypeAnsiCyrillic = 1512,
+					preUniTypeAnsiLatin1 = 1513,
+					preUniTypeAnsiGreek = 1514,
+					preUniTypeAnsiTurkish = 1515,
+					preUniTypeAnsiHebrew = 1516,
+					preUniTypeAnsiArabic = 1517,
+					preUniTypeAnsiBaltic = 1518,
+					preUniTypeAnsiVietnamese = 1519,
+					// End rmm5333
+					// Start rmm_ssl
+					preUniTypeISO8859_1=1526,
+					preUniTypeISO8859_2=1527,
+					preUniTypeISO8859_3=1528,
+					preUniTypeISO8859_4=1529,
+					preUniTypeISO8859_5=1530,
+					preUniTypeISO8859_6=1531,
+					preUniTypeISO8859_7=1532,
+					preUniTypeISO8859_8=1533,
+					preUniTypeISO8859_9=1534,
+					preUniTypeISO8859_10=1535,
+					preUniTypeISO8859_11=1536,
+					// Note that preUniTypeISO8859_12 is not required as there is no ISO-8859-12 character set
+					preUniTypeISO8859_13=1538,
+					preUniTypeISO8859_14=1539,
+					preUniTypeISO8859_15=1540,
+					preUniTypeISO8859_16=1541,
+					// End rmm_ssl
+					preUniTypeOEM=1542,	// rmm6720
+					// rmm5334: Note - big gap until binary and character as these are not real encodings, and are sometimes
+					// treated differently.
+					preUniTypeBinary = 1548,			// rmm5334
+					preUniTypeCharacter = 1549,		// rmm5334
+				preUniTypeL = 1549,	// rmm5333	// rmm5334
+				// End rmm5078
+				
+				// Start rmm_ws2
+				preWSMethodF = 1550,
+					preWSMethodNone = 1550,
+					preWSMethodStatic = 1551,
+					preWSMethodNewPersistent = 1552,
+					preWSMethodPersistent = 1553,
+				preWSMethodL = 1559,
+				// End rmm_ws2
+				// Start rmm_wsl
+				preWSLF = 1560,
+					preWSLOff = 1560,
+					preWSLFaults = 1561,
+					preWSLFull = 1562,
+				preWSLL = 1565,
+				// End rmm_wsl
+
+				// Start PK6773
+				preMoveNodeDstF= 1566,
+					preMoveNodeDstLastChild = 1567,
+					preMoveNodeDstFirstChild = 1568,
+				preMoveNodeDstL= 1570,
+				// end PK6773
+
+				// Start rmm_mobile
+				preSSZF= 1575,
+					preSSZDesktop = 1575,
+					// rmm6489: preSSZPortraitQVGA = 1576,
+					// rmm6489: preSSZLandscapeQVGA = 1577,
+					// rmm6489: preSSZiPhonePortrait = 1578,	// rmm6461
+					// rmm6489: preSSZiPhoneLandscape = 1579,	// rmm6461
+				preSSZL= 1575, // bjw0057
+				// end rmm_mobile
+
+				// Start bjw0057
+				preLandmarkF = 1576,
+					preLandmarkNone = 1576,
+					preLandmarkMain = 1577,
+					preLandmarkNavigation = 1578,
+					preLandmarkBanner = 1579,
+					preLandmarkContentInfo = 1580,
+					preLandmarkComplementary = 1581,
+					preLandmarkForm = 1582,
+					preLandmarkSearch = 1583,
+				preLandmarkL = 1590,
+				// End bjw0057
+
+				// Start rmm_rfmenu: reserved up to 32602 //jmg0107 (was 32610)
+				preRMOF = 1600,
+					preRMOContext	= 1600,
+					preRMOLeft = 1601,
+					preRMORight = 1602,
+				preRMOL = 1602, //jmg0107
+				// End rmm_rfmenu
+
+				// Start jmg0107:  Reserved up to 32610
+				prePlatformF = 1603,
+					prePlatformiOS = 1603,
+					prePlatformAndroid = 1604,
+					prePlatformWinRT = 1605,
+					prePlatformBB = 1606,
+				prePlatformL = 1606, // jmg0114: Keep prePlatformL set no higher than the last supported platform, as used for cycling through values.
+				// End jmg0107
+
+				// Start rmm6397: reserved up to 32620
+				preRBF = 1611,
+					preRBprint = 1611,
+					preRBprintPage = 1612,
+					preRBsave = 1613,
+					preRBpagePreview = 1614,
+					preRBzoom = 1615,
+					preRBpageList = 1616,	// rmm8306
+					preRBsearch = 1617,		// rmm8318
+					preRBsavePDF = 1618,	// rmm9577
+				preRBL = 1620,
+				// End rmm6397
+
+				// Start rmm6490: reserved up to 32624
+				preCPDF = 1621,
+					preCPDnone = 1621,
+					preCPDallMethods = 1622,
+					preCPDmarkedClasses = 1623,
+				preCPDL = 1624, // rmm9799
+				// End rmm6490
+
+				// Start rmm9799
+				preEPF = 1625,
+						preEPreport = 1625,
+						preEPlogStackAndReport = 1626,
+						preEPlogStackAndContinue = 1627,
+				preEPL = 1629,
+				// End rmm9799
+
+				// pkiphone9
+				preTRANSITIONTYPEF = 1630,
+					preTRANSITIONTYPEfade =  1630,
+					preTRANSITIONTYPEpush =  1631,
+					preTRANSITIONTYPEmovein =  1632,
+					preTRANSITIONTYPEreveal =  1633,
+					preTRANSITIONTYPEflipleft =  1634,
+					preTRANSITIONTYPEflipright =  1635,
+					preTRANSITIONTYPEcurlup =  1636,
+					preTRANSITIONTYPEcurldown =  1637,
+				preTRANSITIONTYPEL =  1637,
+
+				// Start rmm7169
+				preJSAnimationCurveF = 1642,
+					preJSAnimationCurveEaseInOut = 1642,
+					preJSAnimationCurveEaseIn = 1643,
+					preJSAnimationCurveEaseOut = 1644,
+					preJSAnimationCurveLinear = 1645,
+					preJSAnimationCurveEase = 1646,
+				preJSAnimationCurveL = 1646,
+				// End rmm7169
+
+				// pkiphone9
+				preTRANSITIONDIRF = 1650,
+					preTRANSITIONDIRnone =  1650,
+					preTRANSITIONDIRfromleft =  1651,
+					preTRANSITIONDIRfromright =  1652,
+					preTRANSITIONDIRfrombottom =  1653,
+					preTRANSITIONDIRfromtop =  1654,
+				preTRANSITIONDIRL =  1654,
+				
+				// rmm_iphone9:
+				preiPhoneBorderF = 1660,
+					preiPhoneBorderNone = 1660,
+					preiPhoneBorderRoundedRectangle = 1661,
+					preiPhoneBorderLine = 1662,		// rmm_iphone13
+					preiPhoneBorderBezel = 1663,	// rmm_iphone13
+				preiPhoneBorderL = 1663, // rmm_sfs	// rmm8982
+
+				// Start rmm8982
+				preLayoutTypeF = 1664,
+					preLayoutTypeScreen = 1664,
+					preLayoutTypeSingle = 1665,
+					preLayoutTypeResponsive = 1666,
+				preLayoutTypeL = 1669,
+				// End rmm8982
+
+				// Start rmm_sfs: JS remote form resize modes
+				preJSformResizeModeF = 1670,
+					preJSformResizeModeNone = 1670,
+					preJSformResizeModeCenter = 1671,
+					preJSformResizeModeAspect = 1672,
+					preJSformResizeModeFull = 1673,
+				preJSformResizeModeL = 1679,				
+				// End rmm_sfs
+
+				// Start rmm_iphone13
+				preiPhoneAutoCapsF = 1680,
+					preiPhoneAutoCapsNone = 1680,
+					preiPhoneAutoCapsWords = 1681,
+					preiPhoneAutoCapsSentences = 1682,
+					preiPhoneAutoCapsAll = 1683,
+				preiPhoneAutoCapsL = 1689,
+
+				preiPhoneAutoCorrF = 1690,
+					preiPhoneAutoCorrDefault = 1690,
+					preiPhoneAutoCorrNo = 1691,
+					preiPhoneAutoCorrYes = 1692,
+				preiPhoneAutoCorrL = 1699,
+				
+				preiPhoneViewModeF = 1700,
+					preiPhoneViewModeNever = 1700,
+					preiPhoneViewModeWhileEditing = 1701,
+					preiPhoneViewModeUnlessEditing = 1702,
+					preiPhoneViewModeAlways = 1703,
+				preiPhoneViewModeL = 1709,
+				// End rmm_iphone13
+				
+				// Start rmm_iphone18
+				preiPhoneLineBreakModeF = 1710,
+					preiPhoneLineBreakModeWordWrap = 1710,
+					preiPhoneLineBreakModeCharacterWrap = 1711,
+					preiPhoneLineBreakModeClip = 1712,
+					preiPhoneLineBreakModeHeadTruncation = 1713,
+					preiPhoneLineBreakModeTailTruncation = 1714,
+					preiPhoneLineBreakModeMiddleTruncation = 1715,
+				preiPhoneLineBreakModeL = 1719,
+				// End rmm_iphone18
+				// Start rmm_iphone29
+				preiPhoneAnimationCurveF = 1720,
+					preiPhoneAnimationCurveEaseInOut = 1721,
+					preiPhoneAnimationCurveEaseIn = 1722,
+					preiPhoneAnimationCurveEaseOut = 1723,
+					preiPhoneAnimationCurveLinear = 1724,
+				preiPhoneAnimationCurveL = 1729,
+				// End rmm_iphone29
+
+			// pkgradient
+			prePatternF = 1730,
+			prePatternL =  1745,
+
+			// pkgradient
+			preGradientF = 1750,
+			preGradientL =  1753,
+			
+			// Start rmm_jsc
+			preWebClientTypeF=1757,
+				preWebClientTypePlugin=1757,
+				preWebClientTypeiPhone=1758,
+				preWebClientTypeJavaScript=1759,
+			preWebClientTypeL=1760,
+			// End rmm_jsc
+
+			preWorkerStateF = 1761, //gra0838
+				preWorkerStateClear = 1761,
+				preWorkerStateinit = 1762,
+				preWorkerStateCancelled = 1763,
+				preWorkerStateRunning = 1764,
+				preWorkerStateComplete = 1765,
+			preWorkerStateL = 1765,
+
+			preLast=1767;									// DRS4056 // rmm2744
+
+const int		
+				rnumEvparm0	= 29100,					// event parameters //DRS4069
+				evparmFirst = 1,
+				evparmLast	=	99;
+		
+#endif
+// End of file

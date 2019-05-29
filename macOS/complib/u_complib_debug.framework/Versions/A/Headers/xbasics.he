@@ -1,0 +1,94 @@
+/* $Header: svn://172.16.3.39/data/repos/trunk/Studio/EXTCOMP/CALLBACK/mac/xbasics.he 2236 2012-11-08 13:31:05Z bmitchell $*/
+ 
+/*
+   	OMNIS 7 Version 4.0 - External component interface header
+	 	Copyright (C) Blyth Holdings Inc 1996
+*/
+
+/**************** Changes ******************
+Date			Edit				Bug					Description
+07-Nov-12	rmm_xc45								Changes to allow Xcode 4.5+ to be used for OSX build.
+08-May-08	rmm_handle							Implemented platform independent handle classes as part of mobile device support.
+22-Dec-05 MHMACH5                 Mach-O webclient changes
+26-Oct-05 MHMACH2                 Mach-o changes
+05-Jul-04 MHCW9										CW9 changes.
+14 DEC 00 MHCARBON								OSX Changes
+23 JUN 99 mpmMEMa									Implements handle chains for ORFC
+16-Jun-99 PKMACCLIENT							Macclient changes
+12-Oct-98	AE4844									Added filevref for external callbacks (Changed FILEfullName & fullName)
+
+*/
+ 
+#ifndef _xbasics_he_
+#define _xbasics_he_
+
+#ifndef _XFILEEXT_HE_
+#include "xfileext.he"
+#endif
+
+#define ismac
+
+// rmm_handle: removed qHandleInfo - now defined in basics.h
+
+#ifndef isRCC		// PKMACCLIENT
+
+struct	HINSTANCEstruct;
+#define	MAKEINTRESOURCE(a)			a
+#define HINSTANCE								HINSTANCEstruct*
+
+#define HGLOBAL									qlongptr
+#define DFAR
+
+#endif
+
+typedef void* 								HPVOID;
+typedef const unsigned char*                                            CHPSTR;
+
+#define OMNISEXTPROC 
+#define OMNISWNDPROC
+#define OMNISPRIPROC 
+
+#define OMNISAPI 
+#define SET_RETURN_REGISTER_ON ignore // MHCW9
+#define SET_RETURN_REGISTER_OFF ignore // MHCW9
+
+// MHMACH2 begins
+#ifdef powerc
+	#ifdef ismach_o
+		#define GCC_SET_CORE_PACKING_ON _Pragma("options align=power")
+	#else
+		#define SET_CORE_PACKING_ON     options align=power
+		#define GCC_SET_CORE_PACKING_ON
+	#endif
+#else
+	#define SET_CORE_PACKING_ON				options align=mac68k
+#endif		
+#ifdef ismach_o
+	#define GCC_SET_CORE_PACKING_OFF _Pragma("options align=reset")
+	// rmm_xc45:
+	#define GCC_SET_BYTE_PACKING_ON _Pragma("pack(2)")
+	#define GCC_SET_BYTE_PACKING_OFF _Pragma("pack()")
+#else	
+  #define SET_CORE_PACKING_OFF				options align=reset
+
+  #define SET_BYTE_PACKING_ON				 	options align=mac68k
+  #define SET_BYTE_PACKING_OFF				options align=reset
+	#define GCC_SET_CORE_PACKING_OFF 
+	#define GCC_SET_BYTE_PACKING_ON 
+	#define GCC_SET_BYTE_PACKING_OFF 
+#endif
+// MHMACH2 ends
+
+// MHMACH5 begins
+#ifdef ismach_o
+	#define GCC_EXPORT_ON _Pragma("GCC visibility push(default)")
+	#define GCC_EXPORT_OFF _Pragma("GCC visibility pop")
+#else
+	#define GCC_EXPORT_ON 
+	#define GCC_EXPORT_OFF 
+#endif
+// MHMACH5 ends
+
+#endif
+
+

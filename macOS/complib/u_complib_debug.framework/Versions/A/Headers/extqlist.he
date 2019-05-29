@@ -1,0 +1,179 @@
+/* $Header: svn://svn.omnis.net/trunk/Studio/EXTCOMP/CALLBACK/extqlist.he 17915 2017-09-06 09:53:26Z bmitchell $ */
+
+//Q4 EXTQLIST.HE
+// external fvals
+//Copyright (C) Blyth Holdings Inc 1996
+
+/**************** Changes ******************
+Date			Edit				Bug					Description
+28-Oct-15	rmm8675			ST/EC/1384	Initial implementation of obrowser xcomp.
+28-Mar-14	rmm_rws									RESTful Web Services support.
+12-Jun-09	jc0025									Added addcolex, setcol callbacks
+18-Feb-08	rmm_mobile							Mobile device support.
+09-Dec-05 MHMACH4                 Mach-O changes
+28-Nov-05	rmm_wsk									Web Services server - wizard to create a client.
+03-Nov-05	rmm_wsg									Define web service method list and row parameters to have a table instance if required.
+26-Oct-05 MHMACH2                 Mach-o changes
+06-Jan-05	gra0235		ST/*A/043			Enable V3 DAMs access to schema info
+03 MAY 00 mpm4617									Implements list constructor for constructing lists from disk format
+06-Jan-00	rmm3582									Added ability to get type and name information about external component method parameters.
+16-Jun-99 PKMACCLIENT							Macclient changes
+18-Aug-98	DRSfval									Version for self contained fldval and list classes (changes mostly unmarked)
+12 MAY 98 mpm4496									Allow calculations to be evaluated on current row on list
+05 DEC 97 mpmPRIv									New crb and pri api callbacks
+10-Jul-97	AE4575									Renamed EXTqlist::getColVal to getColValRef for clarity
+********************************************/
+
+
+#ifndef EXTqlist_he
+#define	EXTqlist_he
+
+#include	"basics.h"
+#include	"extfval.he"
+#include	"strclass.he"
+
+/*
+#ifndef isXCOMPLIB
+	enum listtype {       //basic list types //DRS2102
+        listVlen=1,                   //variable length data
+        listScol=2,                   //simple single text column
+      };  
+#endif
+*/
+
+class lsttype;
+
+// PKMACCLIENT
+#if defined(ismac) && defined(isRCCLIB)
+GCC_EXPORT_ON // MHMACH4
+#pragma export on
+#endif
+
+#ifndef ismobile	// rmm_mobile: avoid packing on mobile devices as alignment issues cause crashes
+	GCC_SET_BYTE_PACKING_ON // MHMACH2
+	#pragma SET_BYTE_PACKING_ON
+#endif
+
+#ifndef isRCCLIB
+	#define	cMaxSortItems 10
+	typedef struct 
+	{
+		qshort	mSortColumn;
+		qbool		mUpperCase;
+		qbool		mDescending;
+	} EXTsortItem;
+	
+	typedef struct
+	{
+		qshort			mSortCount;
+		EXTsortItem	mSortLines[cMaxSortItems];
+	} EXTsortStruct ;
+#endif
+
+
+// PKMACCLIENT
+class ECOAPI EXTqlist { // MHMACH4
+
+protected:
+	lsttype*	mData;
+  
+public:
+  EXTqlist( listtype pType );
+	EXTqlist(EXTqlist* list1);
+	EXTqlist(lsttype* list1);
+	EXTqlist(qbyte* add, qlong len, qret* err = 0); // create list from data in disk format // mpm4617
+	EXTqlist();
+	~EXTqlist();
+
+#ifdef isXCOMPLIB
+	lsttype* 	getLstPtr();
+#else
+	lsttype* 	getLstPtr() { return mData; }
+#endif
+#ifndef isRCCLIB
+	qbool			defineFromSQLClass(strxxx &pSQLClassName, strxxx &pErrorText);	// rmm_wsg
+#endif
+
+  qret      clear( listtype pType );    //	clear list contents & definition
+  qret      empty();                      		//	clear list contents
+	qlong			getBinLen();											//	return length of disk format for list data
+	void			getBinary(qbyte* add);						//	copy list contents to add in disk format
+
+  void      getColVal(qlong rowno, qshort col, ffttype fft, qshort fdp, EXTfldval& fval);
+  qbool     getColVal(qlong rowno, qshort col, EXTfldval& fvalp);
+  qbool     getColValRef(qlong rowno, qshort col, EXTfldval& fvalp, qbool willalter);
+  void      putColVal(qlong rowno, qshort col, EXTfldval& fval);
+	qbool			getColNullInfo(qshort col); //gra0235
+	qlong			getColFlags(qshort col); //gra0235
+
+  qshort		addCol(ffttype fft, qshort	fdp, qlong	fln=0, strxxx* name=0);	
+	qshort		addColEx( qshort col, ffttype fft, qshort fdp, qlong	fln, strxxx* classname = NULL, strxxx* columnname = NULL, qbool noclear = qfalse); // jc0025
+	void 			getCol(qshort col, strxxx& name);
+	void			setCol(qshort col, strxxx* name); // jc0025
+#ifndef isRCCLIB
+  qshort		addCol( qshort col, ffttype fft, qshort	fdp, qlong	fln, strxxx* classname = NULL, strxxx* columnname = NULL);
+	void 			getCol(qshort col, qbool inclfilename, strxxx& name);
+	qshort		findCol(strxxx &pColName);	// rmm_rws
+#endif
+	void      getColType(qshort col, ffttype &fft, qshort &fdp); 
+	void      getColType(qshort col, ffttype &fft, qshort &fdp, qlong &pLen); // rmm3582
+	qbool			copyDef(EXTqlist qlst2, qbool redef);
+
+  qlong     insertRowPtr(qlong before=0, str255* sp=0, qlongptr rptr=0);
+  qlong     insertRow(qlong before=0, str255* sp=0, qlong mark=0); //before=0 does add at end, return rowno or -1*an error message
+  qret      deleteRow(qlong rowno);
+  qret      putRow(qlong rowno, str255* sp=0, qlong mark=0);
+  qret      clearRow(qlong rowno);
+  qret      setFinalRow(qlong rowno); 
+  qret      setCurRow(qlong rowno); 
+  qlong     getCurRow();
+  qret      setRowMax(qlong rowmax);
+  qlong     getRowMax();
+	void			setRow(qbool pIsRow);	// rmm8675
+	qbool			isRow();							// rmm8675
+  qret      selectRow(qlong rowno, qbool selon, qbool issaved=qfalse);
+  qbool			isRowSelected(qlong lineno, qbool issaved=qfalse);
+  void      getRow(qlong rowno, str255* sp);
+  void      getRow(qlong rowno, qlong& mark);
+  void      getRowPtr(qlong rowno, qlongptr& rptr);
+
+  qcrb			getRowCrb( qlong pRow, qbool pWillAlter = qfalse ); // mpmPRIv
+
+  qshort    colCnt();
+  qlong     rowCnt();
+
+	void			loadRows	(qchar *pRows);
+	qbool			dup		(EXTqlist &pList);
+
+	void      operator =(qniltype qnil1);  // empties the list
+
+#ifndef isRCCLIB
+	qbool			sort	(EXTsortStruct *pSortItems);
+#endif
+
+#if !defined(isiphone)	// // pkiphone
+#if defined(isRCCLIB) || defined(isRCC)
+	void			alwaysUseUtf8Encoding(qbool pAlwaysUtf8);
+#endif
+#endif
+
+	friend class EXTfldval; // mpm4496
+
+};
+
+#ifndef ismobile
+	#pragma SET_BYTE_PACKING_OFF
+	GCC_SET_BYTE_PACKING_OFF // MHMACH2
+#endif
+
+// PKMACCLIENT
+#if defined(ismac) && defined(isRCCLIB)
+GCC_EXPORT_OFF // MHMACH4
+#pragma export off
+#endif
+
+#endif
+
+
+
+

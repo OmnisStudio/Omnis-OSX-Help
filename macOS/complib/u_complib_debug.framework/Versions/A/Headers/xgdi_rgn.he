@@ -1,0 +1,42 @@
+/* $Header: svn://svn.omnis.net/trunk/Studio/O7EXE/COCOA/xgdi_rgn.he 16574 2017-01-26 13:52:21Z bmitchell $ */
+/*
+ *  xgdi_rgn.he
+ *  
+ *
+ *  Created by Colin Richardson on 03/04/2012.
+ *  Copyright 2017 Omnis Software Ltd All rights reserved.
+ *
+ */
+
+/**************** Changes ******************
+Date			Edit				Bug					Description
+17-Mar-15	CR0185			ST/HI/1752	Optimisation of low level drawing.
+********************************************/
+
+#ifndef _XGDI_RGN_HE_
+#define _XGDI_RGN_HE_
+
+typedef class qrgn_opaque* qRgnHandle;
+typedef struct qrgn qrgn;
+
+extern void merror();
+
+
+GDIAPI qRgnHandle       OMNISAPI 	GDInewRegion();
+GDIAPI void				OMNISAPI 	GDIdeleteRegion(qRgnHandle pRegion);
+
+GDIAPI void				OMNISAPI	GDIframeRgnCurrPen(HDC pHdc,	qrgn* pRgn);
+GDIAPI void				OMNISAPI	GDIfillRgnCurrBrush(HDC pHdc,	qrgn* pRgn);	// CR0185 : renamed was GDIfillRgnCurrPen
+
+struct qrgn
+{
+	public:
+		qRgnHandle		rgn;
+	
+		qrgn() { if ( ! ( rgn = GDInewRegion() ) ) merror(); }
+		qrgn( qRgnHandle pRgn ) { rgn = pRgn; }
+		~qrgn() { GDIdeleteRegion( rgn ); }
+};
+
+
+#endif

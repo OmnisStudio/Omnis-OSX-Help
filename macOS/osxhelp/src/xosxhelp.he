@@ -1,0 +1,67 @@
+/* $Header: */
+
+/* Changes
+Date			Edit				Fault					Description
+08-Mar-19	CR0583										Win/Linux stub changes and more tidy ( not marked ).
+04-Mar-19	CR0580										Initial Omnis implementation ( tidy up not marked ).
+*/
+
+#ifndef _XOSXHELP_HE_
+#define _XOSXHELP_HE_
+
+typedef void* EventHandlerRef;
+
+@interface cocoa_proxy : NSObject {
+    void * mDispatch;
+}
+//@property (nonatomic) void *mDispatch;
+
+- (id)initWithObject:(void*)objectToCall;
+- (void)action:(id)sender;
+@end
+
+// structure used by the component so that it can be passed to the event handlers
+struct OSXHelpData
+{
+	qobjinst 			mObjInst;
+	EventHandlerRef		menuHandlerRef;
+	NSMenu *			helpMenuRef;
+	NSMenu *            oldHelpMenu;
+	cocoa_proxy *       proxy;
+	qbool				tenFiveOrLater;		//	KB added Nov 14, 2007
+};
+typedef struct OSXHelpData		OSXHelpData;
+typedef OSXHelpData *			OSXHelpDataPtr;
+
+// object class - define any private variables and public/private static methods
+class tqfObj	: public EXTfile
+{
+	private:
+		// define private variables
+		OSXHelpDataPtr		mOSXHelpDataRef;
+		
+		qbool				mIsLoaded;
+		qlong				mRefCount;
+		qbool				mIsDemo;
+		qlong				mDemoCount;
+	public:
+		tqfObj();
+		~tqfObj();
+
+		void		addRef() { mRefCount++; }
+		void		releaseRef() { mRefCount--; if ( !mRefCount ) delete this; }
+		void 		close();
+		void        MenuHandler(void* sender);
+
+		qbool		methodCall(qobjinst pObjPtr, EXTCompInfo* pEci);
+		qlong		propertySupport( LPARAM pMessage, WPARAM wParam, LPARAM lParam, EXTCompInfo* eci );
+		
+		// Static Methods
+		static 	qbool 	staticMethod(EXTCompInfo* pEci);
+		// declare any other public static methods
+private:
+		// declare any private methods
+};
+#endif
+
+/* EOF */

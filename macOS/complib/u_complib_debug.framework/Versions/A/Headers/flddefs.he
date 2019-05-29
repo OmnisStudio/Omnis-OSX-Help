@@ -1,0 +1,1019 @@
+/* $Header: svn://svn.omnis.net/trunk/Studio/O7EXE/INDY/flddefs.he 21584 2018-11-21 12:00:04Z pkelly $ */
+
+//Q4 FLDDEFS.HE
+//tqfld interface definitions
+//Copyright (C) Blyth Holdings Inc 1998
+
+/**************** Changes ******************
+Date			Edit				Bug					Description
+15-Nov-18 pkcocoa_1233 ST/GR/352  issues with mouse over and tables
+23-May-18	rmm9681			ST/DB/982		Added method content tooltips.
+10-May-18	rmm9653			ST/BE/1406	Problem with debugger stack menu.
+20-Apr-18	jmg0729			ST/EC/1500	oBrowser often loses focus while clicking text in oBrowser on macOS, under certain circumstances.
+19-Dec-17	rmm_emat								Text editor for Omnis language.
+25-Oct-16	rmm9123									Implemented $exportjson() and $importjson().
+19-Sep-16	rmm9048			ST/CE/125		Controls can now float when moving a layout breakpoint.
+30-Aug-16	rmm9025			ST/NV/059		Added support for long pathnames to FileOps and to core qfile.
+19-Jul-16	rmm8984									Tooltip issue with constants in property manager droplist.
+13-Jul-16	rmm8970			ST/LR/027		Problem with linked object and JS tab strip.
+29-Jan-16	rmm8732			ST/JS/1324	Change page of linked object when changing selected tab.
+29-Dec-15	rmm8700			ST/JS/464		JS client drag and drop.
+28-Oct-15	rmm8675			ST/EC/1384	Initial implementation of obrowser xcomp.
+01-Sep-15	rmm_cai8								Coding assistance improvements - function and property tooltips for method command list.
+24-Aug-15	rmm_cai7								Coding assistance improvements - parameter help.
+14-Jul-15	rmm_cai									Coding assistance improvements.
+23-Apr-15	rmm8557									Improved drag and drop bitmaps for Cocoa.
+26-Mar-15	rmm8537			ST/HI/1756	Resize drag rectangle issues.
+03-Oct-14	rmm8441									Navigation menu control.
+08-May-14	rmm8318									New and improved page preview - text searching.
+07-Apr-14	rmm8299			OE-2746			Saved selection now includes current page, tab etc.
+03-Mar-14	rmm8279			OE-3061			Old import implementation issue with idents.
+05-Nov-13	rmm_oxie		OE-2657			Re-implemented Omnis X import-export in order to improve performance.
+23-Oct-13	rmm8153			OE-2593			Undo support for adding fields to remote form or report.
+26-Apr-12	rmm64bit2								64 bit portability changes.
+04-Apr-12	rmm7475			ST/JS/243		Added %d place-holder for disable system focus.
+09-Sep-10	rmm_jsc									JavaScript client core changes.
+15-Apr-10	rmm_oe									Omnis Eclipse changes.
+22-Feb-10	rmm6905a								Added ability to vertically align labels - added align labels design window context menu item.
+06-Jan-10	rmm6844			ST/NO/061		Right click to open remote form list context menu can now select the clicked line.
+28-Aug-09	rmm6742			ST/HE/1050	Problems with remote form headed list.
+15-Jun-09	rmm_nc									New controls and supporting APIs.
+02-Mar-09	rmm_iphone10						Sorted out field styles and font-related properties.
+19-Dec-08	rmm_ssl									Added OpenSSL support to WebEnabler: added ISO-8859 character conversion.
+03-Nov-08	rmm6489									Added mobile device screen size configuration.
+20-Oct-08	rmm6484			ST/BE/259		Headed list columns can now be dragged to change column ordering.
+06-Oct-08	rmm6465									Do not allow context menu for mobile device dropped combo box or droplist.
+08-Sep-08	rmm6461									Iphone component design mode changes.
+14-Aug-08	pkiphone								iphone pass 1
+02-Jul-08	rmm_rfmenu							Context menus for remote forms.
+18-Feb-08	rmm_mobile							Mobile device support.
+18-May-07	rmm6071									Web client push buttons did not always accept a click correctly.
+11-Jan-07	rmm5949			ST/HE/908		Mousewheel issue with external components.
+23-Nov-06	rmm5899			ST/ST/059		Problem with radio button background theme specified in field style.
+24-Oct-06 PK6772									Radiobutton group control
+05-Jun-06	rmm5804			ST/WT/1125	Problems with droplist click events.
+22-May-06	rmm5784			ST/EC/987		Fixed some more packing problems. 
+05-May-06	rmm5745			ST/WT/1098	Drag and drop did not work in OSX Web Client.
+02-Feb-06	rmm5615			ST/WO/1851	Crash caused by deleting the previous container of a subwindow.
+05-Dec-05	rmm5546									Added message reserved for internal use.
+28-Nov-05	AE6621			ST/WT/1013 	Webclient Drag & Drop
+07-Nov-05	rmm_wsj									Added threading support, so that a server web service can be called by a client in the same process.
+27-Sep-05 MHMACH                  Mach-o changes
+14-Apr-05	rmm5333			UN/IE/092		Unicode version import-export now supports different Ansi code pages.
+10-Mar-05	PK6466			ST/WO/1712	ellipsis are now optional
+22-Nov-04	AE6535			ST/EC/866: 	Added OLE drag&drop
+05-Aug-04	rmmuni_mk								Added support for multiple characters received in a single keyboard event on OSX.
+30-Jun-04	rmm5006									Multiple select knobs were missing from quite a few components.
+17-Sep-03	rmm4717			ST/PF/262		OSX crash - memory validity checking was insufficient.
+26-Jun-03	rmm4593									If hyplinks control is vertical: draw ellipsis and use tooltips, if link text is too long to fit.
+13 MAY 03 mpm5303			st/wo/1229	Fixes tooltips for children of a complex grid
+23-Apr-03	rmm4449									Drag mode constants are really just qbytes.
+31-Mar-03 PKcolpala								color stuff
+18-Dec-02	rmm4367			ST/VC/284		Added option to make classes read-only, when they have not been checked out of the VCS.
+10-Dec-02	rmm4351			ST/NT/437		Notation helper window now closes when method editor is moved, and when other operations occur.
+17-Jun-02 MHJCORE									Java Support for Studio 4.0
+14-Jan-02 PK6254									Added new mouseover constant
+15-Oct-01 AE6007									mvDesigner: WebClient $alwaysenabledobject property
+26 SEP 01 mpmOSX_DD								Implements new drag drop for OSX
+27 JUN 01 mpm4733									Fixes style crash with inheritence across libs
+27-Apr-01 MHn0143									Fldstyle structures are now core packed.
+17-Apr-01	rmm4085									Double click in catalog now works with mvDesigner code editor.
+18 JAN 01 mpmCarbon21							Implements custom properties for styles
+14 NOV 00 mpmCarbon								OSX changes
+20 OCT 00 mpmCarbon								OSX Changes NOT MARKED
+26 JUL 00 mpm4612a								fix to mpm4612 (change current row during dropping)
+07-Jun-00	rmm3780			ST/WO/1146	GPF doing show field numbers when there is a subwindow on the window.
+21-Dec-99	rmm3574			ST/AH/171		Undo did not work when modifying the layout of an adhoc report.
+19-Dec-99	rmm3569									Stopped clicking around in design mode from moving fields.
+15-Dec-99	rmm3567			ST/EM/115		Fixed crash after dropping.
+03-Dec-99 MHWEBKEY								Added DSGN_HANDLE_KEY_EVENT for webclient key support.
+12-Feb-99	rmm3337									Alt key to disable floating did not work for tab pane.
+05 JAN 99 mpm4545			st/rc/538		Basic External objects need to inherit text properties 
+10 DEC 98 mpm4538			st/wo/934		Fixes drawing problems with lists in complex grid
+25-Aug-98	rmm3202			ST/WO/916		Fixed GPF.  Restored ctrl-Tab functionality for tabbed panes.
+********************************************/
+
+#ifndef _FLDDEFS_
+#define _FLDDEFS_
+
+class tqfFmtref; // mpm4047c
+class tqmfld;
+class tqwfld;
+class tqwnd;
+class tqitemref;
+class valpasstype;
+// struct	fldval;		// PK4130 moved above
+struct fldfnxn;
+struct locptype;
+class crbtype;
+class tqappfile;
+class tqcmd;
+struct FLDdragDrop;
+class  taskinst;
+class  tqfWrfmt;
+class  tqfWndopen;
+class  tqfWndMod; // mpm4027
+struct subwindowstyle; // mpm4020
+class lsttype; //  mpm4028c
+class instfmt;		// DRS4074
+class wrfmt;
+class tqbobj;			// DRS4074
+typedef tqbobj* qbobj;	// rmm4717
+class qlist; // mpm4031d
+struct appfmt;	// rmm1857
+class fmtref; // rmm1857
+class CURref; // mt40338
+
+// ################### field type ids ###################
+const int	
+				qftNull					= 0,
+				qftFld					= 1025,	// basic field
+				qftMfld					= 1026,	// basic mfield
+				qftWfld					= 1027,	// basic window field
+				qftEdit					= 1028,	// single line edit field
+				qftEditMask			= 1029,	// single line edit mask field
+				qftEditMul			= 1030,	// multi line edit field
+				qftEditRich			= 1031,	// old rich text edit field ( multi line )
+				qftPush					= 1032, // pushbutton
+				qftCheck				= 1033, // checkbox
+				qftRadio				= 1034,	// radio button
+				qftButtArea			= 1035, // button area
+				qftGrid					= 1036, // grid control
+				qftGroupBox			= 1037, // goup box field
+				qftList					= 1038, // list
+				qftTreeList			= 1039, // tree list
+				qftPicture			= 1040, // picture
+				qftDroplist			= 1041,	// drop list
+				qftComboBox			= 1042, // combo box
+				qftPoplist			= 1043,	// popup list
+				qftPopmenu			= 1044, // popup menu
+				qftMenubar			= 1045,	// menubar
+				qftTable				= 1046,	// table list
+				qftTabStrip			= 1047, // tabbed strip control
+				qftCompStrip		= 1048,	// component palette
+				qftPopUpPalette	= 1049,	// popup palette
+				qftSelectArray	= 1050,	// selection array for linestyles, colors etc
+				qftSubwindow		= 1051, // subwindow field // DRS4050
+				qftExtcomp 			= 1052, // Cool external component field AE_ECO
+				qftTabPane			= 1053, // AE_TPC tabpane
+				qftToolbar			= 1054, // mtToolbar
+				qftToolGroup		= 1055, // mtToolbar
+				qftIconArray		= 1056, // PK4010h
+				qftDesignMenubar= 1057, // mtMenuEdit
+				qftMenuList			=	1058, // mtMenuEdit
+				qftCommsList		= 1059,	// AE4034
+				qftScrollBox		= 1060, // mpm4030
+				qftProcsList		= 1061, // AE4057
+				qftDataGrid			= 1062,	// PK4110
+				qftStringGrid		=	1063,	// PK4110
+				qftBobj					= 1064, // mpm4028o // used for bobj design mode field
+				qftFBobj				= 1065, // mpm4028o // used for new user shape field
+				qftCheckList		= 1066, // PK4121 check box lists
+				qftStatusBar		= 1067,	// AE4090
+				qftDesignToolgroup		 = 1068, // mtToolEdit
+				qftDesignToolContainer = 1069, // mtToolEdit1
+				qftBitmapSample = 1070, // PK4200
+				qftWindowToolbar = 1071, // mtTool010
+				qftRepSection		= 1072, // mpm4047 all qftRepxxx and qftRepModxxx
+				qftRepEdit			= 1073,
+				qftRepPicture		= 1074,
+				qftRepExtComp		= 1075,
+				qftRepBobj			= 1076,
+				qftRepModPaper	= 1077,
+				qftRepModClient	= 1078,
+				qftRepMod				= 1079, // user modify report field	// mpm4085
+				qftScreenRep		= 1080, // user screen report field	// mpm4085
+				qftPagePane			= 1081,	// AE4222
+				qftHList				= 1082,	// rmm1890
+				qftDesignToolbar	= 1083,	// mt40033
+				qftFontCombo		= 1084,	// mpm4086
+				qftFontSizeCombo	= 1085,	// mpm4086
+				qftColorPalette	= 1086,	// PKcolpala
+				qftRadioGrp = 1087,	 // PK6772
+				qftIndividualPane = 1088,	// AE6737 Special field (pane within tabpane) NB. Not a user control!
+				qftDesignMenubarRemote = 1089,	// rmm_rfmenu
+				qftMenuListRemote=1090,					// rmm_rfmenu
+				qftNotationHelperList = 1091,		// rmm_cai
+				qftEditNameText = 1092,					// rmm_cai
+				qftNotationHelperPopup = 1093;				// rmm_cai
+
+
+// following defines are used by tqfld::setReadOnly to send messages to tqfld::WndProc
+#define WM_CONTROL						WM_USER+1		// used for controls own messaging ( WPARAM should contain controls message )
+#define WM_FLD_ENABLE					WM_USER+2		// send to tqfld when the field has been enabled
+#define WM_FLD_DISABLE				WM_USER+3		// send to tqfld when the field has been disabled
+#define WM_FLD_FILLCHANGED		WM_USER+4		// send to tqfld when the fill brush or backcolor has changed
+#define WM_FLD_FONTCHANGED		WM_USER+5		// send to tqfld when the fontspec has been changed
+#define WM_FLD_WILLPOPUP			WM_USER+6		// send to a popup menu field when it is about to popup
+#define WM_FLD_LOCMENU				WM_USER+7		// send to the field when a local menu item is selected
+#define WM_FLD_DROPLISTEND		WM_USER+8		// sent to a tqfDroplist when the list has been closed
+#define WM_DRAGDROP						WM_USER+9		// drag and drop general message
+#define	WM_FLD_TABCONTROL			WM_USER+10	// AE_TPC messages related to internal tab control
+#define	WM_TOOLTIP						WM_USER+11	// mtToolbar messages related to tooltips
+#define WM_FLD_RBUTTONDOWN		WM_USER+12	// rmm1364: sent to tqfld when right mouse down occurs; allows field to return context menu
+#define WM_FLD_DESIGN					WM_USER+13	// mpm4027 design mode messages. See submessages below
+#define WM_FLD_SETMENU				WM_USER+14	// mtMenuIDE2: sent to tqfld when click in menubar occurs; allows field to set menus status
+#define WM_FLD_EXECMENU				WM_USER+15	// mtMenuIDE2: sent to tqfld when a menu selection occurs; allows field to do specific menu actions
+#define WM_FLD_CHILDPOSCHANGED	WM_USER+16	// send to the parent of a field who's size or position changes ( LPARAM = WNDwindowPosMessageStruct, UPARAM = tqfld* ) // mpm4028m
+#define	WM_EVALMOUSEOVER			WM_USER+17	// evaluate the mouseover() function //DRS4068
+#define	WM_GETBACKOBJECTS			WM_USER+18	// return the background objects for the field //DRS4075
+#define	WM_CONTAINER					WM_USER+19	// messages sent to container for a user field //DRS4084
+#define WM_GETITEMREF					WM_USER+20	// sent to class editor window to get item reference for object corresponding to mouse over point // rmm1621
+#define WM_FLD_HELP						WM_USER+21	// rmm_hlp: help message: WPARAM contains sub-message - see below
+#define WM_FLD_SETDATA				WM_USER+22	// AE4166 - Call to set data
+#define WM_FLD_GETDATA				WM_USER+23	// AE4166
+#define WM_FLD_CMPDATA				WM_USER+24	// AE4166
+#define	WM_FLD_GETDATALEN			WM_USER+25	// AE4166
+#define WM_FLD_DISABLE_VIEW		WM_USER+26	// rmm1873: indicates if the view menu is disabled by disable all menus
+#define WM_FLD_ACTIVATE				WM_USER+27	// mt40029	(qbool (WPARAM) whether field is being activated or not. )
+#define WM_FLD_SCROLLVIEW			WM_USER+28	// mt40136	(qrect *(LPARAM) in parent corrdinates ).
+#define WM_PRI_INSTALL				WM_USER+29	// send to the field of the hwnd given to screen or page preview reports 
+																					// before the hwnd is taken by the print manager (Job opens) (lParam = PRIjob) // mpmPRI
+#define WM_PRI_REMOVE					WM_USER+30	// send to the field of the hwnd given to screen or page preview reports
+																					// after the hwnd is returned (Job closes) // mpmPRI
+#define WM_THUMB_TIP					WM_USER+31	// PK4684b sent to field during thumb tracking lPara, FLDscrollTip
+#define WM_GETTOOLTIPRECT			WM_USER+32	// PK4712 sent to get the tooltip rect lParam = &qrect - return is 0L if no tip
+#define WM_FLD_NEEDCONTROLTAB	WM_USER+33	// rmm3202 sent to a parent field to see if it needs to process ctrl-TAB
+
+// mpm4538
+#define WM_CPLX_KILLROW				WM_USER+34	// send to all row fields in complex grid when row looses focus
+#define WM_CPLX_SETROW				WM_USER+35	// send to all row fields in complex grid when row has received focus
+#define WM_CPLX_STARTDRAW			WM_USER+36	// send to all row fields in complex grid when rows are about to be painted
+#define WM_CPLX_ENDDRAW				WM_USER+37	// send to all row fields in complex grid when rows have been painted
+#define WM_CPLX_PAINT					WM_USER+38	// send to all row fields in complex grid when they require painting outside the current row
+
+#define WM_FLD_GETTEXTSPEC		WM_USER+39	// lParam must point to GDItextSpecStruct // mpm4545
+
+#define WM_FLD_DISABLEFLOAT		WM_USER+40	// rmm3337: sent to disable or enable floating of child windows
+
+#define WM_FLD_STYLES					WM_USER+41  // wParam = STY_xxx flags
+#define WM_FLD_REPLACESELFROMCATALOG WM_USER+42	// wParam = address of data lParam = length of data // rmm4085
+#define WM_FORMWNDSTATUS			WM_USER+43  // wParam=1 if form should be active
+#define WM_STARTJVM						WM_USER+44  // MHJCORE
+#define WM_FLD_CLOSENOTAHELP	WM_USER+45	// rmm4351: if the control has opened the notation helper window,this instructs it to close the notation helper window (wParam,lParam,uParam all zero)
+#define WM_MULTIKEYDOWN				WM_USER+46	// rmmuni_mk: lParam = address of WMmultiKey (see hwnd.he)
+#define WM_DROPFILEDATA				WM_USER+47	// AE6535
+#define WM_GENERALFLAGS				WM_USER+48	// PK6466 - see WM_GENERALFLAGS_XXX
+#define WM_GETCODEPAGE				WM_USER+49	// rmm5333: wParam = code page number, lParam = qfalse for ANSI/ISO to Unicode, true for Unicode to ANSI/ISO (only to be used by complib chrbasic.cpp)
+#define WM_GETANSICODEPAGE		WM_GETCODEPAGE	// rmm_ssl: old name WM_GETANSICODEPAGE defined for backwards compatibility
+#define WM_TESTFORCANCEL			WM_USER+50	// rmm_wsj
+#define WM_SETMAINSTACK				WM_USER+51	// rmm_wsj
+#define WM_RESERVED1					WM_USER+52	// rmm5546
+#define WM_FLD_PARENTCHANGED	WM_USER+53	// rmm5615: sent to field when field's parent has changed
+#define WM_ORFC_GETSCROLLAMT	WM_USER+54	// rmm5745: wParam = qtrue for vscroll, qfalse for hscroll, lParam = (qdim *) to receive scroll amt (Web client only)
+#define WM_ORFC_CURFIELDCHANGING	WM_USER+55	// rmm5804: sent to field when it is about to no longer be the current field
+#define WM_FLD_STYLETHEMECHANGE		WM_USER+56	// rmm5899: sent to field when background theme has been changed by style (LPARAM is new theme)		
+#define WM_FLD_NEEDSWM_MOUSEWHEEL	WM_USER+57	// rmm5949: sent to a field to see if it wants a WM_MOUSEWHEEL message (sent after scrollbar test has failed)
+#define WM_FLD_CAPTURERESTORED		WM_USER+58	// rmm6071: web client only: sent to a field when the capture is restored to it after displaying a message box
+#define WM_POPUP_SOFTKEY_MENU			WM_USER+59	// rmm_rfmenu: mobile win32 web client only: sent to a form to request that the soft key menu pops up: wParam = qtrue for right button menu, qfalse for left
+#define WM_SETMENUBAR							WM_USER+60	// rmm_rfmenu: mobile win32 web client only: set the windows mobile menu bar
+#define WM_FLD_CANOPENCONTEXTMENU	WM_USER+61	// rmm6465: sent to a web client field to see if the context menu can open: returns qtrue if it can (rmm6844: WPARAM is a combination of ORFC_FLD_CANOPENCM_FLAG_... values; LPARAM contains the clicked point in HWND coordinates - use WNDmakePoint to make a qpoint)
+#define WM_FORMWNDSTSCHANGED			WM_USER+62	// rmm_nc: sent to the HWND with the capture when WM_FORMWNDSTATUS has been sent to disable the form, and then again to the same HWND when WM_FORMWNDSTATUS has been sent to re-enable the form
+#define WM_FLD_VERTCENTER_TYPE		WM_USER+63	// rmm6905a: sent to field to see if it is a label or field with $vertcentertext property. WPARAM = 0. If it has the property: sets * (qbool *) LPARAM to FLD_VC_LABEL if it is a label, FLD_VC_FIELD if not
+#define WM_FLD_JS_DISABLE_FOCUS_CHANGED	WM_USER+64	// rmm7475: sent to a JS client design component when the $disablesystemfocus property changes (WPARAM = new value)
+#define WM_FLD_TOOL_COMBO_CHANGED	WM_USER+65	// rmm8318
+#define WM_FLD_REDRAW_PREVIEW			WM_USER+66	// rmm8318
+#define WM_FLD_ALLOW_CTRL_T_DURING_CAPTURE	WM_USER+67	// rmm8441
+#define WM_FLD_CHECK_PARAMETER_HELP WM_USER+68	// rmm_cai7: Check to see if parameter help needs to be displayed,and display it if required
+#define WM_COCOA_SET_DESIRED_RESPONDER WM_USER+69	// rmm8675: sent to HWND when the first responder was requested to be set to a subview of the HWND,but denied because the field is not current (WPARAM = NSResponder *)
+#define WM_FLD_CANFOCUS							WM_USER+70	// rmm8675: Returns true if the receiving field can accept the focus
+#define	WM_FLD_COCOA_DONT_SEND_DOWN_IMMEDIATELY	WM_USER+71	// rmm8675: COCOA only: Returns true if a down event when the field has the focus must not be immediately sent to the view
+#define WM_FLD_DRAGMODECHANGED			WM_USER+72	// rmm8675: Sent when drag mode has changed. wParam is new drag mode
+#define WM_FLD_DRAGDROPSCROLLCLIENT	WM_USER+73	// rmm8700: If true,scroll the client when doing drag drop scroll - only sent to external components
+#define WM_FLD_SETCURRENTPAGE				WM_USER+74	// rmm8732: Set current page of paged pane (wParam = fldval *<paged pane name>, lParam = page number)
+#define WM_FLD_INITDONE							WM_USER+75	// rmm8970: Sent to HWND when the form or window has initialised its controls (only if the HWND receiving the message has called WNDregisterForInitDone(HWND))
+#define WM_FLD_ESCAPE_KEY_PRESSED		WM_USER+76	// rmm_emat: Sent to tqwfld when the escape key is pressed in a field with mNotifyEscapeKey set to true (wParam = tqfld * of field where escape was pressed).Return non-zero if the key was processed
+#define WM_COCOA_RENDERING_EXT_WND	WM_USER+77	// jmg0729: Sent to Cocoa xcomps to ask whether they are (or may be) rendering an external window (which is not a 'topLevelWindow' or 'WND_NSWindow'). Omnis calls this when the focus is moving to an 'external' window, to give the xcomp the chance to prevent the focus being removed (return non-zero).
+#define WM_FLD_ENTER_OR_RETURN_KEY_PRESSED			WM_USER+78	// rmm_emat: Sent to tqwfld when the enter or return key is pressed in a field with mNotifyEnterOrReturnKey set to true (wParam = tqfld * of field where escape was pressed, LPARAM = BOOLEAN (true for Enter or false for Return)).Return non-zero if the key was processed
+#define WM_FLD_GETFIELDFORTOOLMENUCMD						WM_USER+79	// rmm9653: Used to get the tqfld for certain tool menus (WPARAM is tool menu id)
+
+#define WM_FLD_EXTCOMP_FIRST				WM_USER+200	// rmm8675: Messages in the range WM_FLD_EXTCOMP_FIRST
+#define WM_FLD_EXTCOMP_LAST					WM_USER+299	// to WM_FLD_EXTCOMP_LAST are private messages for the use of external components
+
+// rmm6905a: Used with WM_FLD_VERTCENTER_TYPE message
+#define FLD_VC_FIELD	0
+#define FLD_VC_LABEL	1
+#define FLD_VC_UNSET	2	// Internal value meaning that the field cannot be used with $vertcentertext
+
+// rmm6844: ORFC_FLD_CANOPENCM_FLAG_ values
+#define ORFC_FLD_CANOPENCM_FLAG_TESTONLY	0x1	// If (WPARAM & ORFC_FLD_CANOPENCM_FLAG_TESTONLY) != 0, the message is being sent to test if the menu will open - the menu opening process may not start - when the menu opening process starts, WM_FLD_CANOPENCONTEXTMENU will be sent again
+
+// PK6466
+#define WM_GENERALFLAGS_DISABLE_ELLIPSIS			0x00000001
+
+// WM_FLD_STYLES wParam
+#define STY_SETNAME					1 // style name has changed, attach new style ( LPARAM = str80*style name )
+#define STY_SETID						2 // style name has changed, attach new style ( LPARAM = style id )
+#define STY_APPLYPROPS			3 // apply specified properties of attached style ( LPARAM = style flags to apply SBFxxx )
+#define STY_STYLECHANGED		4 // re-applies the modified styles ( LAPARM = style id or zero )
+#define STY_STYLEDELETED		5 // restores saved properties ( LAPARM = style id )
+#define STY_SAVESTART				6	// send prior to saving the objects properties to class data
+#define STY_SAVEEND					7	// send after saving the objects properties to class data
+
+#define STY_GETSTYLEID			8 // returns style id
+
+// WM_FLD_xxxDATA submessages AE4166
+#define DATA_HANDLE_PASSED		0
+#define DATA_CHARPTR_PASSED		1
+#define DATA_FLDVAL_PASSED		2
+#define DATA_CMPDATA_SAME			1
+#define DATA_CMPDATA_DIFFER		2
+
+// WM_DRAGDROP sub messages
+#define DD_STARTDRAG					1
+#define DD_ENDDRAG						2
+#define DD_DROP								3
+#define DD_CANDROP						4
+#define DD_HILITE							5
+#define DD_UNHILITE						6
+#define DD_SHOWDRAGSHAPE			7
+#define DD_HIDEDRAGSHAPE			8
+#define DD_CANDRAG_ON_DOWN		9				// rmm1347
+#define DD_CANDRAG_ON_MOVE		10			// rmm1347
+#define DD_ALWAYS_HILITE			11			// rmm1351
+#define DD_GETSCROLLRECT			12			// rmm1476
+#define DD_DRAGDROPSCROLL			13			// rmm1479
+#define DD_SETDRAGVALUE				14			// DRS4068
+#define DD_CANDROP_OVER				15			// fields should return 1L if the source is allowed to be dropped in the parents // mpm4031
+#define	DD_CANDROPPARENT			16			// DRS4068c
+#define DD_MOVEDRAGSHAPE			17			// mpm4047
+#define DD_GETDRAGCONTAINER		18			// PK4386
+#define	DD_CANSCROLL					19			// rmm2677: return true if the field can be scrolled by the currently dragged item
+#define DD_BUTTONDOWN					20			// control button is held down. Some controls may simulate a selection // mpm4491
+#define DD_BUTTONUP						21			// control button is released // mpm4491
+#define DD_CHILD_STARTDRAG		22			// send to parent of dragged field emmidietly after DD_STARTDRAG has been send to child // mpm4612a
+#define DD_CHILD_ENDDRAG			23			// send to parent of dragged field emmidietly prior to sending DD_ENDDRAG to child // mpm4612a
+#define DD_STARTDRAGWITHVALUE	24			// rmm8675: Start drag with the supplied drag value (fldval * in lParam)
+
+// rmm1479: scroll directions for scrolling during drag and drop // rmm2677: moved to here
+const int 
+			cFLDscrollNone = 0,
+			cFLDscrollLeft = 1,
+			cFLDscrollRight = 2,
+			cFLDscrollUp = 3,
+			cFLDscrollDown = 4;
+
+// WM_TOOLTIP sub messages	// mtToolTip
+#define TIP_GETTIP						1	// rmm1407: Sent to field to get tooltip; lParam is a pointer to a TIPinfo structure, defined in tooltips.he
+#define TIP_CANDOTIP					2	// PK4623:	Sent to field to see if it wants to do context popup
+#define TIP_PARENT_GETTIP			3 // mpm5303: Sent to parent field to see if it wants to overload TIP_GETTIP
+#define TIP_DURING_CAPTURE		4	// rmm4593: Sent to field to get Boolean which indicates if field wants TIP_GETTIP messages when it has the capture
+#define TIP_GET_ACTIVE_SHOW_AREA_AND_SHOW_POINT_FOR_POINT	5 // rmm8984: Get the active show area and show point for the specified point (LPARAM is TIPinfo * and UPARAM is FLDtipActiveShowAreaInfo *)
+
+// mpmORFC moved TIP structures to here
+// Tip information structure, passed to field with WM_TOOLTIP(TIP_GETTIP) message
+// Alignment of Tooltip to Show Point
+enum TIPalign
+{
+	eTIPtopAlign = 0,			// Default Action
+	eTIPleftAlign = 1,
+	eTIPrightAlign = 2,
+	eTIPbottomAlign = 3
+};
+
+#ifndef ismobile	// rmm_mobile
+	GCC_SET_CORE_PACKING_ON					// rmm5784
+	#pragma	 SET_CORE_PACKING_ON		// rmm5784
+#endif
+// The field receiving this message is passed the mShowPoint field in client coordinates
+// of the hwnd supplied to the WndProc.  
+// The field is responsible for storing the tip text in mToolTipText or mResStr (or a bitmap in mToolTipBitmap, mToolTipBitmapWidth and mToolTipBitmapHeight), 
+// and setting mHasTip to qtrue to indicate that there is a tooltip.
+// The field also fills in mActiveShowArea (which defaults to the client rect of the window
+// if left unchanged), and optionally mTipAlign, which indicates where the tip is to be displayed
+// relative to the show point.
+// The field can also modify mShowPoint (leaving it in client coordinates), to adjust where the tip is displayed.
+
+#if !defined(isiphone)		// pkiphone
+class tqfld;
+struct TIPinfo
+{
+  str255        mToolTipText;         // ToolTip: 
+	rstrno				mResStr;							// if mToolTipText has zero length, then ToolTip comes from resources
+
+	qpoint				mShowPoint;						// the position of top/left of the tool tip window
+	qrect					mActiveShowArea;			// Area which the tooltip will keep's on showing Within
+	tqfld					*mActiveShowFld;			// rmm_hlp: Field containing the active show area
+
+	qshort				mTipAlign;						// the alignment of the tool-tip, to the coordinate
+	qbool					mHasTip;							// qtrue if there is a tooltip
+
+	HBITMAP				mToolTipBitmap;				// Start rmm_cai8: If non-zero, mResStr and mToolTipText are not relevant; TIPinfo takes ownership of the bitmap, and will delete it when it has finished with it
+	qdim					mToolTipBitmapWidth;
+	qdim					mToolTipBitmapHeight;	// End rmm_cai8
+
+	qcol					mToolTipTextColor;		// rmm_emat
+
+	// Start rmm9681
+	enum eTipType
+	{
+		eTextOrBitmap = 0,
+		eMethodText = 1
+	} mTipType;
+	// The following 6 fields are significant if mTipType is eMethodText
+	tqappfile			*mMethodLib;					
+	qlong					mMethodClass;
+	qshort				mMethodFldno;
+	qshort				mMethodSeqno;
+	qbool					mMethodIsNew;
+	qbool					mMethodIsNewRef;
+	// End rmm9681
+
+	TIPinfo() { mResStr = 0; mActiveShowFld = 0; mTipAlign = eTIPbottomAlign; mHasTip = qfalse; mToolTipBitmap = 0; mToolTipBitmapHeight = mToolTipBitmapWidth = 0; mToolTipTextColor = GDI_COLOR_QDEFAULT; mTipType = eTextOrBitmap; mMethodLib = 0; mMethodClass = 0; mMethodFldno = 0; mMethodSeqno = 0; mMethodIsNew = mMethodIsNewRef = qfalse;  } // rmm_cai8 // rmm_emat // rmm9681
+};
+#endif
+
+// rmm_hlp: WM_FLD_HELP sub messages
+#define HLP_SET_STATUSBAR_TEXT			1	// Set the status bar text for the window field status bar
+#define HLP_RESTORE_STATUSBAR_TEXT	2	// Restore the status bar text to its old value (after tracking)
+#define HLP_SAVE_STATUSBAR_TEXT			3	// Called to tell the field to save status bar text
+// #define HLP_GET_CONTEXT_INFO				4 // Called to get the help context id and file name; returns long context id; LPARAM is a str255 pointer to receive the help file name, UPARAM a pointer to a qpoint
+#define HLP_GET_CONTEXT							5 // new replacement context help lParam points to hlpContextInfo struct // mpm4470
+
+// mpm4470
+#if !defined(isiphone)		// pkiphone
+struct hlpContextInfo
+{
+	qlongptr		mContextId;	// rmm64bit2
+	tqappfile*	mApp;
+	qbool				mPointSet;
+	qpoint			mPoint;
+	str255			mHelpInstName;
+	str255			mHelpCaption;
+	str255			mHelpFileName;
+	str255			mHelpTopicFileName;
+	str255			mHelpTopicTitle;
+	
+	void setEmpty();
+};
+#endif
+
+#ifndef ismobile	// rmm_mobile
+	GCC_SET_CORE_PACKING_OFF				// rmm5784
+	#pragma	 SET_CORE_PACKING_OFF		// rmm5784
+#endif
+
+// Start rmm_oxie: style flags bit numbers: must correspond to the constants below
+#define BN_SBFfontname					0	// Font name
+#define BN_SBFfontsize					1	// Font Size
+#define BN_SBFfontstyle					2 // Font Style
+#define BN_SBFjustify						3 // Justification
+#define BN_SBFtextcolor					4 // rmm1970: Text color
+#define BN_SBFforecolor					5 // foreground fill color // mpmCarbon begins
+#define BN_SBFbackcolor					6 // background fill color
+#define BN_SBFbackpattern				7 // fill pattern
+#define BN_SBFbackgroundtheme		8 // background theme
+#define BN_SBFbordercolor				9	// border line color
+#define BN_SBFbordereffect			10	// border style
+#define BN_SBFbordertheme				11	// border theme // mpmCarbon ends
+#define BN_SBFcustom						27 // flag specifying custom style properties // mpmCarbon21
+// End rmm_oxie
+
+// Style bit flags
+#define SBFfontname					0x00000001	// Font name
+#define SBFfontsize					0x00000002	// Font Size
+#define SBFfontstyle				0x00000004	// Font Style
+#define SBFjustify					0x00000008	// Justification
+#define SBFtextcolor				0x00000010	// rmm1970: Text color
+#define SBFforecolor				0x00000020	// foreground fill color // mpmCarbon begins
+#define SBFbackcolor				0x00000040	// background fill color
+#define SBFbackpattern			0x00000080	// fill pattern
+#define SBFbackgroundtheme	0x00000100	// background theme
+#define SBFbordercolor			0x00000200	// border line color
+#define SBFbordereffect			0x00000400	// border style
+#define SBFbordertheme			0x00000800	// border theme // mpmCarbon ends
+#define SBFcustom						0x08000000  // flag specifying custom style properties // mpmCarbon21
+#define SBFstandard					0x07FFFFFF	// flag specifying all standard properties  // mpmCarbon21
+
+#define SBFtextspec					0x0000001F	// combined text spec flags
+#define SFBbackFill					0x000001E0	// combined background fill flags // rmm6742: added SBFbackgroundtheme so that fill changed message is also sent for background theme
+#define SFBall							0x0FFFFFFF	// all props
+
+// style properties and info
+#ifndef ismobile	// rmm_mobile
+	GCC_SET_CORE_PACKING_ON // MHMACH
+	#pragma SET_CORE_PACKING_ON // MHn0143
+#endif
+struct STYcustomPropInfo
+{
+	qshort 			mAnum;
+	qshort			mType;
+};
+
+class crbtype;
+#if !defined(isiphone)		// pkiphone
+class	STYstyleProps
+{
+public:
+	STYstyleProps() { mPlatformID = 0; mStyleFlags = 0; mCustomPropsCnt = 0; }
+
+	qword2 	mPlatformID;	// Platform Id (same as platform PBF vals)
+	qlong		mStyleID;			// Style Id
+	qlong		mStyleIndex;	// index into cache
+	qlong  	mStyleFlags;   // Style flags
+	qfnt 		mFont;
+	qsty		mFontStyle;		// Font Style
+	qjst		mTextJst;			// Justification
+	qcol		mTextColor;		// text colour	// rmm1970: 
+	qcol		mForeColor;				// set pixels fill color // mpmCarbon begins
+	qcol		mBackColor;				// cleared pixels fill color
+	qpat		mBackPattern;			// fill pattern
+	qulong	mBackgroundTheme;	// background theme
+	qcol		mBorderColor;			// border color for plain border
+	qulong	mBorderEffect;		// border style // mpmCarbon ends
+	qulong	mCustomPropsCnt;	// custom property count // mpmCarbon21 begins
+	STYcustomPropInfo*	mCustomPropsInfo;	// custom property info
+	crbtype*		mCustomPropsData; // custom property data (use EXTcrb to access) // mpmCarbon21 ends
+	void*				mFldInfo;					// internal use only 
+};
+typedef STYstyleProps* STYstylePropsPtr;
+#endif
+
+// structure containing info about attached style and saved properties
+struct STYstyleCache // mpmCarbon21
+{
+	qlong		mStyleID;				// unique id of style
+	qlong		mStyleIndex;		// index of cached style info
+	qlong 	mSavedIndex;		// index to identify saved properties in cache list
+	qlong  	mStyleFlags;		// flags identifying which properties are set in style
+	qapp		mApp;						// points to app of class this object belongs to (may differ from getApp()) // mpm4733
+	qlong		mHTMLstyleID;		// rmm9123: Style id of style to be saved in JS client HTML (when this is a remote form control). Only set when saving HTML.
+
+	qshort	platformId();		// rmm_iphone10: platform currently required for the style - used to check if this is different from the currently cached values
+};
+typedef STYstyleCache* STYstyleCachePtr;
+#ifndef ismobile	// rmm_mobile
+	GCC_SET_CORE_PACKING_OFF // MHMACH
+	#pragma SET_CORE_PACKING_OFF // MHn0143
+#endif
+
+// WM_FLD_DESIGN sub messages // mpm4027
+#define DSGN_SELECT						1	// send when field is to be selected ( lParam is 1 if it is a multi select )
+#define DSGN_DESELECT					2 // send when field is to be deselected
+#define DSGN_UNIONSIZERECT		3 // send to build a union rect of all selected fields
+#define DSGN_UNIONDRAGRGN			4 // send to build a region of frames for all the selected fields
+#define DSGN_ADDPROPINSP			5 // send when the field is to add it self to the property inspector
+#define DSGN_MOVESIZE					6	// send to selected fields when they are to move ( lParam = DSGNmoveSizeInfoStruct* )
+#define DSGN_DRAWSIZERECT			7 // send to selected fields during sizing ( uParm = HDC, lParam contains a qrect pointer containing adjustments for the window rect )
+#define DSGN_SELECTIFINRECT		8 // send to all fields, fields should select them selfs if they are touching the global rect.
+#define DSGN_DRAWNUMBER				9 // send to all fields, when show numbers is turned on or off ( lParam: 1 = on, 0 = off ) // mpm4028c
+#define DSGN_DELETE						10 // send to selected fields to delete them selfs, fields will call wfld with same message and number in lParam
+#define DSGN_KNOBCHANGE				11 // send to wfld who owns the knobs when knobs are assigned to another wfld
+#define DSGN_LOCK							12 // send to fields to change their lock state ( lParam = lock ) // mpm4028k
+#define DSGN_DBLCLICK					13 // send to field on double click 
+#define DSGN_GETOBJLNK				14 // should return the objlnk for the hwnd. Should return current pasteable objlnk if hwnd not valid // mpm4031b
+#define DSGN_GETOBJLNKHWND		15 // should return the hwnd container as specified by the objlnk in lParam // mpm4031b
+#define DSGN_CLICK						16 // send to field on single click in design mode // mpm4031c
+#define DSGN_ISCONTAINER			17 // sent to a field to find out if its a container object (e.g. scroll box or complex grid) // mpm4047d removed point and click messages
+#define DSGN_DOCLEARKEY				18 // send to wafld to clear fields using doClear functions PK4211
+#define DSGN_SNAPADJRECT			19 // send to wafld to snap size move offsets to grid (lParam = DSGNmoveSizeInfoStruct*, uParam = tqfld* ) // mpm4047e
+#define DSGN_RCLICK						20 // send to field on single right button click in design mode
+#define DSGN_SENDSELDONE			21 // send to wfld after messages have been send to selected fields (lParam = original wParam message )
+#define DSGN_NCCLICK					22 // send to field on single nc click in design mode // mpm4074
+#define DSGN_GROUP						23 // send to fields to change their group state ( lParam = groupNumber ) // PK4432
+#define DSGN_ORDERCHANGED			24 // sent to a field when its udNumber has changed // rmm2080
+#define DSGN_KEY							25 // sent to single selected field on design key events // mpm4132
+#define DSGN_ADJCHILDRECT			26 // sent to a field to adjust a child rect for scroll position // mpm4177
+#define DSGN_ADJLINERECTINSET	27 // send to a field to adjust the window rect to a line rect for line background objects ( lParam = qrect* ) // mpm4186 
+#define DSGN_ISALINE					28 // send to field to query if it is a line object (return 1L if it is otherwise return 0L) // mpm4186
+#define DSGN_NULL							29 // send to a field when in design mode ( same as WM_NULL ) PK4584
+#define DSGN_MOUSEMOVE				30 // send to a field when in design mode ( same as WM_MOUSEMOVE )
+#define DSGN_LBUTTONUP				31 // send to a field when in design mode ( same as WM_LBUTTONUP )
+#define DSGN_RBUTTONUP				32 // send to a field when in design mode ( same as WM_RBUTTONUP )
+#define DSGN_RBUTTONDBLCLK		33 // send to a field when in design mode ( same as WM_RBUTTONDBLCLK )
+#define DSGN_METHODSKEY				34 // sent to a window field in design mode when user presses F8 or Shift-F8 // rmm2478
+#define DSGN_GETMOUSELOC			35 // sent to a window field in design mode to get mouse location for prop-inspec status bar
+#define DSGN_RULER						36 // sent to a window or report wafld in order to update the ruler
+#define DSGN_INVALSELECTKNOBS	37 // sent to a field to invalidate the multi-select knobs // rmm2873
+#define DSGN_ADJMULTIRECT			38 // sent to a field to adjust the rectangle used for drawing multi-select knobs (lParam = qrect *) // rmm2880
+#define DSGN_RESETKNOBS				39 // will reset design knobs
+#define DSGN_HANDLE_WEBKEY_EVENT 40 // sent to a field to see if it can be used to handle clicks generated by webclient key events. // MHWEBKEY
+#define DSGN_NEWVCSSTATE			41	// sent to editor window when state of $showascheckedout changes // rmm4367
+#define DSGN_OVERRIDEMULTIRECTHWND 42 // sent to a field to allow it to override the HWND used for multi-select knobs (lParam = HWND *) // rmm5006
+#define DSGN_SAVESELECTION		43	// rmm8279: Sent to field to add saved selection information
+
+// PK4584 renumbered
+// WM_FLD_DESIGN sub messages send to wfld ( DSGN_FMTMAKE is send to parent ) to manipulate format
+#define	DSGN_FMTUNDO					60 // sent to wfld to perform complete undo DRS4120
+#define DSGN_FMTDELETE				61 // delete field from format ( lParam = field number )
+#define DSGN_FMTCOPY					62 // copy currently selected fields to tmp format in lParam ( return = fmtref* )
+#define DSGN_FMTPASTE					63 // paste fields from tmp format ( lParam = fmtref* , uParam = DSGNmoveSizeInfoStruct* )
+#define DSGN_FMTNEW						64 // add new field to format ( lParam = type , uParam = DSGNmoveSizeInfoStruct* )
+#define DSGN_FMTMAKE					65 // make field from format ( return = tqfld* , lParam = number , uParam = DSGNmoveSizeInfoStruct* ) SEND to parent NOT wfld
+#define DSGN_FMTRESET					66 // remake existing field from format ( lParam = tqfld* )
+#define DSGN_FMTORDER					67 // change order of field ( lParam = old number , uParam = new number )
+#define DSGN_FMTCLEARUNDO			68 // sent to wfld to clear the undo table  PK4130
+#define DSGN_FMTSAVEPROPUNDO	69 // sent to wfld to save a property change PK4130 // rmm3780: was 9 (duplicate of DSGN_DRAWNUMBER)
+
+// rmm2699: DSGN_RULER sub messages
+#define RUL_DRAGREGION				1	// Update the rulers from the drag region
+#define RUL_SIZERECT					2 // Update the rulers from the sizing rectangle
+#define RUL_CURRENTMOUSE			3 // Update the rulers to show the current mouse position
+#define RUL_REDRAW						4	// rmm6461: Redraw the rulers completely
+
+// WM_CONTAINER sub messages
+#define	CO_OBJLNKEXTRA				1	// return the objlnk hiword for the field whose hwnd is passed //DRS4084
+#define CO_BEFORE_MAKEFLD			2	// prepare FMTcreateStruct prior to making a child field or bobj //DRS4084		
+#define CO_AFTER_MAKEFLD			3	// fix up field or bobj after it has been made //DRS4084		
+#define CO_ADDPARMCOUNT				4	// return parameters needed for $objs.$add //DRS4084		
+#define CO_EVALADDPARMS				5	// evaluate paramters $objs.$add and return objlnkExtra	//DRS4084		
+#define CO_DELETECHILD				6 // sent before a field or background object is deleted //DRS4084b
+#define CO_INVALCHILD					7 // sent when a field or background object is invalidated //DRS4084b
+
+// the following are id's for the possible sizing knobs for the selected field(s). mpm4028h
+#define KNOB_TOPLEFT			0
+#define KNOB_TOP					1
+#define KNOB_TOPRIGHT			2
+#define KNOB_BOTTOMLEFT		3
+#define KNOB_BOTTOM				4
+#define KNOB_BOTTOMRIGHT	5
+#define KNOB_LEFT					6
+#define KNOB_RIGHT				7
+
+#define KNOB_FIRST				0
+#define KNOB_LAST					7
+
+// the following struct is send in lParam for
+struct compDetails;
+
+// mpm4421:
+#ifndef ismobile	// rmm_mobile
+	GCC_SET_CORE_PACKING_ON // MHMACH
+	#pragma	 SET_CORE_PACKING_ON
+#endif
+
+#if !defined(isiphone)		// pkiphone
+struct DSGNmoveSizeInfoStruct
+{ // mpm4047f tidy up to retain sanity // THIS WAS GETTING OUT OF CONTROL
+	tqwfld*				mWfld;				// the wfld (design field) to which the knob belongs
+	HWND					mHwndParent;	// the new hwnd parent for the field being moved
+	tqfld*				mFldParent;		// the new fld parent for the field being moved AE4282
+	qrect					mAdjRect;			// contains adjustments (not final locations) for top, left, right and bottom of flds rect
+	qshort				mSizeKnob;		// contains KNOB_xxx define if mIsSize is true
+	compDetails*	mDetails;			// details when field is created from component store
+	qbool					mIsSize:1;		// if true we are sizing and mSizeKnob contains one of the KNOB_xxx defines. If false we are moving.
+	qbool					mNoAdjRect:1;	// if true, do not adjust new field rectangle
+	qbool					mIsAlign:1;		// if true, sizing caused by any of the align options
+	qbool					mIsControl:1;	// if true, control key is held down for square sizing // mpm4101
+	qbool					mDropFromCompStore:1;	// if true, dropping a new field from the component store // rmm2828
+	qbool					mIsUndo:1;		// if true, message is generated because of undo // mpm4407
+	qbool					mSaveUndo:1;	// rmm3574: if true, save undo information when moving or sizing
+	qrect					mSizeUnionRect;	// rmm2699: union of all the size rectangles
+
+	DSGNmoveSizeInfoStruct()
+	{
+		mWfld = NULL;
+		mHwndParent = NULL; mFldParent=NULL;    // AE4282
+		GDIsetRectEmpty(&mAdjRect);
+		mSizeKnob = 0;
+		mDetails = NULL;
+		mIsUndo = mIsAlign = mIsSize = mNoAdjRect = mIsControl = mDropFromCompStore = qfalse; // mpm4407 mpm4101 // rmm2828
+		mSaveUndo = qtrue;	// rmm3574
+	}
+};
+#endif
+
+// Start rmm1364: WM_FLD_RBUTTONDOWN passes the address of this structure in LPARAM
+// The field can set up the menu, and return 1L, in which case the menu pops up.
+class tqfld;
+class qmenu;
+struct FLDrbuttonDown
+{
+	tqfld		*mOrigField;		// The field receiving the rbutton down message
+	qpoint	mPoint;					// The point where the down occurred
+	qmenu		*mMenu;					// Menu to popup (allocated by fldbasic before calling WndProc with WM_FLD_RBUTTONDOWN
+	qbool		mWhiteSpace:1;	// rmm2498: qtrue if the click is in whitespace in the control
+};
+
+struct	STYfldData; // AE_STY2
+struct	fldval;
+class 	tqitemref;
+
+#define DSGN_UNDO_PROP		1			// undo a property value
+#define DSGN_UNDO_MOVE		2			// undo a design mode move operation
+#define DSGN_UNDO_SIZE		3			// undo a design mode size operation
+#define DSGN_UNDO_ALIGN		4			// PK4213 undo a design mode align operation
+#define DSGN_UNDO_DELETE	5			// undo a delete field operation //DRS4120
+#define DSGN_UNDO_ADD			6			// rmm8153: undo an add field (from component store, paste, or drag and drop) operation
+#define DSGN_UNDO_LAYOUT	7			// rmm9048: undo a layout change (responsive layout remote form)
+
+// DSGNundoInfo is sent in lParam and used to undo messages DSGN_FMTSAVEPROPUNDO
+struct DSGNundoInfo 
+{
+	tqitemref* 	mItemRef;		// Design mode tqfld item ref
+	tqfld*			mUndoObj;		// The object undo is for
+	fldval*			mUndoVal;		// The objects undo value
+	qshort			mUndoTyp;		// The type of undo ( DSGN_UNDO_xxx )
+	attnumber   mUndoAnum;	// The real anum undo number
+	attnumber   mUndoAnum1;	// The anum undo number	( possible anumHead ), normally anumNone
+	qshort			mVal1;      // The old value of left/width 
+	qshort			mVal2;			// The old value of top/height
+	qshort			mVal3;      // PK4213 The old value of width ( align only )
+	qshort			mVal4;			// PK4213 The old value of height( align only )
+	HWND				mPrevParent;// An objects previous parent ( in the case of a move )	PK4130a
+};
+
+// PK4130 end
+
+// rmm2699: RULinfo structure passed RUL_SIZERECT ruler message
+struct RULinfo
+{
+#if !defined(isiphone) // pkiphone
+	qrect		*mRect;		// Enclosing rectangle for area being sized, or selected
+	HDC			mHdc;			// Desktop HDC
+#endif
+};
+
+// The return from WM_FLD_RBUTTONDOWN must be one of the following:
+#define FLD_RBUTT_DONE						0			// The field has processed the message, and no further processing is required
+#define FLD_RBUTT_MENU_RETURNED		1			// The field has returned a menu in mMenu of FLDrbuttonDown; fldbasic then pops up the menu and executes the command
+#define FLD_RBUTT_NO_MENU					2			// The field has neither processed the message, nor returned a menu; fldbasic will try passing the message to the parent field
+#define	FLD_RBUTT_DOOPTCLICK			3			// The field processed the message and requests optclick menu AE_CME2
+#define FLD_RBUTT_USER_MENU_RETURNED 4	// rmm1821: indicates that a user menu has been returned in mMenu
+// End rmm1364
+
+// start mtMenuIDE2
+// Menu Ids used in WM_FLD_SETMENU wParam, xxxState pasted in lParam
+#define MM_FILE								1
+#define MM_EDIT								2
+
+// Menu Items Ids used in WM_FLD_EXECMENU wParam
+
+// File's Menu IDs
+#define MI_SAVE								1
+#define MI_PRINT							2
+#define MI_REVERT							3			// rmm1460
+#define MI_PROPS							4			// rmm1974: use file menu message for property manager, to avoid yet another message
+
+// Edit's Menu IDs
+#define MI_UNDO								1
+#define MI_CUT								2
+#define MI_PASTE							3
+#define MI_COPY								4
+#define MI_CLEAR							5
+#define MI_SELECTALL					6
+#define MI_PASTEFF						7			// AE4415
+#define MI_DESELECTALL				8			// rmm_mobile
+#define MI_SELECTLINE					9			// rmm_mobile
+#define MI_DESELECTLINE				10		// rmm_mobile
+#define	MI_SELECTHERETOEND		11		// rmm_mobile
+#define MI_DESELECTHERETOEND	12		// rmm_mobile
+#define	MI_REDO								13		// rmm_emat
+#define MI_PASTELINK					9000
+#define MI_LINKS							9002
+#define MI_INSERTOBJECT				9003
+#define MI_OBJECTMENU					9014
+#define MI_OBJECTVERB1				9015
+#define MI_OBJECTVERB2        9016
+#define MI_OBJECTVERB3        9017
+#define MI_OBJECTVERB4        9018
+#define MI_OBJECTCONVERT			9019
+
+#define MENU_NAME_SIZE 			40 // AE_OLE
+struct FLDeditState
+{
+  qchar mName[MENU_NAME_SIZE];
+  qchar mVerb1[MENU_NAME_SIZE];
+  qbool mVerb1set;
+  qchar mVerb2[MENU_NAME_SIZE];
+  qbool mVerb2set;
+  qchar mVerb3[MENU_NAME_SIZE];
+  qbool mVerb3set;
+  qchar mVerb4[MENU_NAME_SIZE];
+  qbool mVerb4set;
+  qbool mChangeline;
+  qbool mAddline;
+	qbool mUndo;
+	qbool mCut;
+	qbool mPaste;
+	qbool mCopy;
+	qbool mClear;
+	qbool mSelectall;
+	qbool mPasteff;
+	qbool mLinks;
+	qbool mInsertobject;
+	qbool mObject;
+	#if defined(isRCCLIB) || defined (isEXECLIB) || defined(isRCC)
+		qbool	mMultiSelectListFlags;	// rmm_mobile: see constants below
+	#else
+		qbool mConvert;
+	#endif
+	qbool	mFind; // mpm4116	
+	str255 mUndoText;
+	str255 mCutText;
+	str255 mPasteText;
+	str255 mCopyText;
+	str255 mClearText;
+	str255 mSelectAllText;
+	#if defined(isRCCLIB) || defined (isEXECLIB) || defined(isRCC)
+		// rmm_mobile: only significant when mMultiSelectListFlags is non-zero
+		str255	mDeselectAllText;
+		str255	mSelectLineText;
+		str255	mDeselectLineText;
+		str255	mSelectHereToEndText;
+		str255	mDeselectHereToEndText;
+		qpoint	mPt;				// This is the point at which the context menu was opened
+	#endif
+	// Start rmm_emat
+	qbool		mRedoEnabled;		// Set this to qtrue to enable the redo menu item
+	str255	mRedoText;			// Text for the redo menu item (leave this unchanged to use the default)
+	// End rmm_rmat
+#ifdef isOMNISCORE	
+	FLDeditState();
+#endif	
+};
+const qbool FLDeditStateUndoIsRedo = 2;	// rmm_oe: set mUndo to this value to enable redo rather than undo in Eclipse
+
+#if defined(isRCCLIB) || defined (isEXECLIB) || defined(isRCC)
+	// rmm_mobile: flags used in mMultiSelectListFlags
+	const qbool cMSLISTEDITSTATEisMSList = 1,
+							cMSLISTEDITSTATEselectAllEnabled = 2,
+							cMSLISTEDITSTATEdeselectAllEnabled = 4,
+							cMSLISTEDITSTATEselectLineEnabled = 8,
+							cMSLISTEDITSTATEdeselectLineEnabled = 0x10,
+							cMSLISTEDITSTATEselectHereToEndEnabled = 0x20,
+							cMSLISTEDITSTATEdeselectHereToEndEnabled = 0x40;
+#endif
+
+struct FLDfileState
+{
+	qbool mSave:1;
+	qbool mPrint:1;
+	qbool mRevert:1;
+	qbool mProps:1;			// rmm1974
+	
+	// Text for above options, if NULL default used
+	// strings are deleted by caller
+	str255 mSaveText;
+	str255 mPrintText;
+	str255 mRevertText;
+	
+#ifdef isOMNISCORE	
+	FLDfileState();
+#endif
+};
+
+// end mtMenuIDE2
+
+// PK4234c
+const qshort 	xnUNDOident 	= 1, 			// ident number of field for undo
+							xnUNDOtype 		= 2, 			// undo type ( DSGN_UNDO_XXX )
+							xnUNDOanum 		= 3, 			// anum used for property undo
+							xnUNDOanum1 	= 4, 			// anum1 used for property undo ( normally anumNone, but can be anumHead )
+							xnUNDOvalue 	= 5, 			// undo value
+							xnUNDOval1 		= 6,			// can be xpos or width
+							xnUNDOval2 		= 7,      // can be ypos or height
+							xnUNDOitemRef = 8,      // item reference
+							xnUNDOparent 	= 9, 			// oldparent hwnd
+							xnUNDOval3 		= 10,			// PK4213 width ( align only )
+							xnUNDOval4 		= 11;     // PK4213 height ( align only )
+
+
+// following defines are used by tqmfld::getButton
+#define FLD_BUTT_OK				1
+#define FLD_BUTT_CANCEL		2
+#define FLD_BUTT_DEFAULT	3
+
+// following defines are used by tqfld::udDDE
+#define FLD_DDE_PASTE					1
+#define FLD_DDE_COPY					2
+#define FLD_DDE_COPY_EMPTY		3
+#define FLD_DDE_REMOVE_LINK		4
+
+//####################### drag/drop ###############################
+
+const qlong
+					cFLDdragDrop_noDrop						= 	0,
+					cFLDdragDrop_dropEdit					= 	1,
+					cFLDdragDrop_dropButton				= 	2,
+					cFLDdragDrop_dropStdList			= 	4,
+					cFLDdragDrop_dropPicture			= 	8,
+					cFLDdragDrop_dropDropList			= 	16,
+					cFLDdragDrop_dropPopMenu			= 	32,
+					cFLDdragDrop_dropPopComboBo		= 	64,
+					cFLDdragDrop_dropPopTable			= 	128,
+					cFLDdragDrop_dropAll					= 	16384,
+					cFLDdragDrop_dropNonUser			= 	32768,	// allow drop of built-in fields onto user windows //DRS4068a
+					cFLDdragDrop_dropFiles				= 	65536,	// allow drop of files from system //mt40314
+					cFLDdragDrop_dropFileData			=  131072,	// allow drop of file data from system //AE6535
+					cFLDdragDrop_dropControl			=	 262144;	// rmm8700: allow drop of any control (JS client)
+
+const qbyte // rmm4449
+					cFLDdragDrop_noDraging      	=		0,       // no dragging
+					cFLDdragDrop_dragData         =   1,       // other data dragging
+					cFLDdragDrop_dragMultiData    =   2,       // list data dragging
+					cFLDdragDrop_dragObject       =   3,       // object dragging
+					cFLDdragDrop_dragObjectDup    =   4,       // object dragging with duplicate
+					cFLDdragDrop_dragFiles 			  =   5,       // mt40314 object dragging files from system
+					cFLDdragDrop_dragFileData		  =   6,			 // AE6535
+
+					cFLDdragDrop_fromClassBrowser =   50,      // class list is being dragged from class browser //DRS4068
+					cFLDdragDrop_toClassBrowser   =   51,      // user data is being dragged to class browser //DRS4068
+					cFLDdragDrop_fromLibraryBrowser = 52,      // library list is being  dragged from class browser //DRS4321
+
+					cFLDdragDrop_dragAll      		=		0,       // can drag anywhere  //DRS4068
+					cFLDdragDrop_dragTask      		=		1,       // can drag to own task only
+					cFLDdragDrop_dragWindow      	=		2,       // can drag on own window only
+					cFLDdragDrop_dragSubwindow    =		3,       // can drag on own subwindow only
+
+					cFLDmouseOver_Itemref 				=   1,			 // mode for mouseover passed as wparam with WM_EVALMOUSEOVER //DRS4068
+					cFLDmouseOver_Charpos					=   2,
+					cFLDmouseOver_Line 						=   3,
+					cFLDmouseOver_Horz 						=   4,
+					cFLDmouseOver_Vert						=   5,
+					cFLDmouseOver_PLine						=   6,
+					cFLDmouseOver_HorzCell				=   7,			// PK6254
+          cFLDmouseOver_ComplexGridRow  =   8,      // pkcocoa_1233
+					cFLDmouseOver_ClassBrowser		=   cFLDdragDrop_toClassBrowser,
+
+					cFLDedgePixelTolerance = 8;	// rmm1476: Default: Will scroll this far away from the edge of the frame window
+
+class FLDdragRects;	// rmm8537
+struct FLDdragDrop
+{ // mpm4047d moved all qbools to end
+#if !defined(isiphone)		// pkiphone
+	HCURSOR				mDragDropCursor;								// the shape of the cursor to be set during dragdrop	// mt40338
+	HCURSOR				mNoDropCursor;									// AE4072 nodropcursor (default is WND_CURS_NOGO)			// mt40338
+	qrgn*					mDragShape;											// possible shape for drag. This is used if mAllowsBitmapDragging is false
+	qpoint				mStartPoint;										// initial pos for start of drag and drop
+	qpoint				mLastPoint;											// last mouse position ( global coordinates )
+	qpoint				mRestorePoint;									// mouse position at which mCopyOfScreen needs to be restored on a DD_MOVEDRAGSHAPE // mpm4047
+	qpoint				mLocalStartPoint;								// initial pos for start of drag and drop local to mDragSourceHwnd // mpm4047d
+	tqfld*				mDragDestination;								// last field over during dragdrop
+	HWND					mDragDestinationHwnd;						// the last hwnd over during dragdrop // mpm4031
+	qlong					mDestinationId;									// rmm1351: id of area in destination being dropped on
+	tqfld*    		mDragSource;										// the field being dragged
+	HWND					mDragSourceHwnd;								// the hwnd of the field being dragged
+	qrect					mBitmapBounds;									// the rectangle representing mDragBitmap bounds
+	HBITMAP				mDragBitmap;										// the bitmap to be dragged
+	HBITMAPMASK		mDragBitmapMask;								// the bitmap mask to be used
+	HBITMAP				mCopyOfScreen;									// the part of the screen covered by mDragBitmap	
+	qpoint				mDrawOffset;										// rmm1347: used to position the bitmap relative to the mouse
+	qpoint				mDropPoint;											// rmm1351: point where drop is occurring (global coordinates)
+	qlong					mDropId;												// rmm1351: CANDROP returns the drop id to here
+	fldval*				mDragType;											// the type of drag operation (usually holds a cFLDdragDrop_dropXxxx), first parameter of evDrop message //DRS4068
+	fldval*				mDragValue;											// the value being dragged, second parameter of evDrop message //DRS4068
+	qbool					mLeavingField:1;								// rmm1351: tells the field if we are moving to another field, when its being called to unhilite
+	qbool					mEnteringField:1;								// rmm1351: tells the field if we are moving into it, when being called to hilite
+	qbool					mAllowsBitmapDragging:1;				// true if bitmap dragging is allowed
+	qbool					mHaveDrawnDragShape:1;					// true if the drag shape has been drawn
+	qbool					mHilitedInside:1;								// true if the destination field has been hilited inside its boundaries //DRS4068b
+	qbool					mDragStarted:1;									// true if the drag operation has really started //DRS4068c
+	qbool					mRestrictMovement:1;						// true if movement is restricted to horizontal or vertical strait //mpm4101
+	qbool					mDraggingText:1;								// true if the item being dragged is text to insert into an edit field // rmm2677
+	qbool					mCancelled:1;										// true if drag and drop cancelled by the right mouse button // rmm2775
+	qbool					mDone:1;												// true if drag and drop is processing end drag // mpmOSX_DD
+	qbool					mWillShowShapeAgain:1;					// rmm6461: true if the drag shape is about to be shown again
+	qbool					mDisableUserDrop:1;							// rmm6484: true if drop messages for user fields are disabled
+	qbool					mStartWithValue:1;							// rmm8675: drag and drop was started with a value already supplied (DD_STARTDRAGWITHVALUE) - this means we can set the drag shape based on the type of the data
+	tqwfld*				mRulerWfld;											// rmm2699: wfld currently showing ruler positions
+	qlong					mValid;													// rmm3567: contains 'QFDR' in a valid FLDdragDrop structure
+	qlong					mDragStartTics;									// rmm3569: tick count when drag and drop started
+#ifdef ismobile
+	// rmm_mobile:
+	HBITMAP				mNoDropBitmap;									// the bitmap to be dragged - shown when candrop is false
+	HBITMAPMASK		mNoDropBitmapMask;							// the bitmap mask to be used with mNoDropBitmap
+#endif
+	FLDdragRects	*mDragRects;										// rmm8537: Used instead of mDragShape for Vista and later, and Cocoa
+	qshort				mCocoaDragAlpha;								// rmm8557: Alpha value to be applied to drag window by GDIdragStart when running on Cocoa
+#endif
+
+#if defined(isOMNISCORE) || defined(isRCCLIB) || defined(isiphone)	// pkiphone
+		// AE6621
+
+	FLDdragDrop();
+	~FLDdragDrop();			//DRS4068
+	
+	qlong					getDragType();		//DRS4068a
+	void					setDragType( qlong pType );
+	fldval*				getDragValue( qbool pSetNull ); 
+#endif
+};
+
+// Start rmm9681: UPARAM for TIP_GET_ACTIVE_SHOW_AREA_AND_SHOW_POINT_FOR_POINT is the address of this structure
+struct FLDtipActiveShowAreaInfo
+{
+	FLDtipActiveShowAreaInfo(qpoint &pShowPoint, str255 &pShowText)
+	{
+		mShowPoint = pShowPoint;
+		mShowText = &pShowText;
+	}
+	qpoint			mShowPoint;				// The point for which the tooltip is being generated
+	str255			*mShowText;				// The text for which the tooltip is being generated
+};
+// End rmm9681
+
+#ifndef ismobile	// rmm_mobile
+	GCC_SET_CORE_PACKING_OFF				// rmm5784
+	#pragma	 SET_CORE_PACKING_OFF		// rmm5784
+#endif
+
+// rmm6489: reworked, so that invalid and desktop are the only two values hard-coded here
+// Start rmm_mobile: Screen size values (there is a kSSZ constant for each of these)
+typedef qlong WRFMTscreenSize;
+const WRFMTscreenSize SSZinvalid = -1,
+											SSZdesktop = 0;
+extern WRFMTscreenSize gSSZfirst, gSSZlast;	// First and last valid screen size identifiers in ascending order: initialized when screen size configuration is loaded
+// End rmm_mobile
+
+#endif

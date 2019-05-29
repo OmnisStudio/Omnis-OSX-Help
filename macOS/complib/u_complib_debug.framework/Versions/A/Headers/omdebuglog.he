@@ -1,0 +1,167 @@
+// $Header: svn://svn.omnis.net/trunk/Studio/O7EXE/INDY/omdebuglog.he 20702 2018-08-16 12:36:41Z bmitchell $
+
+/*
+Omnis debug logging
+Changes
+Date			Edit				Bug					Description
+16-Aug-18	rmm9763									Improved handling of code editor context menu.
+10-Aug-18	rmm9760									Debug logging for core and components.
+*/
+
+#ifndef _OMDEBUGLOG_HE_
+#define _OMDEBUGLOG_HE_
+
+#if defined(isOMNISCORE)
+	#ifndef _xgstuff_
+		#include "xgstuff.h"
+	#endif
+
+	#ifndef _CFG_HE_
+		#include "cfg.he"
+	#endif
+
+	#include "debugger.h"
+#elif defined(isXCOMPLIB)
+	#include "extcomp.he"
+#endif
+
+#include <sstream>
+#include <iomanip>		// rmm9763
+
+class omstringstream
+{
+private:
+	std::ostringstream mOss;
+
+	void outputString(strxxx &pString)
+	{
+		std::string s;
+		pString.getStdString(s);
+		mOss << s;
+	}
+public:
+	omstringstream& operator<<(str15 &value)
+	{
+		outputString(value);
+		return *this;
+	}
+	omstringstream& operator<<(str31 &value)
+	{
+		outputString(value);
+		return *this;
+	}
+	omstringstream& operator<<(str80 &value)
+	{
+		outputString(value);
+		return *this;
+	}
+	omstringstream& operator<<(str255 &value)
+	{
+		outputString(value);
+		return *this;
+	}
+	#if defined(isOMNISCORE)
+		omstringstream& operator<<(fmtref &pFref);
+		omstringstream& operator<<(tqappfile *pApp);
+		omstringstream& operator<<(superinst *pInst);
+		omstringstream& operator<<(fldval &value);
+	#else
+		omstringstream& operator<<(EXTfldval &value);
+	#endif
+	template <typename T>	omstringstream& operator<<(T const& value)
+	{
+		mOss << value;
+		return *this;
+	}
+	void getChar(strxxx &pStr)
+	{
+		pStr.set(mOss.str());
+	}
+	#if defined(isOMNISCORE)
+		void getChar(fldval &pFval)
+		{
+			pFval.setchar(mOss.str());
+		}
+	#elif defined(isXCOMPLIB)
+		void getChar(EXTfldval &pFval)
+		{
+			pFval.setchar(mOss.str());
+		}
+	#endif
+	template< typename T > static std::string hexString(T i)	// rmm9763
+	{
+		std::ostringstream stream;
+		stream << "0x" << std::setfill('0') << std::setw(sizeof(T) * 2)	<< std::hex << i;
+		return stream.str();
+	}
+};
+
+const qlong cDEBUGLOGgroupMethods = 1;
+
+class qDebugLog
+{
+	public:
+		#if defined(isOMNISCORE)
+			static void init();
+			static qbool componentLoggingEnabled(str80 &pCompName);
+
+			template<typename... Args> static void logDebug(qlong pMessageGroup, Args... args)
+		#elif defined(isXCOMPLIB)
+			template<typename... Args> static void logDebug(const char *pCompName, Args... args)
+		#endif
+			{
+				#if defined(isOMNISCORE)
+					if (!(smCoreDebugGroupsToLog & pMessageGroup))
+						return;
+				#elif defined(isXCOMPLIB)
+					if (!smDebugLoggingEnabled)
+						return;
+				#endif
+
+				omstringstream oss;
+				doDebugLog(oss, args...);
+
+				str255 s;
+				oss.getChar(s);
+				#if defined(isOMNISCORE)
+					qdebugger::addtracestr(&smCore, &s);
+				#elif defined(isXCOMPLIB)
+					str255 name;
+					name.set(pCompName);
+					ECOaddTraceLine(&name, &s);
+				#endif
+			}
+	private:
+		template <typename T> static void doDebugLog(omstringstream& o, T t)
+		{
+			o << t;
+		}
+		template<typename T, typename... Args> static	void doDebugLog(omstringstream& o, T t, Args... args)
+		{
+			doDebugLog(o, t);
+			doDebugLog(o, args...);
+		}
+
+		#ifdef isOMNISCORE
+			static set2047 smCoreDebugGroupsToLog;
+			static std::vector<str80> smCompLibsToLog;
+			static str255 smCore;
+		#elif defined(isXCOMPLIB)
+			public:
+				static qbool smDebugLoggingEnabled;
+		#endif
+};
+
+// Use OMdebugLog to log a debugging message to the trace log
+#ifdef _DEBUG
+	#if defined(isOMNISCORE)
+		#define OMdebugLog(_messageGroup, ...) qDebugLog::logDebug(_messageGroup, __VA_ARGS__)
+	#elif defined(isXCOMPLIB)
+		#define OMdebugLog(_compName, ...) qDebugLog::logDebug(_compName, __VA_ARGS__)
+	#endif
+#else
+	#define OMdebugLog(...)
+#endif
+
+#endif
+// End of file

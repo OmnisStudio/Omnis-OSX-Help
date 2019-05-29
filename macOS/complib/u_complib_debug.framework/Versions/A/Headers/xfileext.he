@@ -1,0 +1,45 @@
+//
+//  xfileext.he
+//  Cocoa common core and complib file declarations.
+//	Copyright (C) Omnis Software Ltd 2017.
+//
+/**************** Changes ******************
+Date			Edit				Bug					Description
+********************************************/
+
+#ifndef _XFILEEXT_HE_
+#define _XFILEEXT_HE_
+
+#ifndef _basics_
+#include "basics.h"
+#endif
+
+//	vrefTypeUrl will store a file reference
+enum eVRefType {vrefTypeUrl = 0, vrefTypeSearch = -32767, vrefTypeTemp = -32766, vrefTypePref = -32765};
+
+class xfilevref
+{
+public:
+	xfilevref(NSURL* url);
+	xfilevref(eVRefType vrefType) {mVrefType = vrefType; mUrl = NULL;}
+	xfilevref() {mVrefType = vrefTypeUrl; mUrl = NULL;}
+	~xfilevref() {mUrl = NULL;}
+	
+	NSString*	getPath();
+	qbool			isValid(qret* error = NULL);
+	
+	qbool operator ==(xfilevref a) { return (mVrefType == vrefTypeUrl ? [mUrl isEqual:a.mUrl] : mVrefType == a.mVrefType); }
+	qbool operator !=(xfilevref a) { return !( *this == a); }
+	void operator =(const xfilevref a) { mUrl = [a.mUrl copy]; mVrefType = vrefTypeUrl; }
+	qbool operator !() { return mUrl == NULL; }
+	
+private:
+	eVRefType mVrefType;
+	NSURL*    mUrl;
+};
+
+typedef	xfilevref filevref;		//file manager volume reference type
+
+qret NSErrorToQret(NSError* pError);	// this should move if caters for more than just file errors
+
+#endif /* defined(_XFILEEXT_HE_) */

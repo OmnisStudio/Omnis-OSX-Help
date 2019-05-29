@@ -1,0 +1,597 @@
+/* $Header: svn://svn.omnis.net/trunk/Studio/EXTCOMP/CALLBACK/extfuncs.he 18218 2017-10-11 11:05:36Z bmitchell $ */
+
+// OMNIS COMPONENTS
+// General External Functions Interface
+// Copyright (C) Blyth Holdings Inc 1998
+
+/**************** Changes ******************
+Date			Edit				Bug					Description
+11-Oct-17	rmm9532			ST/NV/062		Crash when a list copied for use by the worker has a table instance.
+28-Jul-17	rmm9440									OW3 component - IMAP Worker.
+25-Apr-17	rmm9347			ST/RC/1261	Added zoom capability to report class editor.
+19-Apr-17	rmm9333			ST/EC/1446	Added static methods: $listtoarrayarray and $arrayarraytolist.
+14-Feb-17	rmmheadless							Support for headless Omnis server.
+11-Jan-17	rmm9188									Added missing external components (with property support only) required for JSON library representation to work cross platform.
+24-Nov-16	CR0392			ST/FU/686		Allow $getpict/$getmask to turn off scaling of image when main display is hires.
+28-Oct-16	rmm9125									Added bAllowArraysOfRows parameter to $jsontolistorrow.
+30-Aug-16	rmm9025			ST/NV/059		Added support for long pathnames to FileOps and to core qfile.
+19-Aug-16	rmm9010			ST/EC/1416	Added support for large files (files with a size > maximum signed 32 bit integer).
+08-Aug-16	rmm8994			ST/HD/007		Support for high resolution component store external component icons.
+14-Jul-16	rmm8977			ST/WO/2377	$keyevents did not work for obrowser on windows.
+13-Jul-16	rmm8970			ST/LR/027		Problem with linked object and JS tab strip.
+13-Jun-16	rmm8939			ST/FU/670		Code assistant now restricts constants to the set suitable for function and external component object method parameters.
+09-Jun-16	rmm8933			ST/WO/2367	If configured to to so,redirect obrowser JavaScript console log messages to the Omnis trace log.
+02-Jun-16	CR0355									Review and remove COCOA q q q marks.
+29-Apr-16	rmm8896									Issues with localised decimal pt etc in components.
+14-Apr-16	rmm8862									Flicker while changing pages in Omnis help window.
+07-Mar-16	CR0333			ST/BE/1236	Cocoa performance when loading large library is slow.
+29-Jan-16	rmm8733			ST/FU/664		Added static methods: $listtoobjectarray and $objectarraytolist.
+28-Oct-15	rmm8675			ST/EC/1384	Initial implementation of obrowser xcomp.
+03-Aug-15	CR0260			ST/PF/889		Mac was incorrectly using core resource strings for missing xcomp resource ids.
+08-May-15	CR0221									Resource dialogs.
+07-May-15	rmm8573									Various COCOA issues.
+04-May-15	rmm8565									Deprecated global handle functions (these are also not available for Cocoa).
+29-Apr-15	rmm_dep									Replaced some calls to Cocoa deprecated functions.
+29-Apr-15	CR0207									Cocoa deprecated functions.
+12-Dec-14	rmm8467									Memory issues - GlobalAlloc is limited to 64k moveable handles.
+01-Dec-14	rmm8465									SMTP worker.
+03-Oct-14	rmm8441									Navigation menu control.
+01-Aug-14 gra0987     ST/*P/029   Callback to return pushWorkerCallback function pointer
+05-Jun-14	jmg0114									Callback to get form's $defaultappearance
+02-Jun-14	jmg0113									JS Native Display Shortcuts/Comp Store menu options
+23-May-14	rmm8336			ST/WS/228		Added option to always reset Java class cache at startup.
+10-Feb-14	rmm_rws									RESTful Web Services support.
+23-Jan-14	rmm8218			OE-2884			Object reference supported added to various components.
+01-Oct-13	rmm8114			ST/EC/1333	Completion event for PDF reports; sorted out command sequencing for remote tasks in multi-threaded server.
+20-Aug-13	CRCOCOA									Cocoa target.
+25-Jul-13	rmm8068			OE-2211			Property change issues.
+11-Jan-13 gra0866                 Added ECOdoMethodWait for multi-threaded web server
+07-Jan-13	rmm7762									Windows 8 cosmetic issues.
+04-Dec-12	rmm64bit5								Changes required for compiling with 64 bit target.
+15-Oct-12	rmm64bit4								More 64 bit portability changes.
+17-Apr-12	rmm64bit1								First set of changes for 64 bit support: 64 bit Omnis data type.
+30-Jan-12	rmm7399			ST/HI/1684	Print top window failed on Lion; also added islion() function.
+09-Feb-11	gra0778			ST/*A/082		Added ECOgetOmnisVersionNumber
+25-Nov-10	rmm7002			ST/WS/151		Web services issue caused by uprCmp problem.
+10-Dec-09 pkmacalpha							ECOclipboardGetPictureEx added
+29-Oct-09	rmm_win7								Windows 7 appearance changes.
+27-Jul-09	rmm6672			ST/BE/463		Problems with list line highlighting in Classic mode XP/Vista external components.
+15-Jun-09	rmm_nc									New controls and supporting APIs.
+03-Jun-09	rmm_loc5								String table editor integrated with catalog.
+04-Mar-09	rmm_iphone12						$events for iPhone objects now exclude context menu events, and only include evBefore and evAfter when required.
+18-Feb-09	rmm_iphone8							iPhone orientation change support.
+13-Nov-08	pkiphone2								iphone pass 2
+14-Aug-08	pkiphone								iphone pass 1
+25-Jun-08	jc0008									Added ECOisXp, ECOisVista & ECOisLeopard
+09-May-08	rmm_mobile							Mobile device support.
+07-Feb-08	gra0509			ST/*P/009		Added callback to return local IP address
+27-Jul-07	rmm6183			ST/BE/161		Noticed some localisation issues in docview.
+01-Nov-06	AE6744			ST/EC/1035: Added GET_UPARAM_VALUE to WM_CONTROL messages
+26-Apr-06	ijtjperf		ST/EC/966		Improved performance of Known Java Object Arrays
+03-Mar-06 MHMACH16                Added Mach-O support for xcomp print destination dialogs.
+27-Feb-06	rmm5650			ST/PF/431		Problems with multiple instances of the Web Client.
+06-Feb-06	rmm5629			ST/WT/1039	Added support for double click events in list mode.
+26-Oct-05 MHMACH2                 Mach-o changes
+25-Jan-05 pknsapi6								RESopenLibraryEx
+20-Dec-04	AE6551			ST/HI/1423: Sped up #EXTCOMP dialog, moved automation to root & added ECOreloadLibData
+21-Jun-04	rmm4999									Finished rmm4993: remote form fields now show $xxx correctly.
+02-Apr-04	rmm4904									ECOdoMethod can now receive the return value from the method it calls.
+26-Mar-04 MHn0334			ST/FU/402		Added support for selecting apps on OSX.
+28-Oct-03 ijt218			ST/NV/037		Added callback to core versions of convertHFStoPosix and convertPosixToHFS.
+23-Jan-03 MHMEM										Fixed MEMfree syntax
+16-Dec-02	AE6184			ST/EC/713: 	Added ECOmessageBox to external component interface
+27-Nov-02 MHINST									Added ECOgetNVObject
+21-Nov-02	rmm4315			ST/OO/092		$cinst was incorrectly destroyed for a table instance.
+18-Nov-02	rmm4305			ST/EC/706		Timer events were still generated when at a debugger breakpoint.
+29-Oct-01 MHn0163									OSX Serial Port Changes
+23-Apr-01 AE5203									Added ECOinvalBackObj
+11-Aug-00 MHn0124									Added ECOisSerialised callback
+08-May-00 MHn0113			ST/WT/245		Added ECOcanSendEvent webclient callback.
+08-May-00 MHn0111									Added ECOconstructObject and ECOdestructObject webclient callbacks.
+21-Apr-00	rmm3735			ST/FU/252		Use localised day names for the calendar (non-Web) component.
+06-Jan-00	rmm3582									Added ability to get type and name information about external component method parameters.
+06-Dec-99	AEECBS									External Clipboard support
+04-Oct-99	rmm3478									Added function to return version via version resource.
+02 SEP 99 mpm4576			st/wt/061		Fixes decimal point and thousand seperator problems with web client
+18-Mar-99	AE4936			ST/WT/031FC	Added date & time display formatting to the orfc edit field
+12-Jan-99	rmm3298									Clipboard support for thin client.
+11-Jan-99	AE4892									Field styles for thin client
+15-Oct-98	AE4846									Added External CompStore groups for individual control libraries
+********************************************/
+
+#ifndef _EXTFUNCS_HE_
+#define _EXTFUNCS_HE_
+
+#ifndef _basics_
+#	include "basics.h"
+#endif
+
+#if !defined(isiphone)		// pkiphone
+	#ifndef _HWND_HE_
+		#include "hwnd.he"
+	#endif
+#else
+	typedef qlongptr LRESULT;
+#endif
+
+#ifndef _EXTDEFS_HE_
+#	include "extdefs.he"
+#endif
+
+class EXTfldval;
+class strxxx;
+class str255;
+class str80;
+struct PRIdestParmStruct;
+
+enum EXTclipType	// rmm3298
+{
+	eEXTclipText = 0,
+	eEXTclipPicture = 1		// AEECBS
+};
+
+// ORFC api functions
+ECOAPI void			OMNISAPI ECOsetupCallbacks( HWND pHwnd, EXTCompInfo* eci, HINSTANCE pInst=NULL );
+ECOAPI void			OMNISAPI ECOmemoryDeletion( EXTCompInfo* pEci );
+ECOAPI void*		OMNISAPI ECOfindObject( EXTCompInfo* pEci, HWND pHWnd, WPARAM pWParam=0 );
+ECOAPI void			OMNISAPI ECOinsertObject( EXTCompInfo* pEci, HWND pHWnd, void* pObjPointer, WPARAM pWParam=0 );
+ECOAPI void*		OMNISAPI ECOremoveObject( EXTCompInfo* pEci, HWND pHWnd, WPARAM pWParam=0 );
+ECOAPI void*		OMNISAPI ECOremoveObjectFromInst(HINSTANCE pInstance, HWND pHWnd, WPARAM pWParam=0);	// rmm8441
+ECOAPI EXTParamInfo* OMNISAPI ECOaddParam( EXTCompInfo* eci, EXTfldval* pFval, qlong pParamId=0, qshort paramtype=0, qlong paramflags=0, qbyte pParamNum=0, qlong parmparent=0 );  // rmm64bit1
+#if !defined(isiphone)	// pkiphone
+ECOAPI qbool		OMNISAPI ECOgetToolTipRect( HWND pHOmnisCompHwnd, qrect* pRect );
+ECOAPI void			OMNISAPI ECOhideTooltip( HWND pHOmnisCompHwnd );
+#endif
+ECOAPI qbool		OMNISAPI ECOisSetup( HWND pHOmnisCompHwnd );
+ECOAPI qbool		OMNISAPI ECOhasFocus( HWND pHOmnisCompHwnd );
+ECOAPI EXTParamInfo* OMNISAPI ECOfindParamNum( EXTCompInfo* eci, qlong paramid ); // rmm64bit1
+ECOAPI qshort		OMNISAPI ECOgetParamCount( EXTCompInfo* pEci );
+ECOAPI qbool		OMNISAPI ECOsendCompEvent( HWND pObj, EXTCompInfo* pEci, qlong pEventID, qbool pExecnow );
+#ifdef isRCCLIB
+ECOAPI qbool		OMNISAPI ECOcanSendEvent( HWND pHwnd, qlong pEventCode ); // MHn0113
+#endif
+#if defined(isRCCLIB) || defined(isiphone)
+	ECOAPI qbool 		OMNISAPI ECOsendEvent( tORFCobj *pObj, qlong pEventCode, EXTfldval* pParams = 0, qshort pParamCnt = 0, qbool pExecNow=qtrue ); // rmm_iphone8
+#endif
+ECOAPI qbool 		OMNISAPI ECOsendEvent( HWND pHwnd, qlong pEventCode, EXTfldval* pParams = 0, qshort pParamCnt = 0, qbool pExecNow=qtrue );
+#if !defined(isiphone)	// pkiphone
+ECOAPI void 		OMNISAPI ECOgetFont( HWND pHwnd , qfnt* pFnt, qshort pFntIndex, qshort pFntSize );
+#endif
+ECOAPI void			OMNISAPI ECOsetDTformat( str80& pFormat, qshort pFormatType ); 	 // AE4936
+ECOAPI qbool 		OMNISAPI ECOisOMNISinTrueRuntime( HWND pHOmnisCompHwnd );
+ECOAPI qbool 		OMNISAPI ECOisOMNISinTrueRuntime();	// rmm4305
+ECOAPI qbool 		OMNISAPI ECOisDesign( HWND pHOmnisCompHwnd );
+ECOAPI qbool		OMNISAPI ECOisSelected( HWND pHOmnisCompHwnd ); // Returns true if object is selected
+ECOAPI qbool		OMNISAPI ECOisMultiSelected( HWND pHOmnisCompHwnd ); // Returns true if object is selected (with other objects)
+ECOAPI qbool		OMNISAPI ECOisShowNumber( HWND pHOmnisCompHwnd ); // Returns true if show numbers is on (during design mode)
+#if !defined(isiphone)	// pkiphone
+	ECOAPI void		OMNISAPI ECOdrawNumber(HWND pHOmnisCompHwnd,HDC pHdc); // Draws field number (if show numbers is true)
+	ECOAPI void		OMNISAPI ECOdrawNumberEx(HWND pHOmnisCompHwnd,HDC pHdc,qbool pEraseArea); // Draws field number (if show numbers is true) // rmm4999: like ECOdrawNumber, except the background is optionally erased and framed
+	ECOAPI void		OMNISAPI ECOdrawDesignName(HWND pHOmnisCompHwnd,HDC pHdc); // Draws field name during design mode
+	ECOAPI void		OMNISAPI ECOdrawMultiKnobs(HWND pHOmnisCompHwnd,HDC pHdc); // Draws multiselect knobs (if multiselected)
+	ECOAPI void		OMNISAPI ECOmarkModified(HWND pHOmnisCompHwnd, qbool pModified);	// rmm5629: marks the field as modified (use in design mode)
+	void ECOpaintGrayFrame(HDC pHdc, qrect &pRect);	// rmm_nc: draw gray frame around control in design mode, so rectangle of control is visible on design window
+	ECOAPI qdim		OMNISAPI ECOgetFontDpi(HWND pHOmnisCompHwnd);	// rmm9347: Get the DPI with which fonts are to be created (only relevant for controls on report design windows - returns zero if the control is not)
+#endif
+ECOAPI qbool 		OMNISAPI ECOisWndTop( HWND pHOmnisCompHwnd );
+ECOAPI qbool		OMNISAPI ECOallowDefaultContextMenu(HWND pHOmnisCompHwnd);	// rmm8675
+ECOAPI void			OMNISAPI ECOsendTab(HWND pHOmnisCompHwnd, qbool pShiftTab);	// rmm8675
+ECOAPI void  		OMNISAPI ECOaddTraceLine(str255 *pTraceStr);
+ECOAPI void  		OMNISAPI ECOaddTraceLine(str255 *pStr1, str255 *pStr2);	// rmm8933
+ECOAPI void			OMNISAPI ECOopenTraceLog();	// rmm8675
+ECOAPI qshort		OMNISAPI ECOgetFontIndex(HWND pHwnd,EXTfldval& pFVal);
+ECOAPI qbool 		OMNISAPI ECOreturnConstants( HINSTANCE pInst, EXTCompInfo* eci, qlong pResStart, qlong pResEnd );
+ECOAPI qbool 		OMNISAPI ECOreturnProperties( HINSTANCE pInst, EXTCompInfo* eci, ECOproperty* pPropTable, qshort pTableElements );
+ECOAPI qlong 		OMNISAPI ECOreturnCompID( HINSTANCE pInst, EXTCompInfo* eci, qshort pCompResNameID, qshort pCompType );
+ECOAPI qlong 		OMNISAPI ECOreturnCompInfo( HINSTANCE pInst, EXTCompInfo* eci, qshort pLibNameResID, qshort pCompCount );
+ECOAPI qbool 		OMNISAPI ECOreturnIcon( HINSTANCE pInst, EXTCompInfo* eci, qshort pBitmapID );
+ECOAPI qbool		OMNISAPI ECOsetCustomTabName( HINSTANCE pInst, EXTCompInfo* eci, qlong pResId );
+ECOAPI qbool 		OMNISAPI ECOreturnEventMethod( HINSTANCE pInst, EXTCompInfo* eci, qlong pResStart );
+ECOAPI void			OMNISAPI ECOsetParameterChanged( EXTCompInfo* pEci, qshort pParamNum );
+ECOAPI qbool 		OMNISAPI ECOgetProperty( HWND pHwnd, qshort pAnum, EXTfldval &pFval );
+ECOAPI qbool 		OMNISAPI ECOsetProperty( HWND pHwnd, qshort pAnum, EXTfldval &pFval );
+ECOAPI void			OMNISAPI ECOupdatePropInsp( HWND pHOmnisCompHwnd, qlong pPropId=0 );
+ECOAPI void			OMNISAPI ECOupdatePropInspEx( HWND pHOmnisCompHwnd, qlong *pPropIdArray, qshort pCurrentLine = 0 );	// rmm8068: Update several properties in the property inspector, possibly for a particular column in a grid or tab in a tab control for example (identified by pCurrentLine)
+const qlong e_externalcomponent = 108999;	// rmm_rws: If you call ECOsetError(e_externalcomponent, &errorText) you cause a debug error that keeps the external component error text
+ECOAPI void 		OMNISAPI ECOsetError( qlong pErrNum, str255* pErrText );
+ECOAPI qbool 		OMNISAPI ECOreturnMethodEvents( HINSTANCE pInst, EXTCompInfo* eci, ECOmethodEvent* pTable, qshort pTableElements );
+ECOAPI qbool		OMNISAPI ECOreturnEventMethod( HINSTANCE pInst, EXTCompInfo* pEci, ECOmethodEvent* pTable, qshort pTableElements, qbool pIncDesc=qtrue );
+ECOAPI qapp			OMNISAPI ECOgetApp( locptype* pLocp );
+#if !defined(isiphone)	// pkiphone
+ECOAPI void			OMNISAPI ECOgetFont( qapp pApp, qbool pReportFont, qfnt* pFnt, qshort pFntIndex, qshort pFntSize ); // mpm4426
+#endif
+ECOAPI void			OMNISAPI ECOlistFonts(EXTqlist *pList, qbool pReportFonts);	// rmm3101
+#if !defined(isiphone)	// pkiphone
+ECOAPI qbool		OMNISAPI ECOgetStyle( tqappfile* pApp, qchar* pStyleName, qshort pLen, GDItextSpecStruct* pTextSpec ); // AE4892
+#endif
+// MHn0111 begins.
+// Callbacks to create and destroy webclient objects.
+#if defined(isRCCLIB) && !defined(isiphone)	// rmm_iphone12
+ECOAPI HWND ECOconstructObject(HWND pParent, HWND pOwner, qrect pRect, ECOobjProp *pProp);
+ECOAPI void ECOdestructObject(HWND pHwnd);
+#endif
+// MHn0111 ends.
+ECOAPI void OMNISAPI ECOinvalBackObj(); // AE5203
+ECOAPI void * OMNISAPI ECOgetBundleRef( qlong pBundleID ); // MHn0163
+ECOAPI void * OMNISAPI ECOgetNVObject( qobjinst pInst ); // MHINST
+ECOAPI qlong OMNISAPI ECOconvertHFSToPosix(strxxx& pSrcPath, strxxx& pDstPath);	//<ijt218>
+ECOAPI qlong OMNISAPI ECOconvertHFSToPosix(EXTfldval& pSrcPath, EXTfldval& pDstPath);	// rmm9025
+#if defined(iswin32) || defined(isQTCOMP)	
+	typedef qlong CFStringEncoding;	// rmm: this method does nothing on Win32/Unix, so the type just needs to be defined
+#endif
+ECOAPI qlong OMNISAPI ECOconvertPosixToHFS(qbyte *pSrcPath, CFStringEncoding pSrcEncoding, strxxx& pDstPath);	//<ijt218>
+ECOAPI qlong OMNISAPI ECOconvertPosixToHFS(qbyte *pSrcPath, CFStringEncoding pSrcEncoding, EXTfldval &pDstPath);	// rmm9025
+
+struct crbFieldInfo;
+ECOAPI qbool		OMNISAPI ECOgetCrbFieldInfo( strxxx& pFieldName, locptype* pLocp, crbFieldInfo& pFInfo ); // mpm4576
+
+ECOAPI qbool		ECOclipboardHasFormat(EXTclipType pType);			// rmm3298
+ECOAPI qbool		ECOclipboardSetText(qHandle pText);						// rmm3298
+ECOAPI qbool		ECOclipboardGetText(qHandle &pText);					// rmm3298
+ECOAPI qbool		ECOclipboardSetPicture(qHandle pPicture);						// AEECBS
+ECOAPI qbool		ECOclipboardGetPicture(qHandle &pPicture);					// rmm3298
+ECOAPI qbool		ECOclipboardGetPictureEx(qHandle &pPicture);					// pkmacalpha
+
+ECOAPI qbool 		ECOloadFileDialog(HINSTANCE pInstance,HWND pOwner,qlong pResTitle,qlong pResFilter,strxxx& pFileName,strxxx* pInitDir= NULL, qlong pAppFlags = 0 ); // MHn0334
+ECOAPI qbool 		ECOloadFileDialog(HINSTANCE pInstance,HWND pOwner,strxxx& pTitle,strxxx &pFilter,strxxx& pFileName,strxxx* pInitDir = NULL, qlong pAppFlags = 0 ); // MHn0334
+ECOAPI qbool 		ECOsaveFileDialog(HINSTANCE pInstance,HWND pOwner,qlong pResTitle,qlong pResFilter,strxxx& pFileName,strxxx* pInitDir= NULL, qlong pAppFlags = 0); // MHn0334
+ECOAPI qbool 		ECOsaveFileDialog(HINSTANCE pInstance,HWND pOwner,strxxx &pTitle,strxxx &pFilter,strxxx& pFileName,strxxx* pInitDir = NULL, qlong pAppFlags = 0 ); // MHn0334
+ECOAPI qbool 		ECOgetDirectoryDialog(HINSTANCE pInstance,HWND pOwner,qlong pResTitle,strxxx& pFileName,strxxx* pInitDir = NULL, qlong pAppFlags = 0); // MHn0334
+ECOAPI qbool 		ECOgetDirectoryDialog(HINSTANCE pInstance,HWND pOwner,strxxx &pTitle,strxxx& pFileName, strxxx* pInitDir = NULL, qlong pAppFlags = 0 ); // MHn0334
+// Start rmm9025
+ECOAPI qbool 		ECOloadFileDialog(HINSTANCE pInstance, HWND pOwner, qlong pResTitle, qlong pResFilter, EXTfldval& pFileName, EXTfldval* pInitDir = NULL, qlong pAppFlags = 0);
+ECOAPI qbool 		ECOloadFileDialog(HINSTANCE pInstance, HWND pOwner, strxxx& pTitle, strxxx &pFilter, EXTfldval& pFileName, EXTfldval* pInitDir = NULL, qlong pAppFlags = 0);
+ECOAPI qbool 		ECOsaveFileDialog(HINSTANCE pInstance, HWND pOwner, qlong pResTitle, qlong pResFilter, EXTfldval& pFileName, EXTfldval* pInitDir = NULL, qlong pAppFlags = 0);
+ECOAPI qbool 		ECOsaveFileDialog(HINSTANCE pInstance, HWND pOwner, strxxx &pTitle, strxxx &pFilter, EXTfldval& pFileName, EXTfldval* pInitDir = NULL, qlong pAppFlags = 0);
+ECOAPI qbool 		ECOgetDirectoryDialog(HINSTANCE pInstance, HWND pOwner, qlong pResTitle, EXTfldval& pFileName, EXTfldval* pInitDir = NULL, qlong pAppFlags = 0);
+ECOAPI qbool 		ECOgetDirectoryDialog(HINSTANCE pInstance, HWND pOwner, strxxx &pTitle, EXTfldval& pFileName, EXTfldval* pInitDir = NULL, qlong pAppFlags = 0);
+// End rmm9025
+// rmm6672: Changed ECOisXp and ECOisVista to have pTheme argument.
+// When pTheme is qtrue, returns qtrue when running on XP/Vista or later with themes enabled
+// When pTheme is qfalse, returns  qtrue when running on XP/Vista or later operating system.
+// So for example, ECOisXp(qfalse) always returns qtrue on XP, but ECOisXp(qtrue) would return qfalse when running
+// on XP in classic mode.
+ECOAPI qbool OMNISAPI ECOisXp(qbool pTheme = qtrue);			//jc0008 // rmm6672
+ECOAPI qbool OMNISAPI ECOisVista(qbool pTheme = qtrue);		//jc0008 // rmm6672
+ECOAPI qbool OMNISAPI ECOisWindows7(qbool pTheme = qtrue);	// rmm_win7
+ECOAPI qbool OMNISAPI ECOisWindows8(qbool pTheme = qtrue);	// rmm7762
+ECOAPI qbool OMNISAPI ECOisLeopard(void); //jc0008
+ECOAPI qbool OMNISAPI ECOisSnowLeopard(void); // rmm_win7
+ECOAPI qbool OMNISAPI ECOisLion(void); // rmm7399
+ECOAPI qbool OMNISAPI ECOisMountainLion(void); // rmm7762
+ECOAPI qlong OMNISAPI ECOgetOmnisVersionNumber(void) ; //gra0778
+
+// pkiphone2
+ECOAPI qlong 		OMNISAPI ECOreturnCompIDEx( HINSTANCE pInst, EXTCompInfo* eci, qlong pCompResNameID, qshort pCompType );
+ECOAPI qlong 		OMNISAPI ECOreturnCompInfoEx( HINSTANCE pInst, EXTCompInfo* eci, qlong pLibNameResID, qshort pCompCount );
+
+// ORFC not supported functions
+#if !defined(isRCCLIB) && !defined(isEXECLIB)
+	void* 				ECOfindNVObject( HINSTANCE pInstance, LPARAM pInstPtr );
+	void 					ECOinsertNVObject( HINSTANCE pInstance, LPARAM pInstPtr, void* pObjPointer );
+	void* 				ECOremoveNVObject( HINSTANCE pInstance, LPARAM pInstPtr );
+	qbool					ECOreturnObjects( HINSTANCE pInst, EXTCompInfo* eci, ECOobject* pObjectTable, qshort pTableElements );
+	PRIdestParmStruct* ECOgetDeviceParms( locptype* pLocp ); // mpm4425
+	qbool 				ECOresetObjDetails(qobjinst pObjInst,EXTfldval& pProps,EXTfldval& pMethods);
+	qret					ECOnotifyObject(qobjinst pObjInst,strxxx* pMethod, EXTfldval* pParams = 0, qshort pParamCnt = 0); //gra0866 // rmm8114
+	qret					ECOdoMethod(qobjinst pObjInst,strxxx* pMethod, EXTfldval* pParams = 0, qshort pParamCnt = 0,qbool pExecNow=qtrue, EXTfldval *pReturnValue = 0);	 // AE4724 // rmm4904
+	qret					ECOdoMethodECI(qobjinst pObjInst,strxxx* pMethod,EXTCompInfo* pEci,qbool pExecNow=qtrue);		 // AE4724
+	qret					ECOnotifyObjectECI(qobjinst pObjInst,strxxx* pMethod,EXTCompInfo* pEci); //gra0866 // rmm8114
+	void 					ECOlistSetLineHeight( HWND pHOmnisCompHwnd, qlong pLineHeight );
+	qbool					ECOreadLocalisationItem(EXTCompInfo *pEci, qshort pLocItemXn, str255 &pLocItemData);	// rmm3735
+	// Start rmm8896: Read separators directly when required, as different server stack threads can use different separators
+	inline qchar ECOreadSeparatorItem(qshort pIndex)
+	{
+		extern qret DAMgetSeparators(str15 &pSeparators);
+
+		str15 seps;
+		DAMgetSeparators(seps);
+		if (pIndex >= 1 && pIndex <= seps.length())
+			return seps[pIndex];
+		return 0;	// Just in case (should never get to here)
+	}
+	inline qchar ECOgetCoch()
+	{
+		return ECOreadSeparatorItem(2);
+	}
+	inline qchar ECOgetDpch()
+	{
+		return ECOreadSeparatorItem(1);
+	}
+	inline qchar ECOgetSepch()
+	{
+		return ECOreadSeparatorItem(6);
+	}
+	inline qchar ECOgetFsch()
+	{
+		return ECOreadSeparatorItem(3);
+	}
+	// End rmm8896
+	void					ECOreplaceSeparators(strxxx &pString);	// rmm6183
+	qbool					ECOisSerialised( HWND pHOmnisCompHwnd, qchar *pProductCode, qchar *pFunctionCode = NULL, 
+																 qchar *pSerial = NULL, qchar *pNotes = NULL); // MHn0124
+	ECOAPI void		OMNISAPI ECOsetParameterKeepTableInstance( EXTCompInfo* pEci, qshort pParamNum );	// rmm4315
+	LPARAM				ECOgetUParamValue( HWND pHOmnisCompHwnd ); // AE6744
+	// MHMACH2 begins
+	#if defined(ismach_o)	// CR0221
+		qbool         RESgetDialogIDForMachO( HINSTANCE pInst, qlong	pId, str255 &pDialogID ); // MHMACH16
+	#ifndef isCOCOA	// CR0221
+		IBNibRef      RESloadDialog( HINSTANCE pInst, qlong	pId );
+	#endif
+	#else
+		qHandle				RESloadDialog( HINSTANCE pInst, qlong	pId ); // mpmPRIv2
+	#endif
+	// MHMACH2 ends
+	ECOAPI qbool OMNISAPI ECOreloadLibData(str80& pLibName);		// AE6551
+	ECOAPI qbool OMNISAPI ECOconvKnownJavaObjs(tqappfile *pLib, qlong &pFlag);		// <ijtjperf>
+	ECOAPI qulong OMNISAPI ECOgetLocalIpAddress(void); //gra0509
+	ECOAPI qshort OMNISAPI ECOgetJSNativeDisplay(HWND pHwnd); //jmg0113 jmg0114: Gets the $defaultappearance of the form containing pHWND
+	class lsttype;	// rmm_loc5
+	void ECOdoFind(str255 &pFindString, str255 &pStringToSearch, lsttype *pResultList);	// rmm_loc5
+	ECOAPI qshort OMNISAPI ECOuprCmp(qchar* add1, qchar* add2, qlong len);  // rmm7002: Compare text after converting to upper case
+	ECOAPI void OMNISAPI ECOpostTaskMessage(qlongptr pTask, qlong pTaskUnq, char *pMessage, qfldval *pParams = 0, qshort pParamCount = 0); // rmm8114: Note pParamCount must be 0-8 inclusive
+	// Start rmm8218
+	void ECOsetConnectFlags(LPARAM pConnectLparam);
+	qbool ECOrunningInOmnisX();
+	// End rmm8218
+	// Start rmm8733
+	ECOAPI qbool OMNISAPI ECOparseJSONObjectArray(EXTfldval &pJSONData, EXTfldval &pReturnedList, EXTfldval &pReturnedErrorText);
+	ECOAPI qbool OMNISAPI ECOsaveToJSONObjectArray(EXTfldval &pList, qlong pEncoding, EXTfldval &pReturnedJSON, EXTfldval &pReturnedErrorText);
+	// End rmm8733
+	// Start rmm9333
+	ECOAPI qbool OMNISAPI ECOparseJSONArrayArray(EXTfldval &pJSONData, EXTfldval &pReturnedList, EXTfldval &pReturnedErrorText);
+	ECOAPI qbool OMNISAPI ECOsaveToJSONArrayArray(EXTfldval &pList, qlong pEncoding, EXTfldval &pReturnedJSON, EXTfldval &pReturnedErrorText);
+	// End rmm9333
+	// Start rmm_rws
+	ECOAPI qbool OMNISAPI ECOparseJSON(EXTfldval &pJSONData, EXTfldval &pReturnedListOrRow, EXTfldval &pReturnedErrorText, qbool pAllowArraysOfRows = qfalse); // rmm9125
+	ECOAPI qbool OMNISAPI ECOsaveToJSON(EXTfldval &pListOrRow, qlong pEncoding, EXTfldval &pReturnedJSON, EXTfldval &pReturnedErrorText);
+	ECOAPI qchar OMNISAPI ECOgetFirstCharFromJSON(EXTfldval &pJSONData);	
+	ECOAPI void  OMNISAPI ECOformatJSON(EXTfldval &pJSONData, EXTfldval &pReturnedFormattedJSON);
+	ECOAPI qlong OMNISAPI ECOresolveJSONMember(EXTfldval &pJSONList, EXTfldval &pMember, EXTfldval &pResolvedMember, EXTfldval &pReturnedErrorText, qbool pWillAlter);
+	ECOAPI void	 OMNISAPI ECOlistJSONmembers(EXTfldval &pJSONList, EXTfldval &pMemberIdList);
+	ECOAPI qbool OMNISAPI ECOisJSONArray(EXTfldval &pFval, qlong &pArrayLength);
+	ECOAPI qbool OMNISAPI ECOisJSONObject(EXTfldval &pFval);
+	// Start rmm8675
+	ECOAPI void OMNISAPI ECOsaveToClientJSON(qlong pMessageType, EXTfldval &pList, EXTfldval &pReturnedJSON);
+	ECOAPI qbool OMNISAPI ECOparseClientJSON(qbyte *pJSON, qlong pJSONlen, qlong &pMessageType, EXTfldval &pReturnedList, EXTfldval &pErrorTextFval);
+	// End rmm8675
+	// Call ECOupdateJSON in one of three ways:
+	// a.  With non-null pValueFval and null pMemberNameToAddOrRemove to set existing member identified by pMemberIdFval
+	// b.	 With non-null pValueFval and non-null pMemberNameToAddOrRemove to add new member pMemberNameToAddOrRemove (with value pValueFval) to existing member identified by pMemberIdFval
+	// c.	 With null pValueFval and non-null pMemberNameToAddOrRemove to remove existing member pMemberNameToAddOrRemove from existing member identified by pMemberIdFval
+	ECOAPI qlong OMNISAPI ECOupdateJSON(EXTfldval &pJSONList, EXTfldval &pMemberIdFval, EXTfldval *pValueFval, EXTfldval *pMemberNameToAddOrRemove, EXTfldval &pErrorText);
+	// pValueFval is the value to add to the end of the array is pPush is true
+	// pValueFval receives the value removed from the end of the array is pPush is false (a pop operation)
+	ECOAPI qlong OMNISAPI ECOupdateJSONArray(EXTfldval &pJSONList, EXTfldval &pMemberIdFval, EXTfldval *pValueFval, qbool pPush, EXTfldval &pErrorText);
+	
+	typedef	void (OMNISEXTPROC *ECOpushWorkerCallback_Ptr)(qobjinst pObjInst, strxxx *pMethod, lsttype *pResultList);
+	void * ECOpushWorkerCallback(); //gra0987
+	void * ECOpushWorkerCallbackECI(); //gra0987
+	// End rmm_rws
+	// Start rmm8336
+	ECOAPI void OMNISAPI ECOreadStringConfigurationItem(const char *pGroupName, const char *pItemName, strxxx &pValue);
+	ECOAPI void OMNISAPI ECOwriteStringConfigurationItem(const char *pGroupName, const char *pItemName, strxxx &pValue, qbool pCanWriteInteger = qfalse);
+	ECOAPI qlong OMNISAPI ECOreadIntegerConfigurationItem(const char *pGroupName, const char *pItemName, qlong pDefaultValue);
+	ECOAPI void OMNISAPI ECOwriteIntegerConfigurationItem(const char *pGroupName, const char *pItemName, qlong pValue);
+	ECOAPI qbool OMNISAPI ECOreadBooleanConfigurationItem(const char *pGroupName, const char *pItemName, qbool pDefaultValue);
+	ECOAPI void OMNISAPI ECOwriteBooleanConfigurationItem(const char *pGroupName, const char *pItemName, qbool pValue);
+	ECOAPI qbool OMNISAPI ECOhasConfigurationItem(const char *pGroupName, const char *pItemName);
+	// End rmm8336
+	// Start rmm8465
+	// Note that for ECOpromptForInput the prompt and title must not contain /
+	ECOAPI qret OMNISAPI ECOpromptForInput(str255 &pPrompt, str255 &pTitle, qbool pCancel, EXTfldval &pReturnValue, qbool &pReturnValueOk);
+	// For ECOencrypt and ECOdecrypt, pKey must address an array of dimension 4 of unsigned longs
+	ECOAPI void OMNISAPI ECOencrypt(qbyte *pDataToEncrypt, qlong pDataToEncryptLen, qulong *pKey, EXTfldval &pEncryptedData);
+	ECOAPI void OMNISAPI ECOdecrypt(qbyte *pDataToDecrypt, qlong pDataToDecryptLen, qulong *pKey, EXTfldval &pDecryptedData);
+	// End rmm8465
+	void ECOtlsSetValue(threadStorageIndex pIndex, void* pValue); // rmm_dep	// CR0333
+	ECOAPI void OMNISAPI ECOgetOmnisErrorText(qret pErrorCode, EXTfldval &pErrorText);	// rmm9010
+	void ECOgetConstantDescriptionByValue(qlong pValue, rstrno pFirstConstant, rstrno pLastConstant, EXTfldval &pDescription);	// rmm9010
+	// Start rmm8675: Run a command prompt command on windows (Unix and OSX can just use the POSIX API system())
+	// Returns the exit code from the command process.
+	#if defined(iswin32) && !defined(isunix)
+		DWORD ECOrunCommand(TCHAR *pCmd);
+	#endif
+	ECOAPI qbool OMNISAPI ECOrunningInHeadlessServer();	// rmmheadless
+	// Start rmm9440
+	ECOAPI qlong OMNISAPI ECOtoUChar(ECOconverter pConverter, UChar *pTarget, qlong pTargetLen, const char *pSource, qlong pSourceLen, qlong *pSizeNeeded, qlong *pOutputLen);
+	ECOAPI qlong OMNISAPI ECOfromUChar(ECOconverter pConverter, char *pTarget, qlong pTargetLen, UChar *pSource, qlong pSourceLen, qlong *pSizeNeeded, qlong *pOutputLen);
+	ECOAPI qlong OMNISAPI ECOnormalizeUChar(qbool pNFC, UChar *pDest, qlong pDestLen, UChar *pSource, qlong pSourceLen, qlong *pSizeNeeded, qlong *pOutputLen);
+	// End rmm9440
+#endif
+ECOAPI qbool OMNISAPI ECOmessageBox(qulong pFlags,qbool pBell,str255& pMsg);	// AE6184 // rmm_mobile: ok message (pass pFlags as MSGBOX_OK) now available on web client
+
+// general inlines
+inline qbool ECOreturnCStoreGrpName( HINSTANCE pInst, EXTCompInfo* eci, qlong pId ) // AE4846
+	{ return ECOsetCustomTabName(pInst,eci,pId); }
+
+
+inline qlong ECOgetId(EXTCompInfo* eci)
+	{ return eci && eci->mParamFirst ? eci->mParamFirst->mId : 0; }
+
+#if !defined(isiphone)		// pkiphone
+inline void ECOexcludeToolTipRect( HWND pHOmnisCompHwnd, HDC pHdc )
+	{ 
+		qrect tipRect;
+		if ( ECOgetToolTipRect( pHOmnisCompHwnd, &tipRect ) )
+		{
+			#ifndef isRCCLIB
+				WNDmapWindowRect( HWND_MAINWINDOW, pHOmnisCompHwnd, &tipRect );
+			#else
+				WNDmapWindowRect( HWND_DESKTOP, pHOmnisCompHwnd, &tipRect ); // rmm5650
+			#endif
+			GDIexcludeClipRect( pHdc, &tipRect );		
+		}
+	}
+
+#endif
+
+inline qbool ECOreturnEvents( HINSTANCE pInst, EXTCompInfo* eci, ECOmethodEvent* pTable, qshort pTableElements )
+	{ return ECOreturnMethodEvents( pInst, eci, pTable, pTableElements ); }
+
+
+inline qbool ECOreturnMethods( HINSTANCE pInst, EXTCompInfo* eci, ECOmethodEvent* pTable, qshort pTableElements )
+	{ return ECOreturnMethodEvents( pInst, eci, pTable, pTableElements ); }
+
+inline qlong ECOreturnVersion( qshort pMajor, qshort pMinor )
+	{ return (qlong(pMajor)<<16) | (qlong)pMinor; }
+
+// rmm3478: this function is needed by the core, but not the ORFC; generate a STUB for the ORFC
+#ifndef isRCCLIB
+	ECOAPI qlong OMNISAPI ECOreturnVersion(HINSTANCE pInst);
+#else
+	inline qlong ECOreturnVersion(HINSTANCE pInst) { return 0; }
+#endif
+
+// Start rmm_nc: return number of 1/60sec since startup (will wrap eventually)
+#ifndef isiphone
+	inline qlong ECOgetTickCount() 
+	{
+		#ifdef isCOCOA	// CR0207
+			return ([[NSProcessInfo processInfo] systemUptime] * 60); // rmm8573
+		#elif defined(ismacosx)
+			return TickCount();
+		#else
+			return MulDiv(GetTickCount(), 6L, 100L); 
+		#endif
+	}
+#endif
+// End rmm_nc
+
+void ECOpaintControlNotImplemented(HDC pHdc, HWND pHwnd, rstrno pMessageResource, qcol pTextColor = GDI_COLOR_WINDOWTEXT);	// rmm9188
+
+// Heap Handling Functions (all inlines)
+#ifndef isCOCOA	// rmm8565
+	HGLOBAL				MEMglobalAlloc ( qlong pLength, qbool pZeroInited=qfalse );
+	HGLOBAL				MEMglobalReAlloc ( HGLOBAL pGlobal, qlong pNewLen );
+	void					MEMglobalFree	 ( HGLOBAL pGlobal );
+	qlongptr			MEMglobalSize ( HGLOBAL pGlobal ); // rmm64bit4
+	HGLOBAL				MEMglobalHandle ( void *pObject );
+	void*					MEMglobalLock 	( HGLOBAL pGlobal );
+	void					MEMglobalUnlock ( HGLOBAL pGlobal );
+#endif
+
+// Big Pointer Routines (all inlines)
+void* 				MEMmalloc( qulong pSize );
+void* 				MEMcalloc( qulong pSize );
+void* 				MEMrealloc( void* pData, qulong pNewLen );
+// rmm8467: Removed redundant API that can on longer be used as a result of this change: qulongptr 		MEMdataLen( void* pData ); // rmm64bit4
+void 					MEMfree( void* pData ); // MHMEM
+qbyte* 				MEMincAddr( qbyte* pAddress, qlong pOffset );
+qbyte* 				MEMdecAddr( qbyte* pAddress, qlong pOffset );
+qchar* 				MEMincAddr( qchar* pAddress, qlong pOffset );
+qchar* 				MEMdecAddr( qchar* pAddress, qlong pOffset );
+
+
+// Resource Handling Functions
+#ifdef ismac
+ECOAPI HINSTANCE		OMNISAPI RESopenLibraryEx ( strxxx& pLibraryPath );
+#endif
+ECOAPI HINSTANCE		OMNISAPI RESopenLibrary ( strxxx pLibraryPath );
+ECOAPI qlong 				OMNISAPI RESloadString( HINSTANCE pInst, qlong  pId,qchar *pBuffer, qlong pBufferLen );
+ECOAPI qlong 				OMNISAPI RESloadString( HINSTANCE pInst, qlong  pId, strxxx &pStr );
+#if !defined(isiphone)		// pkiphone
+ECOAPI HBITMAP 			OMNISAPI RESloadBitMap( HINSTANCE pInst, qlong	pId  );
+ECOAPI qbool				OMNISAPI RESloadPNG(HINSTANCE pInst, qlong pId, EXTfldval &pPNG);	// rmm8994
+#endif
+ECOAPI void					OMNISAPI REScloseLibrary ( HINSTANCE pInst );
+ECOAPI HINSTANCE		OMNISAPI RESgetOmnisDAT( EXTCompInfo* pEci );
+
+// Resource Handling Functions
+// Mac-ONLY Functions
+#ifdef iscarbon	// CR0355
+qshort				RESopenResourceFork  ( HINSTANCE pInst );
+void					REScloseResourceFork ( HINSTANCE pInst );
+#endif
+
+
+// Default Processing
+ECOAPI LRESULT OMNISAPI WNDdefWindowProc( HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam, EXTCompInfo* eci ); // rmm64bit5: UINT Msg, LRESULT
+
+// MHn0334 begins
+const qlong	cSelectApps			          = 1,
+				    cOpenApps					        = 2;
+// MHn0334 ends
+
+extern HINSTANCE gInstLib;
+
+#ifdef ismac	// CR0260
+extern HINSTANCE gOmnisInst;
+#endif
+
+// Start rmm8467: moved to here from xextcinl.hi, and now use malloc etc on all platforms
+#include <stdlib.h>
+
+inline void* MEMrealloc(void* pData, qulong pNewLen)
+{
+	return realloc(pData, (size_t)pNewLen);
+}
+
+inline void* MEMmalloc(qulong pSize)
+{
+	return malloc((size_t)pSize);
+}
+
+inline void* MEMcalloc(qulong pSize)
+{
+	return calloc(1, (size_t)pSize);
+}
+
+inline void MEMfree(void* pData)
+{
+	free(pData);
+}
+// End rmm8467
+
+// rmm8862:
+class ECOdisableTestesc
+{
+private:
+	qbool	mOldValue;
+public:
+	ECOdisableTestesc();
+	~ECOdisableTestesc();
+};
+
+extern void WNDregisterForInitDone(HWND pHwnd);	// rmm8970: Register to receive WM_FLD_INITDONE after all controls on the form or window have been constructed
+
+// Start rmm8977: while this class is constructed, key events are sent rather than pushed, so we immediately know
+// what happened to the event.
+class ECOsendKeyEvents
+{
+private:
+	qbool	mOldValue;
+public:
+	ECOsendKeyEvents();
+	~ECOsendKeyEvents();
+};
+// End rmm8977
+
+// Start CR0392
+class ECOdisableIconSetScaling
+{
+private:
+	qbool	mOldValue;
+public:
+	ECOdisableIconSetScaling();
+	~ECOdisableIconSetScaling();
+};
+// End CR0392
+
+// Start rmm9532
+class ECOdisableTableInstanceCopying
+{
+private:
+	qbool	mOldValue;
+public:
+	ECOdisableTableInstanceCopying();
+	~ECOdisableTableInstanceCopying();
+};
+// End rmm9532
+
+// rmm8939:
+#ifndef MAKELONG
+	#define MAKELONG(a, b) (qint4)(((qword4)(a)) | ((((qword4)(b)) << 16) & 0xffff0000))
+#endif
+
+#endif

@@ -1,0 +1,46 @@
+/*$Header: svn://svn.omnis.net/trunk/Studio/EXTCOMP/CALLBACK/extcomp.he 18701 2017-12-18 15:46:09Z bmitchell $*/
+ 
+/*
+   	OMNIS Studio - External component interface header
+	 	Copyright (C) Blyth Holdings Inc 1996-98
+*/
+
+/**************** Changes ******************
+Date			Edit				Bug					Description
+*/
+ 
+#ifndef _extcomp_
+#define _extcomp_
+
+#if defined(iswin32)
+	#include <tchar.h>
+#endif
+
+
+#include "basics.h"
+#include "hwnd.he"
+#include "gdi.he"
+#include "gdipict.he"
+#include "strclass.he"
+#include "extfval.he"
+#include "extqlist.he"
+#include "extbmp.he"
+#include "anums.he"
+#include "xkey.he"
+#include "extcrb.he"
+#include "pri.he"
+#include "extfile.he"
+
+#include "extdefs.he"
+#include "flddefs.he"
+#include "extfuncs.he"
+
+// inlines are in Here
+#include "xextcinl.hi"
+
+#include "handle.he"
+
+#endif
+
+
+// End of file

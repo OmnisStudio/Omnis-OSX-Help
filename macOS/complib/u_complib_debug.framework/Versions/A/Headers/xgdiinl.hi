@@ -1,0 +1,206 @@
+ /* $Header: svn://svn.omnis.net/trunk/Studio/O7EXE/COCOA/xgdiinl.hi 17032 2017-04-06 10:06:53Z crichardson $ */
+ 
+//Q4 xgdiinl.hi
+//Dependent Omnis GDI inlines
+//Copyright (C) Blyth Holdings Inc 1996
+
+/**************** Changes ******************
+Date			Edit				Bug					Description
+19-Jan-16	rmm8714									Added appearance.json to allow system colors to be configurable.
+15-Jun-09	rmm_nc									New controls and supporting APIs.
+21-May-09 pkgradient							Gradient support
+06-Jan-04	rmmuni_fnt3							Mac OSX Unicode Port: more changes to support Unicode fonts and ATSUI.
+17-Dec-03	rmmuni_fnt2							Mac OSX Unicode Port: more changes to support Unicode fonts and ATSUI.
+11-Dec-03	rmmuni_fnt							Mac OSX Unicode Port: changes to support Unicode fonts and ATSUI.
+11 JUN 03 MHn0237									OSX Alpha changes.
+29 MAY 03 MHTEXT			ST/RC/391		Implemented Rotated Text for OSX.
+28 NOV 02 mpm_qdim		st/wo/1447	Changed qdim on OSX from short to long
+15 JUN 01 mpm4732a								Complex grid painting/performance changes
+09 APR 01 mpmCarbon40							Implements CGContext
+01 DEC 00 mpmCarbon11							Creating theme fonts should not be inlines
+20 OCT 00 mpmCarbon								OSX Changes NOT MARKED
+12-Oct-00	AESOL										Solaris implementation
+20 APR 00 PK											isOMNISCORE in invertrgn
+15 OCT 99 mpmCarbon								Carbon port
+16-Jun-99 PKMACCLIENT							Macclient changes
+22-Aug-98 PK added isOMNISCORE and other thin client changes
+24 APR 98 mt40490		st/he/013			Range check offset in GDIsysColArr.
+24 APR 98 mt40470									CWPro-2 Changes
+18-Dec-97	rmm2894									Problems drawing patterns to printer.
+07-Nov-97	rmm2758									Better handling of cursor properties.
+17-OCT-97	mpmPRI									New print manager implementation.
+07-Oct-97	mt40338									HCURSOR Support
+13-Jun-97	mt40295									fixed WNDenumChildWindows && GDIsetOptionClick thru exteral component interface
+09-May-97	rmm2471			PR/HI/695		Flicker when using animated cursors on Windows.
+11 MAR 97 mt40224									removed GDIsetFontNum && GDIgetFontNum
+14 FEB 97 mpm4168									Problems with large font sizes when printing to high res printer 
+04-Nov-96	mt40046									68k Code fragment
+13 AUG 96 mpm4046									Changes for printer paper margins
+24 Jul 96 mtStyle									added GDIsetFontNum, GDIgetFontNum
+18 APR 96 mpm4018									Performance changes
+********************************************/
+
+#if defined(isOMNISCORE) && !defined(_XGDI_HI_)
+#include "xgdi.hi"
+#endif
+
+#pragma SET_RETURN_REGISTER_ON 
+
+inline void   GDIignore(const void* a1) 	// used to avoid 'unused parameter' warnings
+{
+	#pragma unused (a1)
+}  
+
+#if defined(isOMNISCORE)
+	extern HDC GDI_PORT; // mpmCarbon							// rmmuni_fnt3: moved to here
+	extern HDC GDI_GPORT; // mpmCarbon // mpm4018	// rmmuni_fnt3: moved to here
+	extern qbool GDI_OPTION_CLICK_ON;	// rmm2471	// rmmuni_fnt3: moved to here
+	inline HDC GDIgetTempDC()
+	{
+		return (HDC) GDI_GPORT; // mpm4018
+	}
+#else
+	GDIAPI HDC OMNISAPI GDIgetTempDC();
+#endif
+
+GDIAPI HDC OMNISAPI GDIgetTempDC();
+
+inline void GDIfillRectEx( HDC pHdc, qrect* pRect, HBRUSH pBrush ) // rmm2894
+{
+	GDIfillRect(pHdc, pRect, pBrush);
+}
+
+/******** cursor/line functions ***************/
+// now in xgdi.cpp to stop core conflict
+
+/******** rect testing ******************************/
+
+inline qbool GDIequalRect( qrect* pRect1, qrect* pRect2 ) 
+{
+	CGRect r1,r2;
+	return CGRectEqualToRect( *GDIconv(pRect1,&r1), *GDIconv(pRect2,&r2) );
+}
+
+
+inline qbool GDIisRectEmpty( qrect* pRect ) // mpm_qdim
+{
+	return qbool(pRect->left==0 && pRect->top==0 && pRect->right<=0 && pRect->bottom<=0); 
+}
+
+
+inline qbool GDIptInRect( qrect* pRect, qpoint* pPoint )
+{
+	CGRect r; CGPoint p;
+	return CGRectContainsPoint( *GDIconv(pRect,&r), *GDIconv(pPoint,&p) );
+}
+
+/******** pixel manipulation ******************************/
+
+inline void GDIsetPixel( HDC pHdc, qdim pX, qdim pY, qcol pCol)
+{
+	GDIsetPixel( pHdc, (qreal)pX, (qreal)pY, pCol);
+}
+
+inline qcol GDIgetPixel( HDC pHdc, qdim pX, qdim pY )
+{
+	return GDIgetPixel( pHdc, (qreal)pX, (qreal)pY);
+}
+
+inline void GDIfloodFill(HDC pHdc, qdim pX, qdim pY, qcol pCol )
+{
+	return GDIfloodFill( pHdc, (qreal)pX, (qreal)pY, pCol);
+}
+
+/******** font functions ****************/
+
+inline void GDIsetFontNumber( qfnt* pFnt, qshort pFontNumber ) // mpmPRI
+{
+	pFnt->mFont = pFontNumber;
+}
+
+inline qshort GDIgetFontNumber( qfnt* pFnt ) // mpmPRI
+{
+	return pFnt->mFont;
+}
+
+inline void GDIfontSetSize( qfnt* pFnt, qshort pSize )
+{
+	pFnt->mSize = pSize; // mpm4168 mSize is now a short
+}
+
+inline void GDIfontSetExtra( qfnt* pFnt, qshort pExtra )
+{
+	pFnt->mExtra = pExtra;
+}
+
+inline qshort GDIfontGetSize( qfnt* pFnt )
+{
+	return pFnt->mSize;	
+}
+
+inline qshort GDIfontGetExtra( qfnt* pFnt )
+{
+	return pFnt->mExtra;	
+}
+
+// For now assume the font described by pFnt can be generated in the size it specifies.
+inline qbool GDIfontIsReal( qfnt* pFnt )
+{
+	GDIignore(pFnt);
+	return qtrue;
+}
+
+// For now assume the font described by the DC's HFONT can be generated in the size it specifies.
+inline qbool GDIfontIsReal( HDC pHdc )
+{
+	GDIignore(&pHdc);
+  return qtrue;
+}
+
+/******** GDI objects stuff ***********/
+
+#ifndef isXCOMPLIB
+inline void GDIdeleteObject( HFONT pObject )
+{
+	xFONTdeleteObject(pObject);	// rmmuni_fnt2
+}
+
+inline void GDIdeleteObject( HPEN pObject )
+{
+	if (pObject) delete pObject;
+}
+
+ 
+inline void GDIdeleteObject( HBRUSH pObject )
+{
+	if (pObject) delete pObject;
+}
+
+#endif
+
+/******** screen rect inlines ************/
+
+/******** color stuff ******************************/
+extern qcol GDIsysColArr[];	// mt40490
+
+#ifdef isOMNISCORE
+inline qcol GDIgetRealColor( qcol pCol )
+{
+	// rmm8743:
+	if (!(pCol & GDI_COLOR_FST))
+		return pCol;
+	
+	qshort colorId = (qshort) (pCol - GDI_COLOR_FST);
+	if (colorId > COLOR_MAX) colorId = GDI_COLOR_QBLACK - GDI_COLOR_FST;
+	if (GDIcolor::getColor(colorId, pCol))
+		return pCol;
+	
+	return GDIsysColArr[colorId];
+}
+#endif
+
+/******** bitmap stuff ******************************/ // mpmPRI
+
+#pragma SET_RETURN_REGISTER_OFF
+
+/*eof*/

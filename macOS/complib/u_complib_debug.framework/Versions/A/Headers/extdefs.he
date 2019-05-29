@@ -1,0 +1,1214 @@
+/* $Header: svn://svn.omnis.net/trunk/Studio/O7EXE/INDY/extdefs.he 21842 2019-01-03 12:59:01Z bmitchell $ */
+
+//Q4 EXTDEFS.HE
+//External component definitions
+//Copyright (C) Blyth Holdings Inc 1998
+
+/**************** Changes ******************
+Date			Edit				Bug					Description
+03-Jan-19	rmm9887			ST/HE/1560	Problems viewing and printing Omnis help pages.
+21-Nov-18	rmm_jsw									OW3 component - JavaScript Worker.
+12-Nov-18	rmm9826			ST/IE/148		Copy $enabled to $active when converting specified JS controls to Studio 10.
+01-Nov-18	dmw0135									Accessibility - Added $active property to JS controls.
+27-Sep-18	bjw0097									Added Accessibility tab to property manager.
+10-Aug-18	rmm9760									Debug logging for core and components.
+01-Aug-18	bjw0059									Accessibility - Added $arialabel, $arialabelledby & $ariadescribedby properties.
+02-May-18	rmm9640a		ST/EC/1502	Cocoa webview was generating 2 mouseup JS events.
+12-Apr-18 pkcocoa_1194 						Studio9 alpha extras
+15-Jan-18	CR0490									Support for custom dictation commands in extcomps.
+11-Oct-17	rmm9532			ST/NV/062		Crash when a list copied for use by the worker has a table instance.
+04-Oct-17	rmm9519			ST/FR/139		Find and replace did not handle multi-value properties.
+24-Aug-17	rmm9400a		ST/AD/080		Added tool method to reload JSON defined controls.
+28-Jul-17	rmm9440									OW3 component - IMAP Worker.
+02-Jun-17	rmm9400									New JS component to allow controls to be added using just a JSON definition, PNG images and JavaScript implementation.
+17-May-17	CR0416									Cocoa dictation support for xcomps.
+25-Apr-17	rmm9347			ST/RC/1261	Added zoom capability to report class editor.
+24-Nov-16	CR0392			ST/FU/686		Allow $getpict/$getmask to turn off scaling of image when main display is hires.
+25-Oct-16	rmm9123									Implemented $exportjson() and $importjson().
+13-Oct-16	rmm9108			ST/JS/1280	Allow double click to edit text in a JS client label field.
+19-Aug-16	rmm9010			ST/EC/1416	Added support for large files (files with a size > maximum signed 32 bit integer).
+04-Aug-16	rmm8991									Improved design name etc drawing when GDI_COLOR_WINDOWTEXT is white (often the case for remote form controls with no text color property which are filled with white).
+18-Jul-16	rmm8982									Responsive design for JS client remote forms.
+14-Jul-16	rmm8977			ST/WO/2377	$keyevents did not work for obrowser on windows.
+13-Jul-16	rmm8970			ST/LR/027		Problem with linked object and JS tab strip.
+11-Jul-16	rmm8965									VS2015 compiler issues.
+29-Jun-16	rmm8956									Removed old 16 bit external component support.
+13-Jun-16	rmm8939			ST/FU/670		Code assistant now restricts constants to the set suitable for function and external component object method parameters.
+14-Apr-16	rmm8862									Flicker while changing pages in Omnis help window.
+29-Feb-16	rmm8752			ST/EC/1394	Redraw issue re-sizing obrowser on Windows platform.
+29-Dec-15	rmm8700			ST/JS/464		JS client drag and drop.
+28-Oct-15	rmm8675			ST/EC/1384	Initial implementation of obrowser xcomp.
+02-Jul-15	jmg0274									Added $pagesize property, for list pagers (used by JS Client) (reworked)
+02-Dec-14	CR0149									Cocoa externals.
+28-Nov-14	rmm8462									Make sure worker completion methods are called sequentially.
+03-Oct-14	rmm8441									Navigation menu control.
+04-Sep-14	rmm_rws8								Timer worker object.
+01-Sep-14	rmm8428			ST/EC/1346	HTML control printing issues.
+05-Jun-14	jmg0114									Made $defaultappearance a form property. (Replaces much of jmg0113)
+11-Apr-14	rmm_rwslog							Logging (added as part of RESTful web services)
+09-Apr-14	rmm_rws									RESTful Web Services support: JSON.
+26-Mar-14	rmm8295			OE-3172			Problem with standard events in Omnis X dictionary.
+05-Mar-14	rmm8281			OE-3084			Problem with default value of new external component property added to existing control.
+28-Feb-14	rmm8278			OE-3059			Label control did not redraw when changing dataname property.
+07-Feb-14	rmm8250			OE-2953			Added message to allow non-Omnis X properties, methods, events to be hidden by components.
+23-Jan-14	rmm8218			OE-2884			Object reference supported added to various components.
+05-Nov-13	rmm_oxie		OE-2657			Re-implemented Omnis X import-export in order to improve performance.
+29-Oct-13	rmm8161			OE-2641			Added isa() function for Omnis X only.			
+14-Oct-13	rmm8135			OE-2256			Added $datanames group for Omnis X.
+07-Oct-13	rmm8128			OE-2437			More tab control issues in Omnis X.
+01-Oct-13	rmm8114			ST/EC/1333	Completion event for PDF reports; sorted out command sequencing for remote tasks in multi-threaded server.
+17-Sep-13	rmm8106			OE-2436			Data grid export to XML behaved differently after initial import from library.
+19-Aug-13	rmm64bitux							Linux 64 bit port.
+25-Jul-13	rmm8068			OE-2211			Property change issues.
+02-Jul-13	rmm8030			OE-2055			Where possible, generate more informative type strings for object and object reference types.
+03-Jun-13	rmm7990			ST/RC/1175	Added PDF device support for styled text icons.
+14-Feb-13	rmm7847									Additional calls to jniObjectSelected for Omnis X to cater for tab changing etc on design window.
+20-Nov-12	rmm_xc45								Changes to allow Xcode 4.5+ to be used for OSX build.
+03-Oct-12	rmm7649									Omnis PDF device did not work correctly when font point size is zero.
+04-Sep-12	rmm_pdf									Omnis PDF device for all platforms - modified version of Linux print device.
+17-Jul-12	rmm7563			ST/JS/424		JS client number formatting.
+26-Apr-12	rmm64bit2								64 bit portability changes.
+17-Apr-12	rmm64bit1								First set of changes for 64 bit support: 64 bit Omnis data type.
+03-Oct-11	rmm7261									$screensizefloat now has a separate value for each screen size.
+29-Jul-11	rmm7197									Added $autoscroll for JS client.
+18-Jul-11	rmm7186									JavaScript client date formatting and parsing.
+08-Jun-11 CR0034									Add enable/disable notifications flag.
+03-Jun-11	rmm7141									Added support for tab menus.
+25-May-11	rmm7138									Mobile device wrapper apps.
+19-May-11	mpm_jsc_vis							Implements "data-visible" property for js client
+14-Apr-11	rmm7101									JS tab strip component.
+15-Mar-11	rmm7095									JavaScript client - data grid design component.
+04-Mar-11	mpm_cmenu								Implements js context menu
+02-Feb-11	rmm7082									JavaScript client - more HTML generation issues.
+01-Feb-11	rmm7081									JavaScript client - HTML generation for subform.
+21-Jan-11	rmm7075									Changed JavaScript client id generation.
+10-Jan-11	rmm7058									More JavaScript components for design mode.
+09-Sep-10	rmm_jsc									JavaScript client core changes.
+08-Mar-10	rmm6928			ST/BE/540		Background pictures crashed the iPhone client.
+22-Jan-10	jc0048									Support for Web Service clients to be generated in a runtime.
+13-Aug-09	rmm6734									Improvements to iPhone paged pane support.
+04-Aug-09	rmm6710			ST/WT/1464	evAnimationsComplete event for iPhone.
+31-Jul-09	rmm6691									PG and MY serial number support.
+03-Jun-09	rmm_loc5								String table editor integrated with catalog.
+02-Jun-09	rmm_iphone28						Added support for fixed width or fixed height for iPhone controls in design mode.
+16-Apr-09	rmm_iphone24						Navigation bar field.
+03-Apr-09	rmm_iphone22						Toolbar field.
+31-Mar-09	rmm_iphone21						Segmented control.
+20-Mar-09	rmm_iphone18						Label field.
+12-Mar-09	rmm_iphone14						Not all controls need $backcolor and $backalpha.
+09-Mar-09	rmm_iphone13						Text field controls.
+04-Mar-09	rmm_iphone12						$events for iPhone objects now exclude context menu events, and only include evBefore and evAfter when required.
+30-Jan-09	rmm_iphone4							iPhone save and restore application state.
+20-Oct-08	rmm6484			ST/BE/259		Headed list columns can now be dragged to change column ordering.
+08-Sep-08	rmm6461									Iphone component design mode changes.
+14-Aug-08	pkiphone								iphone pass 1
+06-Aug-08	rmm6357			ST/DC/399		Improved help for formroll and added droplist to select field style to property manager.
+02-Jul-08	rmm_rfmenu							Context menus for remote forms.
+18-Feb-08	rmm_mobile							Mobile device support.
+22-Jan-08	rmm6313			ST/GF/309		Fixed crash.
+18-Jan-08	rmm6303			ST/WO/2040	Could not change background color of string table label object.
+29-Mar-07	rmm6029									$designdpi modified to have per-platform support.
+03-Jan-07	rmm5929			ST/LR/011		Mac OSX focus issue with local remote forms.
+01-Nov-06	AE6744			ST/EC/1035: Added GET_UPARAM_VALUE to WM_CONTROL messages
+16-Oct-06	rmmcups									Linux: Use CUPS for printing.
+10-Aug-06	rmm5880									More data grid and headed list column improvements.
+29-Mar-06	rmm5700			ST/EC/982		Bad interaction between timers and menu tracking.
+06-Feb-06	rmm5629			ST/WT/1039	Added support for double click events in list mode.
+17-Oct-05	rmm_wsa									Web services - improved data structures with performance and thread safety in mind.
+27-Sep-05 MHMACH                  Mach-o changes
+14-Jul-05	rmm5434			ST/WE/090		Large attachment received via POP3 receive command was truncated.
+06-Jun-05	rmm5389b								Documentation generator changes.
+18-May-05 MHnJava     ST/PF/337   Implemented Advanced Properties for Java
+12-May-05	rmm5369			ST/WT/931		Implemented masked edit field for web client.
+20-Dec-04	AE6551			ST/HI/1423: Sped up #EXTCOMP dialog, moved automation to root & added ECOreloadLibData
+04-Nov-04	AE6526			ST/EC/864: 	Added xfcPostClick event in order that Transbutton flashes during QueueClick
+06-Sep-04	pknsapi4								remoteforms opened in core
+19-Aug-04	rmm5057			ST/WT/888		Fixed memory leak.
+21-Jun-04	rmm4999									Finished rmm4993: remote form fields now show $xxx correctly.
+17-Apr-04 MHn0367			ST/WT/688		Added secure socket support for proxies on OSX
+22-May-03	AE6246			ST/WO/1415: XCOMP Slider & progress bar didn't support themes correctly.
+15-May-03	rmm4487									Windows platform list highlighting now uses a different colour when the field does not have the focus.
+																	Added $oldlisthiliting preference to disable the new behaviour if desired
+09-May-03	AE6234									Added EXT_FLAG_HIDDEN
+16-Dec-02	AE6184			ST/EC/713: 	Added ECOmessageBox to external component interface
+21-Nov-02	rmm4315			ST/OO/092		$cinst was incorrectly destroyed for a table instance.
+06-Nov-02	AE6164									Added support for multiple methods of the same name
+20-Sep-02	AE6135			ST/WO/1222: StrTable & field styles
+17-Jun-02 MHJCORE									Java support for Studio 4.0
+29-Oct-01 MHn0163									OSX Serial Port Changes
+27 SEP 01 mpmOSX_FOCUS						Implements ECM_CANSHOWSYSTEMFOCUS
+12-Jan-01	rmm4011			ST/CP/048		Difference in timer behaviour between Mac and Windows.
+11-Aug-00 MHn0124									Added support for ECOisSerialised callback
+19-Jun-00	PK6044									New SetEditMenu message
+08-May-00 MHn0111									Added ECOobjProp structure for ECOconstructObject.
+14-Apr-00	AE5038									Added EXTD_FLAG_PWINDCURSOR
+31-Mar-00	rmm3690									$createnames for table instances did not work with new DAMs.
+14-Feb-00	rmm3624									Added evFormToTop event to remote form, to support multiple forms.
+09-Feb-00	rmm3618									Mac callback issues.
+28-Jan-00 MHHBOX			ST/WT/054		Multiple selection enhancement for headed list box.
+06-Jan-00	rmm3582									Added ability to get type and name information about external component method parameters.
+23-Nov-99	DRS5200									v3 sql session objects
+17 NOV 99 mpmCarbon5							More Carbon changes
+14-Oct-99	rmm3500									Added $enableheader property.
+12-Oct-99	PK4937									Header change for mac xcomp compiles
+16-Jun-99 PKMACCLIENT 						Mac client changes
+27 JAN 99 mpmTHINo								Fixes tabbing
+22 JAN 99 mpmTHINm								Implements optimized instance vars and inheritance of instance vars
+19-Jan-99	AE4901									Fixes to format notation for external components+overriding udAttribSupport
+02-Dec-98	AE4871									Web components now reside in WEBCOMP
+15-Oct-98	AE4846									Added External CompStore groups for individual control libraries
+13-Oct-98	PKrcc2									Thin client event receive message
+04-Sep-98	AEPICC									Picture conversion enhancements
+*/
+
+#ifndef _EXTDEFS_HE_
+#define _EXTDEFS_HE_
+
+#ifdef isiphone
+	#ifdef is64bit
+    typedef long long LRESULT;
+	#else
+    typedef long LRESULT;
+	#endif
+#endif
+
+#ifdef isOMNISCORE
+#define EXTPREF_SECTNAME				66					// Resource id containing Omnis pref section name
+#define	EXTCOMP_DIR							333					/* External component dir name */
+#define	WEBCOMP_DIR							334					/* AE4871 WEB component dir name */
+#define IPCOMP_DIR							337					// rmm6461: IPhone components dir name
+#define JSCOMP_DIR							338					// rmm_jsc: JavaScript components dir name
+#define	LOGCOMP_DIR							340					// rmm_rws: Logging components dir name
+#endif
+
+#define EXTFUNCPROCRCID					31000				// Resource string number of function proc name
+#define LOGFUNCPROCRCID					31001				// rmm_rwslog: Resource string number of log proc name (logcomps only)
+#define EXTNOTATION							255					// Value of mParamNum to indicate notation value rather than parameter
+
+/**************** Flags passed from Omnis to component in LPARAM of ECM_CONNECT message *****************/
+#define EXT_CONNECT_FLAG_OMNISX	0x0001	// rmm8218: If specified,the component is being used in Omnis X
+
+/**************** Status flags *****************/
+#define EXT_FLAG_LOADED					0x0001 	// External component is loaded
+#define EXT_FLAG_USABLE					0x0002 	// External component is available to editors
+#define	EXT_FLAG_ALWAYS_USABLE	0x0004	// External component cannot be switched out (eg. StdFlds)
+#define EXT_FLAG_REMAINLOADED		0x0008	// AE_OLE - Remain loaded after startup enquiry (provides FASTEST loading)
+#define EXT_FLAG_HIDDEN					0x0010	// AE6234
+#define EXT_FLAG_DAM						0x0020	// rmm6691: The external component is a DAM; must be set in addition to EXT_FLAG_SESSION for DAMs only
+#define	EXT_FLAG_USE_DICTATION	0x0040	// External component can use dictation ( macOS only ) // CR0416
+#define	EXT_FLAG_VOICE_COMMANDS	0x0080	// External component supports voice commands ( macOS only )	// CR0490
+#define EXT_FLAG_PRI_OUTPUT			0x0100	// External custom printing output component // mpmPRI
+#define EXT_FLAG_NVOBJECTS			0x0200	// External library has non-visible objects/functions
+#define	EXT_FLAG_SESSION				0x0400  // Library contains a SQL session object //DRS5200
+#define EXT_FLAG_OWNROOTNODE		0x0800	// AE6551
+#define EXT_FLAG_BCOMPONENTS		0x1000	// AE4464 - Library contains background objects only
+#define	EXT_FLAG_EVENTHANDLER		0x2000	// External component is an event handler
+#define	EXT_FLAG_CTRLHANDLER		0x4000	// External component is a control handler (eg. OCX,VBX)
+// rmm8956: #define	EXT_FLAG_16BIT					0x8000	// External component is 16bit
+#define EXT_FLAG_COMPSTOREGROUP_AT_END	0x8000	// rmm9400: If true,the comp store group for this component is to be inserted at the end of the comp store category list
+
+#define EXT_EX_FLAG_ALPHAHWND  0x00010000 // pkcocoa_1194 set if child hwnd to be created an an alpha layered child
+
+#ifdef isOMNISCORE
+/**************** Dialog defines ****************/
+#define EXTCDLG_COMPLIST					1
+#define EXTCDLG_CTRLLIST					2
+#define EXTCDLG_INSTALL						3
+#define EXTCDLG_UNINSTALL					5
+#define EXTCDLG_FILELOCATION			936
+#define EXTCDLG_STATUS						937
+#define EXTCDLG_NOTLOADED					7
+#define EXTCDLG_ALWAYSLOADED			8
+#define EXTCDLG_LIBLOADED					9
+#define EXTCDLG_GROUPTEXT				990
+#endif
+
+/**************** Main Message defines ****************/
+#define ECM_FIRST_MSG					0x00010000L
+#define ECM_GETCOMPLIBINFO		0x00010000L	
+#define ECM_GETCOMPID					0x00020000L	
+#define ECM_CONSTPREFIX				0x00030000L	
+#define	ECM_GETPROPNAME				0x00040000L	// Get Property name for CONTROL
+#define	ECM_GETEVENTNAME			0x00050000L	// Get Event name for CONTROL
+#define	ECM_GETCONSTNAME			0x00060000L	// Get Property name for LIBRARY (not CONTROL!!!)
+#define	ECM_GETMETHODNAME			0x00070000L	// Get Function name for CONTROL
+#define ECM_SETPROPERTY				0x00080000L
+#define ECM_CONNECT						0x00090000L
+#define ECM_DISCONNECT				0x000a0000L
+#define ECM_GETCOMPICON				0x000b0000L
+#define ECM_METHODCALL				0x000c0000L
+#define ECM_MEMORYDELETION		0x000d0000L 
+#define ECM_OBJCONSTRUCT			0x000e0000L	// Obj construction (HWND set & data1=Rect)
+#define ECM_OBJDESTRUCT				0x000f0000L	// Obj destruction (HWND set)
+#define ECM_GETPICTUREDIM			0x00100000L  // Get cObjType_Picture dimensions(qrect passed in lParam)-return TRUE if done. AE4184
+#define ECM_PROPERTYCANASSIGN	0x00120000L	// Property assignable? - Failure to respond will mean YES!
+#define ECM_GETPROPERTY				0x00130000L	// Get property data
+#define	ECM_DEBUGGING					0x00140000L	// Debugging on/off(wParam)
+#define ECM_INSTALLLIBRARY		0x00150000L	// Install other... library, return TRUE(if lib selected) or -1
+#define ECM_GETPROPERTYENUMS	0x00160000L 	// Call for external to populate property inspector enum list
+#define ECM_OBJECTDATABLOCK		0x00170000L	// Setting object properties with a data block
+#define ECM_XFCEVENT					0x00180000L	// Omnis Internal events (wParam will be the xfcXXX)
+#define ECM_GETHANDLERICON		0x00190000L	// AE4117 Handler(eg OCX,VBX,JAVA etc..) icon (created/deleted by external)
+#define ECM_NEWPROPERTYFLAGS	0x001a0000L 	/* Return revised property flags (called in response to RESET_PROPERTY_FLAGS) */
+#define ECM_SETPRIMARYDATA		0x001b0000L	// Notification external should set its data
+#define ECM_GETPRIMARYDATA		0x001c0000L	// Call to external to get primary data
+#ifndef isiphone	// rmm_iphone13
+	#define ECM_CMPPRIMARYDATA		0x001d0000L	// Return true if data differs 
+	#define ECM_GETPRIMARYDATALEN	0x001e0000L	// Return true if external data (qlong* len passed in lparam)
+#endif
+#define ECM_PRIMARYDATACHANGE	0x001f0000L	// Inform external that data has changed
+#define ECM_HELP							0x00200000L // Sent when user requested help (only when used with EXTD_FLAG_HELP) AE4207
+#define ECM_CUSTOMTABNAME			0x00210000L // Sent when property inspector needs Custom tab name.Add param0 with string if req.
+#define	ECM_LISTDRAWLINE			0x00220000L // List object (lParam=EXTListLineInfo*)
+#define ECM_PRINT							0x00230000L // Print report object message (LParam=paintStruct*)
+#define ECM_PRINTMAPPING			0x00240000L // Return true if object wants printer mapping on
+#define ECM_GETPROCEDURE			0x00250000L // Return true if procedure list lines are returned
+#define ECM_GETEVENTMETHOD		0x00250000L	// As above.
+#define ECM_OBJINITIALIZE			0x00260000L	// Sent during object construction (before set property WPARAM=0; after WPARAM=1)
+#define ECM_GETOBJECTRECT			0x00270000L	// Sent during object construction (LPARAM=qrect *)
+#define ECM_PAINTCONTENTS			0x00280000L // Drop-List object (lParam=EXTListLineInfo*) drawing area by button
+#define ECM_NEWMETHODFLAGS		0x00290000L /* Return revised method flags (called in response to RESET_METHOD_FLAGS) */
+#define ECM_BOBJ_EXERASE			0x002a0000L // Return true if background object wants to exclude erase region during WM_ERASEBKGND
+#define ECM_FMT_CANASSIGN			0x002b0000L // FORMAT NOTATION equilavent of ECM_PROPERTYCANASSIGN
+#define ECM_FMT_SETPROPERTY		0x002c0000L // FORMAT NOTATION equilavent of ECM_SETPROPERTY 
+#define ECM_FMT_GETPROPERTY		0x002d0000L // FORMAT NOTATION equilavent of ECM_GETPROPERTY 
+#define ECM_GETVERSION				0x002e0000L // Request for version number. Use ECOreturnVersion otherwise Version 1.0 is assumed.
+#define ECM_ICONDRAWENTRY			0x002f0000L // IconArray object (lParam=EXTIconArrayInfo*)
+#define ECM_TEXTDRAWENTRY			0x00300000L // IconArray object (lParam=EXTIconArrayInfo*)
+#define ECM_ISUNICODE					0x00310000L // Return true if unicode, false otherwise
+#define ECM_ADDTOPRINTJOB			0x00320000L // Add object(s) to print job, return non-zero if implemented (lParam=printInfo*) // mpmPRI
+#define ECM_COMPONENTCMD			0x00330000L	// AE4672 $components.$componentcmd : General external component command
+#define ECM_CANADDTOPRINTJOB	0x00340000L // Can Add object(s) to print job, return non-zero if implemented (lParam=printInfo*) // mpmPRIv2
+#define ECM_GETOBJECT					0x00350000L
+#define ECM_GETSTATICOBJECT		0x00360000L
+#define ECM_PROPERTYCALCTYPE	0x00370000L	// Request for the Calculation type of an attribute // mt40455
+#define ECM_OBJECT_REBUILD		0x00380000L // Return TRUE if object requires a rebuild (ie resend request for methods/properties)
+#define ECM_OBJECT_COPY				0x00390000L	// Indicates object assignment (LPARAM=objCopyInfo*)
+#define ECM_GETPICTFORMAT			0x003a0000L	// AEPICC Request for picture format type
+#define ECM_CONVTOHPIXMAP			0x003b0000L	// AEPICC Convert data supplied and return HPIXMAP
+#define ECM_CONVFROMHPIXMAP		0x003c0000L	// AEPICC Convert HPIXMAP supplied and return binary data
+#define ECM_ISCONVFORMAT			0x003d0000L	// AEPICC 
+#define ECM_CONVHEADER				0x003e0000L // AEPICC Request to add (WPARAM=1) or remove (WPARAM=0) header
+#define ECM_GETPICTFILEDESC		0x003f0000L // AEPICC Request for file description (for Paste from file purposes)
+#define ECM_EVENTRESULT				0x00400000L // PKrcc2 result of an ECOsendEvent call wParam = evCode, lParam = result)
+#define ECM_GETCOMPSTOREGROUP 0x00410000L // AE4846 Get Component store group name (maximum 31 chars)
+#define ECM_GETCOMPSTOREICON	0x00420000L // AE4846 Get Component store group Icon (if returned will override handler icon ECM_GETHANDLERICON)
+#define ECM_INBUILT_OVERRIDE  0x00430000L // AE4901 Return true to override an inbuilt attribute
+#define ECM_HASPRIMARYDATACHANGED	0x00440000L	// return one of the ECMRET_ defines depending on how the primary data has changed since the last set data // mpmTHINm
+#define ECM_CANFOCUS					0x00450000L	// return 1 if the object can have the focus, otherwise return 0 (wParam is 1 if object is enabled; on the web client, lParam is the message (if any) which caused the call to ECM_CANFOCUS or zero) // mpmTHINo
+#define ECM_CANCLICK					0x00460000L // return 1 if the object can receive mouse click events, otherwise return 0 (wParam is 1 if object is enable) // mpmTHINo
+#define ECM_DAM_GETCOLTEXT		0x00470000L	// rmm3690: requests the column text for a SQL column (WPARAM=&DAMcolText, LPARAM=non-visual object instance *)
+#define ECM_DAM_NULLTEXT			0x00480000L	// rmm3690: requests the NULL text for this DAM (WPARAM=&strxxx)
+#define ECM_DAM_NOTNULLTEXT		0x00490000L	// rmm3690: requests the NOT NULL text for this DAM (WPARAM=&strxxx)
+#define ECM_SQLOBJECT_COPY		0x004a0000L // wParam is 0 (add to NV Chain), 1 (remove from NV Chain)
+#define ECM_CANSHOWSYSTEMFOCUS	0x004b0000L // return 1L if focus can be drawn around framehwnd of control // mpmOSX_FOCUS
+#define ECM_AUTOMATIONMSG			0x004c0000L
+#define ECM_START_EVAFTER			0x004d0000L	// rmm5369: sent when evAfter is about to be generated (web client only); return false in response to this message to stop the after occurring and stay in the current field
+#define ECM_END_EVAFTER				0x004e0000L	// rmm5369: sent when evAfter has been generated (web client only)
+#define ECM_DOCGEN_ALLPROPS		0x004f0000L	// rmm5389b: internal message used when generating Studio documentation
+#define ECM_IPHONE_MESSAGE		0x00500000L	// pkiphone4
+#define ECM_IPHONE_SAVECTRL		0x00510000L	// rmm_iphone4
+#define ECM_IPHONE_RSTRCTRL		0x00520000L	// rmm_iphone4
+#define ECM_IPHONE_OR_JAVASCRIPT_COMPFLAGS	0x00530000L	// rmm_iphone14: returns EXTIP_FLAG_... flags which indicate properties of an iPhone control // rmm_jsc: Renamed to include JavaScript controls
+#define ECM_IPHONE_COMPFLAGS ECM_IPHONE_OR_JAVASCRIPT_COMPFLAGS	// rmm_jsc: for backwards compatibility
+#define	ECM_FINDSTRINGS				0x00540000L	// rmm_loc5: used when searching resources (processed by WNDdefWindowProc)
+#define ECM_SYNCPAGECONTROL		0x00550000L	// rmm6734: sent to iPhone page control, to synchronize it with its linked paged pane
+#define ECM_IPHONESETIMAGE		0x00560000L	// rmm6928: set background picture image on the iPhone
+#define ECM_GET_JSHTML				0x00570000L	// rmm7082: get HTML for JavaScript client control, while executing class notation
+#define ECM_GET_JSMENUS				0x00580000L	// rmm7141: get the remote menus for the JavaScript control (must set EXTJS_FLAG_HASMENUS)
+#define ECM_AUTOSCROLLCHANGED	0x00590000L	// rmm7197: Sent to control when $autoscroll changes value
+#define ECM_GETOBJECTTYPE			0x005A0000L	// rmm8030: Internal message for Omnis X
+#define ECM_JSGETCONTROLNAME	0x005B0000L	// rmm8161: Internal message for Omnis X
+#define ECM_GETMULTIVALUEPROPS_DEFN 0x005C0000L	// rmm_oxie: Get the multi-value properties definition. WPARAM = EXTmultiValuePropsDefn * to receive entries
+#define ECM_HIDE_FROM_OMNISX	0x005D0000L	// rmm8250: Tells component to hide properties, methods, events not supported for Omnis X
+#define ECM_DATANAME_CHANGED	0x005E0000L	// rmm8278: Sent during design mode only to tell the control that the dataname property has been changed
+#define ECM_FMT_DEFAULTVALUE	0x005F0000L	// rmm8281: Allow control to set default value for a property (typically used for a new property added after the first version of the control has been released; only needed when the default value is for example non-zero for an integer, or non-empty for a string)
+#define ECM_IS_NATIVE_JS_COMP	0x00600000L // jmg0114: JS Native Components should return true to this message. (Causes them to be redrawn when the form's $defaultappearance changes)
+#define ECM_XCOMP_COMPFLAGS		0x00610000L	// rmm8441: returns EXTNW_FLAG_... flags for non-web components
+#define ECM_GETCURRENTLINE							0x00620000L	// rmm8675: Get the current line (for external component data bound to a list - see new ext comp data mode)
+#define ECM_GETSELECTIONANDCURRENTLINE	0x00630000L	// rmm8675: Get the list selection and the current line (for external component data bound to a list - see new ext comp data mode)
+#define ECM_GETDOUBLECLICKANUM 0x00640000L					// rmm9108: Get the anum edited by a double click on the external component in design mode (it must have a character value)
+#define ECM_DICTATION_GET_STRING		0x00650000L	// CR0416
+#define	ECM_DICTATION_UPDATE_STRING	0x00660000L	// CR0416
+#define ECM_TEMPCONTROLICONID				0x00670000L	// rmm9400: Sends the temporary icon id of the PNG control icon id to the control
+#define	ECM_RELOADJSONCONTROLS			0x00680000L	// rmm9400a: Tells jsControls to reload control definitions
+#define ECM_DICTATION_COMMAND_LIST	0x00690000L	// CR0490
+#define ECM_DICTATION_COMMAND				0x006A0000L	// CR0490
+#define ECM_ENABLEDEBUGLOGGING			0x006B0000L	// rmm9760: Sent to enable debug logging for the component
+
+#define ECM_LAST_MSG					0x006A0000L // Last external message // mpmPRI // rmm5369 // rmm5389b // rmm_loc5 // rmm6734 // rmm6928 // rmm7082 // rmm7141 // rmm7197 // rmm8030 // rmm8161 // rmm8250 // rmm8278 // jmg0114 // rmm8441 // rmm8675 // rmm9108 // CR0416 // rmm9400 // rmm9400a // CR0490
+
+// returns for ECM_HASPRIMARYDATACHANGED message // mpmTHINm
+#define ECMRET_NOTIMPLEMENTED		0		// default return value
+#define ECMRET_NOTCHANGED				1		// return this if the data has NOT been changed by user since the last ECM_GETPRIMARYDATA or ECM_SETPRIMARYDATA
+#define ECMRET_CHANGED					2		// return this if the data has been changed by user since the last ECM_GETPRIMARYDATA or ECM_SETPRIMARYDATA
+#define ECMRET_CURROWCHANGED		3		// return this if the primary data is a single selection list and the current row has changed since the last ECM_GETPRIMARYDATA or ECM_SETPRIMARYDATA
+#define ECMRET_ROWSELECTCHANGED	4		// return this if the primary data is a multiple selection list and the current row and list selection state has changed since the last ECM_GETPRIMARYDATA or ECM_SETPRIMARYDATA // MHHBOX
+#define ECMRET_CURROWSELECTCHANGED	5	// return this if the primary data is a multiple selection list and the current row and list selection state of the current row only has changed since the last ECM_GETPRIMARYDATA or ECM_SETPRIMARYDATA // MHHBOX
+
+// rmm_iphone12: wParam for ECM_IPHONE_MESSAGE
+#define IPHONE_RESIGNFIRSTRESPONDER	0
+#define IPHONE_BECOMEFIRSTRESPONDER	1
+
+/**************** wParam sub-messages ****************/
+// ECM_WPARAM_SUBMSG_MASK is the mask for WPARAM sub messages & should be used to mask off flags for ...
+#define ECM_WPARAM_SUBMSG_MASK 0x00FF			
+#define ECM_WPARAM_PROPBUTTON			0x0001	// Msg=ECM_SETPROPERTY - Property inspector button pressed
+#define ECM_WPARAM_BLOCKSAVE			0x0002	// Msg=ECM_OBJECTDATABLOCK - Object required to save to param1, rtn TRUE if processed OK!!
+#define ECM_WPARAM_BLOCKLOAD			0x0003	// Msg=ECM_OBJECTDATABLOCK - Object required to load from param1, rtn valued ignored
+#define ECM_WPARAM_WINDOWOBJ			0x0000	// Msg=ECM_OBJCONSTRUCT - Indicates external should create a window obj
+#define ECM_WPARAM_REPORTOBJ			0x0001	// Msg=ECM_OBJCONSTRUCT	- External should create a report obj (nb. hwnd passed will be 0!!)
+#define ECM_WPARAM_PICTNOSCALE		0x0001	// MSG=ECM_PRINT & fieldtype=cRepObjType_Picture. Bit will be set if no scale
+// ECM_WPARAM_FLAGS_MASK is the mask for the WPARAM flags
+#define ECM_WPARAM_FLAGS_MASK	 		0xFF00	// Mask for WPARAM flags
+#define ECM_WFLAG_NOHWND 					0x8000	// Msg=ALL - If this bit is set then HWND is a unique ID & not a valid HWND
+#define ECM_WFLAG_PRINTING				0x4000	// rmm6303 - If this flag is set, then ECM_PRINT is being sent during printing, as opposed to the painting of a background component
+
+#define ECM_WPARAM_OBJMSG					0x0000	// ECM_OBJCONSTRUCT/OBJDESTRUCT - Indicates $construct/$destruct call
+#define ECM_WPARAM_OBJINFO				0x0001	// ECM_OBJCONSTRUCT/OBJDESTRUCT - Indicates object is physically being created/deleted
+
+/**************** Return values ****************/
+#define DATA_CMPDATA_SAME								1	// Msg=ECM_CMPPRIMARYDATA - Data block is same   
+#define DATA_CMPDATA_DIFFER							2	// Msg=ECM_CMPPRIMARYDATA - Data block is different   
+#define FMT_CANASSIGN										0 // Msg=ECM_FMT_CANASSIGN - Indicates property is assignable
+#define FMT_NOCANASSIGN									1 // Msg=ECM_FMT_CANASSIGN - Indicates property is not assignable
+#define FMT_VALID												0 // Msg=ECM_FMT_GET/SETPROPERTY - Indicates property get/set was valid
+#define FMT_INVALID											1	// Msg=ECM_FMT_GET/SETPROPERTY - Indicates property get/set was invalid
+
+/**************** Standard control events ****************/
+#define ECE_CLICK												-5L
+#define ECE_DBLCLICK										-6L
+#define ECE_TABSELECTED									-43L				// rmm7101
+#define ECE_GRIDCELLCHANGED							-53L				// rmm7095
+#define ECE_OPENCONTEXTMENU							-58L				// rmm_rfmenu
+#define ECE_HDRCLICK										-68L				// rmm3500
+#define ECE_FORMTOTOP										-77L				// rmm3624
+#define ECE_SCREENORIENTATIONCHANGED		-89L				// rmm_mobile	
+#define ECE_EXECUTECONTEXTMENU					-90L				// rmm_rfmenu
+#define ECE_HLISTDISPLAYORDERCHANGED		-91L				// rmm6484
+#define ECE_SUBFORMTOTOP								-92L				// rmm_iphone24
+#define ECE_ANIMATIONSCOMPLETE					-93L				// rmm6710
+#define ECE_USERCHANGEDPAGE							-94L				// rmm6734
+#define ECE_LAYOUTCHANGED								-106L				// rmm8982
+
+#define ECE_DROP						-18L
+#define ECE_CANDROP					-51L
+#define ECE_WILLDROP				-50L
+#define ECE_DRAG						-13L
+#define ECE_DRAGFINISHED   	-83L
+
+/**************** Standard control methods/properties ****************/
+#define	ECF_CUSTOM						-1000L			// AE4084	- Unique property/function id for custom dialog
+#define	ECF_ABOUT							-1001L			// AE4084 - Unique property/function id for about box
+
+/************************** Data Info **************************/
+#define EXTC_FLAG_HASITEM					0x80		// rmm3582: Flag indicates that the parameter has good mItem and mVpt fields
+#define EXTC_FLAG_EXTDEL					0x40		// Flag to inform Omnis to call external to delete parameters(inc.non readonly memory) allocated by external
+#define EXTC_FLAG_KEEPTABLEINST		0x20		// rmm4315: Flag indicates that when a list is returned (using EXTC_FLAG_PARAMCHANGED) the original table instance must be kept
+#define EXTC_FLAG_SAVINGFIELD			0x08		// rmm_iphone22: Flag indicates a call to canassign when the field is being saved
+#define EXTC_FLAG_PARAMCHANGED 		0x04		// Flag to indicate function parameter data has been changed by external. Must be used with EXTD_FLAG_PARAMALTER
+#define EXTC_FLAG_DONOTDELPARM		0x02		// rmm_wsa: Flag to indicate that the parameter is not to be deleted (for internal use by Omnis)
+
+#define CMD_LIST_PARAMETER_NUM		 		255	// Parameter number which contains list to update $components after $componentcmd call
+																					// List is same format as should be returned from ECM_INSTALLLIBRARY
+
+/************************** Property Inspector Info **************************/
+// Data type flags (>=256) - stored in MS 3bytes in fft data type field
+#define EXTD_FLAG_ENUM 				0x00000100L		/* Flag to indicate external should build list for property inspector */
+#define EXTD_FLAG_BUTTON			0x00000200L		/* Flag to indicate property inspector to show button */
+#define EXTD_FLAG_EDITRONLY		0x00000400L		/* Flag to indicate property inspector data is readonly */
+#define EXTD_FLAG_RUNTIMEONLY 0x00000800L		/* Flag to indicate property is for runtime ONLY!! */
+#define EXTD_FLAG_PRIMEDATA		0x00001000L		/* Flag to indicate property is the primary databound(only 1 per control) */
+#define EXTD_FLAG_HIDDEN   		0x00002000L		// Flag to indicate property hidden in the property inspector. PK4523a
+#define EXTD_FLAG_PARAMOPT		0x00004000L		/* Flag to indicate function parameter is optional */
+#define EXTD_FLAG_SINGLESEL		0x00008000L   /* Flag to indicate that the property cannot be edited during multiple selection */
+#define EXTD_FLAG_STATEONLY		0x00010000L		/* True if property inspector should show a property state (ie "empty" or "not empty") */
+#define EXTD_FLAG_HELP				0x00020000L		/* True if entry has help (Omnis will provide a help button on dialog) AE4207 */
+#define EXTD_FLAG_EXTCONSTANT	0x00040000L		/* True if property is an external constant */
+#define EXTD_FLAG_INTCONSTANT	0x00080000L		/* True if property is an OMNIS internal constant(from DMCONST.HE) */
+#define EXTD_FLAG_FONTPROP		0x00100000L		/* True if property is an Omnis font (External rtn font indexes) */
+#define EXTD_FLAG_PARAMALTER	0x00200000L		/* True if function param can be altered by External. Set EXTC_FLAG_PARAMCHANGED if altered */
+#define EXTD_FLAG_FAR_SRCH		0x00400000L   // True if property can be inspected by find & replace
+#define EXTD_FLAG_SUPPRESS    0x00800000L   // True if property should be suppressed from property manager (used with anumXXX - anums.he)
+#define EXTD_FLAG_PWINDTYPE		0x0f000000L		// Nibble which contains the popup window type
+#define EXTD_FLAG_PWINDCOL		0x01000000L		// Color (Omnis will provide a popup color window)
+#define EXTD_FLAG_PWINDICON		0x02000000L		// OMNIS Icon (Omnis will provide a icon selection window)
+#define EXTD_FLAG_PWINDPAT		0x03000000L		/* Pattern (Omnis will provide a popup pattern window) */
+#define EXTD_FLAG_PWINDFSTYLE 0x04000000L		/* FontStyle (Omnis will provide a popup FontStyle window) */
+#define EXTD_FLAG_PWINDLSTYLE 0x05000000L		/* LineStyle (Omnis will provide a popup linestyle window) */
+#define EXTD_FLAG_PWINDMLINE	0x06000000L		/* Multiline box (Omnis will provide a multiline edit field) */
+#define EXTD_FLAG_PWINDSET		0x07000000L		/* Property is a set of constants */
+#define EXTD_FLAG_PWINDCOL256 0x08000000L   // AE4540 Color (as EXTD_FLAG_PWINDCOL but limited to 256 color wells)
+#define EXTD_FLAG_PWINDCURSOR 0x09000000L   // AE5038 Cursor
+#define EXTD_FLAG_PWINDCOLUMNS	0x0a000000L	// rmm5880: Comma-delimited columns
+#define EXTD_FLAG_PWINDFLDSTYLES	0x0b000000L	// rmm6357: Drop list of field styles
+#define EXTD_FLAG_PREMOTEMENUS		0x0c000000L	// rmm7141: Drop list of remote menu class names
+#define EXTD_FLAG_PHTMLCONTROLS		0x0d000000L	// rmm8675: Drop list of HTML control names
+#define EXTD_FLAG_PROW						0x0e000000L	// rmm8675: row editor
+#define EXTD_FLAG_PSENDMESSAGE		0x0f000000L	// rmm8675: NOT IMPLEMENTED YET - ALLOWS FOR EXTENSIONS TO THE EXTD_P... SERIES OF CONSTANTS BY SENDING A MESSAGE TO THE CONTROL
+#define	EXTD_FLAG_PROPGRP1		0xf0000000L		// Nibble to indicate which property group
+#define	EXTD_FLAG_PROPCUSTOM	0x00000000L		// Custom(default) group flag
+#define EXTD_FLAG_PROPGENERAL	0x10000000L		// General group
+#define	EXTD_FLAG_PROPDATA		0x20000000L		// data group flag
+#define	EXTD_FLAG_PROPAPP 		0x30000000L		// appearance group flag
+#define	EXTD_FLAG_PROPACT			0x40000000L		// action group flag
+#define	EXTD_FLAG_PROPPREFS 	0x50000000L		// prefs group flag
+#define	EXTD_FLAG_PROPTEXT		0x60000000L		// text group flag
+#define EXTD_FLAG_PROPPANE		0x70000000L		// Pane group
+#define EXTD_FLAG_SECTIONS		((qlong) 0x80000000L)		// Sections group // rmm8965
+#define EXTD_FLAG_PROPJAVA	  ((qlong) 0x90000000L)		// Java group MHnJava // rmm8965
+#define EXTD_FLAG_PROPCOLS		((qlong) 0xa0000000L)		// rmm7095: Columns group // rmm8965
+#define EXTD_FLAG_PROPACCESS	((qlong) 0xb0000000L)		// bjw0097: Accessibility group
+// Start rmm_rws8: object flags
+#define EXTD_OBJFLAG_SINGLE_NOTIFY	0x00000100L	// If true,a worker object using pushWorkerCallback can only have a single outstanding notification
+#define EXTD_OBJFLAG_WORKER					0x00000200L	// rmm8462: If true, this is a worker object
+// End rmm_rws8
+
+#define EXTD_EFLAG_REPFONT										0x00000001L		// mpm4426
+#define EXTD_EFLAG_MVDBUTTON									0x00000002L		// PK6266a
+#define EXTD_EFLAG_LISTDATEFORMATCUSTOM				0x00000004L		// rmm7563: anumPropList for this property lists $jsdateformatcustom
+#define EXTD_EFLAG_LISTNUMBERFORMAT						0x00000008L		// rmm7563: anumPropList for this property lists $jsnumberformat
+#define EXTD_EFLAG_ISDATANAME									0x00000010L		// rmm8135: This property needs to be treated like $dataname
+#define EXTD_EFLAG_NOEXPORT										0x00000020L		// rmm9123: This property is not to be exported e.g. because it is read-only
+#define EXTD_EFLAG_REPORT_MEASURE							0x00000040L		// rmm9123: This property is a report measurement: the dps are stored in enumStart
+#define EXTD_EFLAG_EXT_PROPERTIES_CRB					0x00000080L		// rmm9123: Set this for standard Omnis properties (defined in anums.he) which are handled by the component rather than using the Omnis core to handle the property
+#define EXTD_EFLAG_ENUM_CHAR									0x00000100L		// rmm9123: Set this for EXTD_FLAG_ENUM properties that have a character value
+#define EXTD_EFLAG_EXT_PROPERTIES_CRB_REPORT	0x00000200L		// rmm9123: Set this for standard Omnis properties (defined in anums.he) which are handled by the component (when used on a report class) rather than using the Omnis core to handle the property
+
+// AE6184 Flags for ECOmessageBox
+#define MSGBOX_OK    				0
+#define MSGBOX_YESNO 				1
+#define MSGBOX_NOYES 				2
+#define MSGBOXICON_OK  			3
+#define MSGBOXICON_YESNO 		4
+#define MSGBOXICON_NOYES  	5
+#define MSGBOXCANCEL_YESNO  6
+#define MSGBOXCANCEL_NOYES  7
+#define MSGBOXCANCEL_OK			8	// rmm8675
+
+// rmm4011: possible values for the pExecNow parameter of ECOsendEvent
+#define EEN_EXEC_LATER				qfalse
+#define	EEN_EXEC_IMMEDIATE		qtrue
+#define EEN_EXEC_PUSH					2
+// AE6567 Possible values for pExecNow parameter of ECOdoMethod
+#define DOMETHOD_EXEC_LATER			qfalse
+#define DOMETHOD_EXEC_IMMEDIATE	qtrue
+#define DOMETHOD_EXEC_QUEUE			2
+
+// Start rmm_iphone14: flags for iPhone controls - or'd together - used as the response to ECM_IPHONE_OR_JAVASCRIPT_COMPFLAGS
+// Start rmm_jsc: Renamed to include JavaScript.  Added defines for old names, for backwards compatibility
+#define EXTIPJS_FLAG_BEFORE_AND_AFTER															0x00000001		// The control generates before and after events
+#define EXTIPJS_FLAG_BACKCOLOR_AND_BACKALPHA											0x00000002		// The control has $backcolor and $backalpha properties - used to control property table contents
+#define	EXTIPJS_FLAG_EFFECT																				0x00000004		// The control has $effect - used to control applying $effect field style
+#define EXTIPJS_FLAG_NOENABLED																		0x00000008		// rmm_iphone18: The control does not have $enabled
+#define EXTIPJS_FLAG_TRANSPARENT_BACKGROUND												0x00000010		// rmm_iphone21: The control does not have $backcolor and $backalpha properties, and needs a transparent background (EXTIP_FLAG_BACKCOLOR_AND_BACKALPHA must not be set)
+#define EXTIP_FLAG_NEEDSLAYOUT_ON_RESIZE													0x00000020		// pkverticalslider // rmm_jsc: iPhone-only
+#define EXTJS_FLAG_HAS_DEFAULT_BORDER															0x00000040		// rmm_jsc: The JavaScript control can have $effect set to kJSborderDefault
+#define EXTIPJS_FLAG_NO_ERASE_BACKGROUND													0x00000080		// rmm7095: Disables automatic erase background processing for control
+#define EXTJS_FLAG_HASMENUS																				0x00000100		// rmm7141: The control has remote menus which need to be added to the context menu list sent to the client
+#define EXTJS_FLAG_NOTIFY_FLD_ENABLE															0x00000200		// CR0034: Send WM_FLD_ENABLED/WM_FLD_DISABLE
+#define EXTJS_FLAG_HAS_DISPLAY_FORMAT															0x00000400		// rmm7186: True if the control has $jsdateformat, $jsdateformatcustom and $jsnumberformat properties // rmm7563
+#define EXTIPJS_FLAG_BEFORE																				0x00000800		// rmm8295: The control generates before events
+#define EXTJS_FLAG_DRAG_EVENTS																		0x00001000		// rmm8700: True if the control has the events evDrag, evWillDrop and evDragFinished
+#define EXTJS_FLAG_BLACK_DESIGN_NAME															0x00002000		// rmm8991: True if the control wants design name etc to always draw in black
+#define	EXTJS_FLAG_ARIA_LABEL																			0x00004000		// bjw0059: True if the control has the $arialabel property
+#define	EXTJS_FLAG_ARIA_LABELLEDBY																0x00008000		// bjw0059: True if the control has the $arialabelledby property
+#define	EXTJS_FLAG_ARIA_DESCRIBEDBY																0x00010000		// bjw0059: True if the control has the $ariadescribedby property
+#define EXTJS_COPY_ENABLED_TO_ACTIVE_WHEN_CONVERTING_PRE_STUDIO10	0x00020000		// rmm9826: If true,the library converter copies $enabled to $active when converting a pre-Studio 10 library
+
+#define EXTIP_FLAG_BEFORE_AND_AFTER							EXTIPJS_FLAG_BEFORE_AND_AFTER
+#define EXTIP_FLAG_BACKCOLOR_AND_BACKALPHA			EXTIPJS_FLAG_BACKCOLOR_AND_BACKALPHA
+#define	EXTIP_FLAG_EFFECT												EXTIPJS_FLAG_EFFECT
+#define EXTIP_FLAG_NOENABLED										EXTIPJS_FLAG_NOENABLED
+#define EXTIP_FLAG_TRANSPARENT_BACKGROUND				EXTIPJS_FLAG_TRANSPARENT_BACKGROUND
+// End rmm_iphone14
+
+#define EXTNW_FLAG_NO_EFFECT										0x00000001		// rmm8441: If set, the control does not have $effect as a property
+#define EXTNW_FLAG_NO_MOUSEEVENTS								0x00000002		// rmm8675: If set, the control does not support $mouseevents or $rmouseevents
+#define EXTNW_FLAG_NO_KEYEVENTS									0x00000004		// rmm8675: If set, the control does not support $keyevents
+#define EXTNW_FLAG_DISABLE_DEFAULT_CONTEXT_MENU	0x00000008		// rmm8675: If set, the control supports disable default context menu
+#define EXTNW_FLAG_NOREDRAWONBEFORE							0x00000010		// rmm8675: If set, Omnis does not set the control data on evBefore - meaning that the application code must explicitly call $redraw()
+#define EXTNW_FLAG_NO_CURSOR										0x00000020		// rmm8675: If set, the control does not have $cursor as a property
+
+/************************** Object base class Info ****************************/
+#define OBJTYPE_MASK		0x3f
+#define OBJTYPE_REPORT  0x40
+#define OBJTYPE_WINDOW  0x80
+
+// MHn0163 begins
+// OSX Bundle definitions
+#define kXsocket 1
+#define kCoreGraphics 2
+#define kSystemConfigration 3 // MHn0367
+// MHn0163 ends
+
+#define METHOD_OVERRIDE_LEFTSYM				'{'			// AE6164 
+#define METHOD_OVERRIDE_RIGHTSYM			'}'			// AE6164 
+
+// rmm8675: Moved to here: Internal commands sent to component using ECM_XFCEVENT
+enum
+{
+	xfcAfter=116,
+	xfcBefore=117,
+	xfcWclick=120,
+	xfcWDown=135,
+	xfcFDown=138,
+	xfcDde=145,
+	xfcsetfocus=152,
+	xfckillfocus=153,
+	xfcdatachanged=156,
+	xfcgetfocushwnd=200,
+	xfcPostClick=300
+};
+
+// Window & report base types. Window & report types may be OR'd but they MUST be of same type!!
+#ifdef isOMNISCORE
+	const int 
+				cObjType_Basic = 1,									// Basic object type
+				cObjType_Picture = 2,								// Object derived from picture field
+				cObjType_List = 3,									// Derived from list field
+				cObjType_Button = 4,								// Derived from button field
+				cObjType_CheckBox = 5,							// Derived from checkbox field
+				cObjType_RadioButton = 6,						// Derived from radio button field
+				cObjType_DropList = 7,							// Derived from drop-list field -- mt40187
+				cObjType_IconArray = 8,							// Derived from icon-array field -- mt40300
+				cObjType_PriOutput = 9;							// Printing custom output // mpmPRIs
+#else
+	const int 
+				cObjType_Basic = OBJTYPE_WINDOW + 1,								// Basic object type
+				cObjType_Picture = OBJTYPE_WINDOW + 2,							// Object derived from picture field
+				cObjType_List = OBJTYPE_WINDOW + 3,									// Derived from list field
+				cObjType_Button = OBJTYPE_WINDOW + 4,								// Derived from button field
+				cObjType_CheckBox = OBJTYPE_WINDOW + 5,							// Derived from checkbox field
+				cObjType_RadioButton = OBJTYPE_WINDOW + 6,					// Derived from radio button field
+				cObjType_DropList = OBJTYPE_WINDOW + 7,							// Derived from drop list field
+				cObjType_IconArray = OBJTYPE_WINDOW + 8,						// Derived from icon array field
+				cRepObjType_Basic = OBJTYPE_REPORT + 1,							// Basic Report object type AE4212
+				cRepObjType_Picture = OBJTYPE_REPORT + 2;						// Picture report object AE4240
+#endif
+
+
+/**** External Component WM_CONTROL messages ****/ // mpmORFC moved here from fldextc.he
+				const int
+					GET_FLDINFO = 30000,
+					GET_FLDTYPE = 30001,
+					IS_IN_DESIGN = 30002,
+					GET_MENUHANDLE = 30003,
+					PICTURE_ERASEBKGROUND = 30004,
+					IS_FLD_EDITABLE = 30005,
+					SET_STATUSBAR_TEXT = 30006,
+					RESET_PROPERTY_FLAGS = 30008,		/* Reset property flags (lParam is PARAMINFO structure) */
+					UPDATE_PROPINSPECTOR = 30009,
+					LIST_SETLINEHEIGHT = 30010,
+					HAS_FOCUS = 30011,
+					IS_SETUP = 30012,
+					SET_PALETTE = 30013,		// mt40103
+					PICTURE_UPDSCROLLRANGE = 30015,
+					OMNIS_IN_BACKGROUND = 30016,
+					SET_TOOLGRPS_VISIBLE = 30017, 	// AE4448
+					SET_WINDOWS_VISIBLE = 30018,		// AE4448
+					DESKTOP_MENU_ENABLED = 30019,		// AE4448
+					GET_OMNIS_HPALETTE = 30020,			// Get OMNIS HPALETTE (Windows ONLY!)
+					SETNOERASEFORPICTURES = 30021,			// PK4530
+					IS_OMNIS_IN_BUILDMODE = 30022,		// PK4550
+					HIDE_TOOLTIP = 30023,		          // PK4550
+					IS_WINDOW_TOP = 30024,						// AE4535
+					RESET_METHOD_FLAGS = 30025,				// AE4537
+					IS_SELECTED = 30026,							// Returns true if selected
+					IS_MULTISELECTED = 30027,					// Returns true if multi-selected
+					IS_SHOWNUMBER = 30028,						// Returns true if design number is to be shown
+					DRAW_NUMBER = 30029,							// Draws the design number
+					DRAW_DESIGN_NAME = 30030,					// Draws the design name
+					DRAW_MULTIDESIGN_KNOBS = 30031,		// Draws the multidesign knobs
+					SET_EDITMENU = 30032,							// PK6044 force edit menu rebuild message
+					IS_SERIALISED = 30033,						// MHn0124 Test to see if component is serialised.
+					IS_REPORTDESIGN_FIELD = 30034,		// AE6135
+					GET_HILITE_INFO = 30035,					// rmm4487: get the hilite colours to use for the field; LPARAM is address of EXThiliteInfo structure
+					// rmm4487: Note: not available on web client
+					DRAW_THEMETABPANE = 30036,				// AE6246 Not available on web client
+					DRAW_SETPARENTERASE = 30037,			// AE6246
+					DRAW_NUMBER_ERASE = 30038,				// rmm4999: like DRAW_NUMBER, except the area in which the number is drawn is erased (and framed) first.
+					IS_TOPWND_MODAL = 30039,					// pknsapi4 - return true if topwnd is modal
+					MARK_FIELD_MODIFIED = 30040,			// rmm5629: mark the field as modified when in design mode
+					MENU_TRACKING_IN_PROGRESS = 30041,// rmm5700: return true if menu tracking is in progress
+					GET_UPARAM_VALUE = 30042,					// AE6744 Return uParam value
+					GET_PRINTER_DESTINATION = 30043,	// rmmcups: (Unix only) gets the printer destination associated with the dest params
+					GET_PRINTER_OPTIONS = 30044,			// rmmcups: (Unix only) gets the printer options from the dest params
+					FORCE_TOPWND_TOFRONT = 30045,			// rmm5929: Forces top window back to the top, for example after a standard alert has run on OSX
+					SCALE_VALUE_TO_DESIGN = 30046,		// rmm6029: Scale a value from current DPI to design DPI
+					DISABLE_DEBUGGER = 30047,					// rmm6313: disable debugger (typically because painting is about to occur): LPARAM = 1 to disable, 0 to re-enable 
+					GET_IS_LANDSCAPE = 30048,					// rmm_iphone28: returns Boolean: get orientation of remote form design window that is on top
+					GET_JSC_ICONID = 30049,						// pk_jsc_2
+					APPEND_JSC_OUTER_HTML = 30050,		// pk_jsc_2 // rmm7081
+					GET_JSC_MAKECOLOR = 30051,				// pk_jsc_2
+					GET_HTML_ID = 30052,							// rmm7075 // rmm7081
+					GET_JTT = 30053,									// rmm_pdf: Get justified text threshold for current locp
+					GDI_REPLACECOLORS = 30054,				// rmm_pdf: Internal message to replace colors
+					GET_OSXFONTINFO = 30055,					// rmm_pdf: Internal message to get font information when running on OSX
+					GET_PDF_INFO = 30056,							// rmm_pdf: Internal message to get server-stack specific information for PDF device
+					SET_PDF_INFO = 30057,							// rmm_pdf: Internal message to set server-stack specific information for PDF device
+					GET_OPDF_FOLDER = 30058,					// rmm_pdf: Internal message to get pathname of omnispdf folder
+					GET_TEMP_FOLDER = 30059,					// rmm_pdf: Internal message to get pathname of omnispdf/temp folder
+					GET_DEFAULT_POINTSIZE = 30060,		// rmm7649: Get point size to use when qfnt point size is zero
+					GET_PNG_DATA = 30061,							// rmm7942: Get the PNG data for an icon by icon id etc
+					GET_APP_FOR_PRINT_JOB = 30062,		// rmm7942: Return tqappfile * for specified print job
+					UPDATE_PROPINSPECTOREX = 30063,		// rmm8068: Internal message used to update multiple properties
+					GETOMNISX_INEXPORTCLASSTOXML = 30064,	// rmm8106: Returns true if currently exporting a class to XML in Omnis X
+					GET_TASK = 30065,									// rmm8114: Returns the current task (a 32 or 64 bit integer); if task is non-zero, * (qlong *) LPARAM receives the instance unq value for the task
+					GETOMNISX_INIMPORTCLASSFROMXML = 30066,	// rmm8128: Returns true if currently importing a class from XML in Omnis X
+					GET_INOMNISX = 30067,										// rmm8128: Returns true if running in the Omnis X IDE
+					GETOMNISX_INIMPORTOREXPORTXML = 30068,	// rmm8128: Returns true if importing or exporting class XML in Omnis X
+					STRIP_DATANAMES_PREFIX = 30069,					// rmm8278: Strip $datanames. from start of string.  LPARAM is a fldval * (qfldval) to the fldval containing the string to be checked and possibly modified
+					CONVERT_TO_UTF8 = 30070,								// rmm_rws: Internal message used to try and convert input to UTF-8.  LPARAM is a pointer to EXTutf8ConvertParams
+					DETACH_PRIPROC_FROM_PRINT_JOB = 30071,	// rmm8428: Called with lParam = PriProc ptr to detach a PriProc from a print job (typically because the window owning the object with PriProc is closing)
+					COCOA_SEND_MOUSE_EVENT_TO_HIT_TESTED_VIEW = 30072,	// rmm8675: COCOA only. lParam is the mouse message (e.g. WM_LBUTTONDOWN).  Called to dispatch the current mouse event for an HWND to its hit-tested child view (which is not an NSView component of one of our HWNDs)
+					COCOA_SEND_KEY_EVENT = 30073,												// rmm8675: COCOA only. lParam zero.  Called to dispatch the current key down event to either the menu system or directly to a child NSView of the HWND (where the child is not one of our HWNDs)
+					WINDOWS_MOUSEDOWN = 30074,													// rmm8675: Windows (not Linux) only. lParam is the mouse down message (e.g. WM_LBUTTONDOWN).  Called to generate evAfter for the current field when clicking on an external component.Returns non-zero if the click is to be discarded
+					WINDOWS_GETCONTAINERHWND = 30075,										// rmm8675: Windows (not Linux) only. Returns the Windows HWND representing the tqwnd containing the Omnis HWNDs
+					WINDOWS_KEYDOWN = 30076,														// rmm8675: Windows (not Linux) only. lParam is qkey *. If possible pass the key to the menu. Returns zero if the key was processed.
+					WINDOWS_ISVIRTCHAR = 30077,													// rmm8675: Windows (not Linux) only. Returns the Omnis virtual key code if lParam would generate an Omnis virtual key (or zero if not)
+					SET_FOCUS = 30078,																	// rmm8675: Generate evActon to set focus on top tqwnd
+					IS_RUNTIME = 30079,																	// rmm8675: Returns true if Omnis is serialised as a runtime (send this with HWND equal to zero)
+					GET_HTMLCONTROLS_FOLDER = 30080,										// rmm8675: Gets the htmlcontrols folder path (including a terminating path separator). lParam is fldval * to receive folder path
+					SET_EXTCOMPDATA_MECHANISM = 30081,									// rmm8675: Sets the data handling mechanism (default is all data). lParam is a value of eEXTcompData
+					SET_ROW_EDITOR_DESCRIPTIONS = 30082,								// rmm8675: Sets the column descriptions for the row editor
+					UD_SET_DATA = 30083,																// rmm8675: Calls udSetData for the control
+					ALLOW_DEFAULT_CONTEXT_MENU = 30084,									// rmm8675: Returns true if the default context menu is allowed for the control
+					SEND_TAB = 30085,																		// rmm8675: Send fcTab or fcShiftTab (lParam true for shift)
+					SET_DRAGBORDERUPDATE = 30086,												// rmm8752: Set component function to be called during drag border (lParam is address of function - void with no parameters)
+					DISABLE_TESTESC = 30087,														// rmm8862: Disable or enable testesc processing by the core (lParam != 0 means disable, lParam == 0 means enable; returns previous value)
+					REGISTER_FOR_INITDONE = 30088,											// rmm8970: Register for WM_FLD_INITDONE message
+					SEND_KEY_EVENTS = 30089,														// rmm8977: Send rather than push key events
+					KEY_EVENT_DISCARDED = 30090,												// rmm8977: Returns qtrue if key event was discarded when SEND_KEY_EVENTS is on
+					DISABLE_ICONSET_SCALING = 30091,										// CR0392:	Disable or enable icon set scaling by the core (lParam != 0 means disable, lParam == 0 means enable; returns previous value)
+					GET_FONT_DPI = 30092,																// rmm9347: Get the DPI with which fonts are to be created (returns zero unless the control is on a report design window)
+					DISABLE_TABLE_INSTANCE_COPYING = 30093,							// rmm9532: Disable or enable table instance copying when lists are copied (lParam != 0 means disable, lParam ==0 means enable; returns previous value)
+					COCOA_NO_DEFAULT_MOUSEUP = 30094,										// rmm9640a: Cocoa only. Set the no default mouse up flag for the HWND (this means we do not just call sendEvent for mouse up events before our own event processing)
+					GET_NODE_PATHS = 30095,															// rmm_jsw: GFet node.js paths
+					PRINT_WITH_DEFAULT_COLORS = 30096;									// rmm9887: Tell print job (LPARAM) to print with default colors, rather than $appearance settings
+
+const int anumUPDATEVIAMOUSE = -100000;		// rmm7847: Special value passed to ECOupdatePropInsp to inform Omnis that the update is as a result of user interaction with the mouse (this will result in a full property inspector update) - this is a safe value to use as internal anums do not exceed 2000
+
+#ifndef ismobile	// rmm_mobile: avoid packing on mobile devices as alignment issues cause crashes
+	GCC_SET_BYTE_PACKING_ON // MHMACH
+	#pragma	 SET_BYTE_PACKING_ON
+#endif
+
+#ifdef isunix
+	// rmmcups: structure for GET_PRINTER_DESTINATION LPARAM
+	struct PRIjobStruct;
+	class str255;
+	struct customDevicePrinterDestination
+	{
+		PRIjobStruct				*mJob;							// Passed by caller
+		str255							*mPrinterName;			// String object passed by caller; contents overwritten by the code processing the message
+	};
+
+	// rmmcups: structure for GET_PRINTER_OPTIONS LPARAM
+	struct fldval;
+	typedef fldval*	qfldval;
+	struct customDeviceOptions
+	{
+		PRIjobStruct				*mJob;							// Passed by caller
+		qfldval							mOptionsFval;				// fldval object passed by caller; contents overwritten by the code processing the message
+	};
+#endif
+
+// rmm6029: Structure for scaling a value from current DPI to design
+struct GDIscaleValueStruct
+{
+	qapp			mApp;
+	qshort		mValue;
+};
+
+// structure for ECM_ADDTOPRINTJOB message passed in lParam // mpmPRI
+struct PRIobjectStruct;
+struct printInfo
+{
+	void*							mJob;
+	PRIobjectStruct*	mObj;
+};
+
+// Structure for ECM_OBJECT_COPY message passed in lParam
+struct objCopyInfo
+{
+	LPARAM						mSourceObject;
+	LPARAM						mDestinationObject;
+};
+
+#ifndef isTABINST	// rmm3690
+
+// Structure used to pass data for external functions & notation
+struct tag_EXTParamInfo
+{
+	// rmm64bitux: Changed long to int
+	int 							mId;				// Parameter id (either notation id or function id) 0=Group member
+	int 							mInfo;			// Data type of parameter (nft_xxx types used) & EXTD_FLAGs
+	void*							mData;			/* Parameter data pointer */
+	int								mParent;		/* Parent id for notation purposes */
+	unsigned char			mNum;				// Parameter number (0=rtnval,1=param 1...), EXTNOTATION if not a parameter
+	char							mFlags;			/* Parameters flags of type EXTC_FLAG_ */
+	tag_EXTParamInfo* mNext;			// Pointer to tag_EXTParamInfo structure of next parameter
+	void							*mItem;			// rmm3582: tqitemref to allow callback to get fnxn information
+	void							*mVpt;			// rmm3582: valpasstype to allow callback to get fnxn information
+#ifdef isOMNISCORE
+	tag_EXTParamInfo();
+#endif
+};
+
+#else	// rmm3690
+
+struct tag_EXTParamInfo;
+
+#endif	// rmm3690: #ifndef isTABINST
+typedef struct tag_EXTParamInfo EXTParamInfo;
+
+// rmm3618:
+#if !defined(isRCCLIB) && !defined(isEXECLIB)
+struct EXTparamTypeInfo
+{
+	qshort					mType;				// One of the ffttype enum values
+	qshort					mSubType;
+	qlong						mLength;
+	str255					mName;
+};
+
+// rmm8675:
+struct EXToptionDefn : public EXTparamTypeInfo
+{
+	EXToptionDefn() { mType = mSubType = 0; mLength = 0; }
+};
+#endif
+
+// Data structure ALWAYS passed to external component
+struct locptype; // mpm4425
+class tORFCinst;
+class tORFCform;
+class tORFCobj;
+
+typedef struct EXTCompInfo EXTCompInfo;
+
+#ifndef isOMNISCORE
+
+#if defined(ismobile) && defined(ismacosx)	// pkiphone
+	#define EXTHANDLE int
+	#define EXTADDR int
+#else
+
+// POKMACCLIENT
+	#if defined(ismac) && defined(isRCCLIB)		// PK4937
+	 #define	EXTHANDLE								CFragConnectionID
+	 #ifdef isCOCOA	// CR0149
+		#define EXTADDR CProcPtr
+	 #elif defined(iscarbon)
+		#define EXTADDR ProcPtr
+	 #else
+		#define EXTADDR UniversalProcPtr
+	 #endif
+	#else
+		#define EXTHANDLE HINSTANCE
+		#define EXTADDR FARPROC
+	#endif
+#endif
+#endif
+
+struct EXTCompInfo
+{
+	qlong							mCompLibId;			// Externals Identifier of component library (used for object handlers)	// rmm64bitux
+	qlong							mCompId;				// Externals Identifier of component within the library	// rmm64bitux
+	void* 						mGdata;					// Externals global data (managed only by external)
+	EXTHANDLE					mOmnisInstance;	// AE4084 - Omnis instance handle
+	tag_EXTParamInfo*	mParamFirst; 		// pointer to first parameter for call/returned data
+	void*							mPrivate;				// Private Omnis pointer
+  EXTADDR           mECOCallBack;   // ECO callback + old callback(index 0)
+  EXTADDR           mGDICallBack;   // GDI   Callbacks
+  EXTADDR           mHWNDCallBack;  // HWND  Callbacks
+	EXTADDR  					mFVALCallBack;	// FVAL  Callbacks
+	EXTADDR						mQLISTCallBack;	// QLIST Callbacks
+	EXTADDR						mBMPCallBack;		// BMP Callbacks
+	EXTADDR						mCRBCallBack;		// CRB Callbacks // mpmPRIs
+	EXTADDR						mPRICallBack;		// Print manager Callbacks // mpmPRIs
+	EXTADDR						mQFILECallBack;	// qfile manager Callbacks // mt40408
+	locptype*					mLocLocp;				// calling locp //mpm4425
+	locptype*					mInstLocp;			// locp of object instance //mpm4425
+	EXTADDR						mDAMCallBack;		// DAM Callbacks // rmm3542
+	EXTADDR						mJPICallBack;		// JPI Callbacks // MHJCORE
+	EXTADDR						mWSCCallBack;		// WSC Callbacks // jc0048
+
+#ifdef isOMNISCORE
+	EXTCompInfo(EXTCompItem* complib, locptype* pLocLocp, locptype* pInstLocp, qlong compctrlid=-1); //mpm4425	// rmm64bit1
+	EXTCompInfo(EXTCompInfo *pSrc);	// rmm8114
+	~EXTCompInfo();
+	EXTParamInfo *pushFldVal(locptype pLocp,qint1 pParamid,fldval* pFval,void *pItem = 0,void *pVpt = 0);		// rmm3582 // rmm5057: return EXTParamInfo *
+	qbool popFldVal(locptype pLocp,qint1 pParamid,fldval& pFval);
+	tag_EXTParamInfo* findParam(qint1 pParamid);
+#endif
+#if defined(isRCCLIB) && !defined(isRCC) || ( defined(ismacosx) && defined(ismobile))	// pkiPhone
+	EXTCompInfo( EXTHANDLE pOmnisHandle = 0, tORFCform* pORFCform = 0, tORFCobj* pORFCobj = 0, long pCtrlNum = -1 );
+	~EXTCompInfo();
+#endif
+};
+
+#ifdef isOMNISCORE
+	struct EXTqlist				// AE4441
+	{
+		qlongptr mData;				// Pointer to qlist	// rmm64bit2
+	};
+#else
+	class EXTqlist;
+#endif
+
+// Draw single line info
+#if defined(ismacosx) && defined(ismobile) // pkiphone
+	// Nothing implemented for iPhone as yet
+#else
+struct EXTListLineInfo
+{
+	HDC 			mHdc;
+	qrect 		mLineRect;
+	qlong 		mLine;
+	qbool			mSelected;
+	EXTqlist*	mListPtr;			// AE4441
+	qbool			mDrawFocusRect;
+
+#ifdef isOMNISCORE
+	EXTListLineInfo(HDC pHdc,qrect* pLineRect,qlong pLine,qbool pSelected,lsttype* pListPtr,qbool pDrawFocusRect);
+	~EXTListLineInfo();	 // AE4441
+#endif
+};
+
+// Draw Icon Entry info
+struct EXTIconArrayInfo
+{
+	HDC 			mHdc;
+	qlong 		mLine;
+	qrect 		mEntryRect;
+	qrect 		mDrawRect;
+	qbool			mDrawFocus;
+	qbool			mSelected;
+	qbool			mDragging;
+	qbool			mSmallIcons;
+	EXTqlist*	mListPtr;
+	
+#ifdef isOMNISCORE
+	EXTIconArrayInfo(HDC pHdc,qlong pLine,qrect* pEntryRect,qrect *pDrawRect,qbool pDrawFocus,qbool pSelected,qbool pDragging,qbool pSmallIcons, lsttype* pListPtr);
+	~EXTIconArrayInfo();
+#endif
+};
+#endif	 // pkiphone
+
+
+typedef struct ECOproperty ECOproperty;
+struct ECOproperty
+{ 
+	qlong 						mPropID;
+	qlong 						mNameResID;
+	qlong 						mDataType;
+	qlong 						mFlags;
+	qlong 						mExFlags;
+	qlong 						mEnumStart;
+	qlong 						mEnumEnd;
+};
+
+typedef struct ECOparam ECOparam;
+struct ECOparam
+{
+	qlong							mNameResID;
+	qlong							mDataType;
+	qlong							mFlags;
+	// rmm8939: Renamed unused mExFlags to mConstRange: 
+	// Range of constants that can be used with parameter: MAKELONG(start,end) where start and end are either both external component
+	// constant resource numbers, or both internal constant ids, with the constant EXT_BUILTIN or'd in.
+	// e.g. MAKELONG(20053,20067) 
+	//				or 
+	//			EXT_BUILTIN | MAKELONG(preTabsecF, preTabsecL)
+	qlong							mConstRange;
+};
+const qshort cSpecialConstRangeJsonEncodings = 32000;	// rmm8939: Special values for mConstRange - EXT_BUILTIN|MAKELONG(special,special) results in a specific list of constants
+#define EXT_BUILTIN ((qlong)0x80000000) // rmm8939
+
+typedef struct ECOmethodEvent ECOmethodEvent;
+struct ECOmethodEvent
+{
+	qlong							mId;
+	qlong							mNameResID;
+	qlong							mReturnDataType;	// Return data type (0=VOID,fftNone=Variant)
+	qlong							mParameterCount;
+	ECOparam* 				mParameters;
+	qlong							mFlags;
+	qlong							mExFlags;
+};
+typedef ECOmethodEvent ECOfuncEvent; // BUG in Documentation: Maintained for backwards comp.
+
+struct ECOobject
+{
+	qlong							mObjectID;			// Components' ID for the object
+	qlong							mNameResID;			// Objects' name resource id
+	qlong							mFlags;					// Flags
+	qlong							mGroupResID;		// Objects' group resource id (may be 0 for default)
+};
+
+// MHn0111 begins
+#ifdef isRCCLIB
+typedef struct ECOobjProp ECOobjProp;
+struct ECOobjProp
+{
+	qshort mFntIndex;
+	qshort mFntSize;
+	qsty mFntStyle;
+	qjst mFntJst;
+	qlong mStyleIndex;
+	qcol mForeColor;
+	qcol mBackColor;
+	qpat mPattern;
+	qcol mTextColor;
+	qchar mLibName[30];
+	qchar mCtrlName[30];
+	qbool mActive;
+	qbool mVisible;
+	qbool mEnable; 
+  qlong mBorderStyle;
+};
+#endif
+// MHn0111 ends.
+
+/**************************************************************************/
+
+struct tag_EXTNVCobjectInfo
+{
+	LPARAM	mInstPtr;
+	void*	mObjPointer;					// The objects data
+	tag_EXTNVCobjectInfo* 	mNext;	// Pointer to next object
+};
+typedef struct tag_EXTNVCobjectInfo EXTNVCobjectInfo;
+struct tag_EXTNVCinstances
+{
+	HINSTANCE mOmnisInstance;		// The instance 
+	tag_EXTNVCobjectInfo* mFirst;	// Pointer to first object 
+
+	tag_EXTNVCinstances* mNext;		// The next instance 
+};
+typedef struct tag_EXTNVCinstances EXTNVCinstances;
+
+struct tag_EXTobjectInfo
+{
+	HWND	mObjHwnd;							// The objects HWND
+	void*	mObjPointer;					// The objects data
+	tag_EXTobjectInfo* 	mNext;	// Pointer to next object
+};
+typedef struct tag_EXTobjectInfo EXTobjectInfo;
+struct tag_EXTinstances
+{
+	HINSTANCE mOmnisInstance;		// The instance 
+	tag_EXTobjectInfo* mFirst;	// Pointer to first object 
+
+	tag_EXTinstances* mNext;		// The next instance 
+};
+typedef struct tag_EXTinstances EXTinstances;
+extern EXTinstances* gEXTinstanceChain; // Global chain of instance & object pointers 
+extern EXTNVCinstances* gEXTobjectChain; // Global chain of object instances'
+
+// MHn0124 begins
+#if !defined(isRCCLIB) && !defined(isEXECLIB)
+
+// pk_jsc_2
+struct tag_EXTjavaScripColor
+{
+	qcol	mColor;				// rmm_xc45: was qlong
+	qlong	mAlpha;				// rmm7058: set to -1 when there is no alpha component
+	str80 mColorStr;		// rmm7058: was str15
+};
+typedef struct tag_EXTjavaScripColor EXTjavaScripColor;
+
+// pk_jsc_2
+struct tag_EXTjavaScripIcon
+{
+	qlong mIconID;
+	qlong mIconStyle;
+	str255 mIconStr;
+};
+typedef struct tag_EXTjavaScripIcon EXTjavaScripIcon;
+
+// Start rmm7082
+struct tag_EXTjavaScriptOuterHtml
+{
+	// IMPORTANT: 
+	// please add new members to the end of the structure
+	// and increment the version number in the constructor
+	// code added in tqfld::jsAppendOuterHtml must be protected
+	// by a check for the new version number
+	
+	qlong			mVersion;				// structure version number // mpm_cmenu
+	str255		mCtrlName;
+	qbool			mCtrlHasDataName;
+	qbool			mCtrlHasEvents;
+	qbool			mEventsAreMask;	// If true, mEvents is a qlong mask of events stored in mEventMask
+	qbool			mEnabled;
+	qbool			mVisible; // mpm_jsc_vis
+	qbool			mAdjustWidthHeightForBorder;	// If true, appending outer HTML adjusts width and height by the border width
+	
+	str80			mFldStyle;
+	qlong			mOrder;
+	qlong			mIdent;
+	qlong			mObjLink;
+	str255		mName;
+	str255		mDataName;
+	str255		mTooltip;
+	str255		mContextMenu;	// name of the conetxt menu for that control // mpm_cmenu
+	qfldval		mEvents;			// Significant if mCtrlHasEvents && !mEventsAreMask
+	qlong			mEventMask;		// Significant if mCtrlHasEvents && mEventsAreMask
+	qlong			mSpare1;			// rmm7138: Floating mask for runtime screen-size floating // rmm7261: Unused field (was mFloatMask)
+	
+	qfldval		mHtml;
+
+	qdim			mWidth;		// Returned
+	qdim			mHeight;	// Returned
+	
+	qbool			mHasJSDisplayFormat;	// rmm7186: If true the control supports $jsdateformat, $jsdateformatcustom and $jsnumberformat
+	qlong			mPageSize; // jmg0274: List pager page size.
+	qbool			mAriaLabel; // bjw0059
+	qbool			mAriaLabelledby; // bjw0059
+	qbool			mAriaDescribedby; // bjw0059
+	qbool			mActive; // dmw0135
+	
+	tag_EXTjavaScriptOuterHtml() { mVersion = 6; mSpare1 = 0; mActive = qtrue; } // rmm7186 // rmm7261 // jmg0274 // bjw0059 // dmw0135
+	~tag_EXTjavaScriptOuterHtml() {}
+};
+typedef struct tag_EXTjavaScriptOuterHtml EXTjavaScriptOuterHtml;
+
+struct tag_EXTjavaScriptGenerateId
+{
+	str255		mSuffix;	// id also returned here
+	qlong			mIdent;
+	HWND			mHwnd;
+};
+typedef struct tag_EXTjavaScriptGenerateId EXTjavaScriptGenerateId;
+// End rmm7082
+
+struct tag_EXTserialise
+{
+	str255 mProductCode;
+	str255 mFunctionCode;
+	str255 mSerial;
+	str255 mNotes;
+};
+typedef struct tag_EXTserialise EXTserialise;
+
+// Start rmm4487: receives hilite info for field (not available on Web client)
+struct EXThiliteInfo
+{
+	qcol	mHiliteColor;				// Use this rather than GDI_COLOR_HIGHLIGHT
+	qcol	mHiliteTextColor;		// Use this rather than GDI_COLOR_HIGHLIGHTTEXT
+};
+// End rmm4487
+
+// Start rmm7990
+struct EXTpngData
+{
+	qlong			mIconID;
+	qlongptr	mApp;	
+	int				mSize;
+	int				mPicMode;
+	qfldval		mPNGdata;
+};
+// End rmm7990
+
+#endif
+// MHn0124 ends
+
+// Start rmm_oxie: Moved from wccsuper
+const qlong EXT_NOT_SPECIFIED = -1;
+// Structure representing a property with multiple values stored in a list
+struct EXTmultiValueProperty
+{
+	qshort	mPropId;			// External component property id of property
+	qshort	mColumn;			// Column number in list storing the values of multiple-value properties
+	qshort	mFft;					// fft of data for property
+	qlong		mMinIntValue;	// Min value for fftInteger (EXT_NOT_SPECIFIED if no range is specified)
+	qlong		mMaxIntValue;	// Max value for fftInteger (EXT_NOT_SPECIFIED if no range is specified)
+};
+
+// Structure passed to ECM_GETMULTIVALUEPROPS_DEFN
+struct EXTmultiValuePropsDefn
+{
+	qshort								mListPropId;				// Prop id of list property containing values
+	qshort								mSelectedPropId;		// Current or selected property prop id
+	qshort								mPropertyCount;			// Count of multi-value properties
+	EXTmultiValueProperty	*mProperties;				// The multi-value properties
+
+	EXTmultiValuePropsDefn() { clear(); } // rmm9519
+	void clear() { mListPropId = mSelectedPropId = 0; mPropertyCount = 0; mProperties = 0; }	// rmm9519
+};
+// End rmm_oxie
+
+// Start CR0416
+struct EXTDictationData
+{
+	qHandle mText;			// a handle storing the dictation text.
+	qlong		mSelStart;	// the start of the selection in the text being updated by dictation.
+	qlong		mSelEnd;		// the end of the selection in the text being updated by dictation.
+};
+// End CR0416
+
+// Start rmm_rws
+#if !defined(isRCCLIB) && !defined(isEXECLIB)
+	struct EXTutf8ConvertParams
+	{
+		qfldval			mInput;
+		qfldval			mOutput;
+	};
+#endif
+// End rmm_rws
+
+// Start rmm_jsw
+#if !defined(isRCCLIB) && !defined(isEXECLIB)
+	struct EXTnodePathParams
+	{
+		EXTnodePathParams(qfldval pNodeJsPath, qfldval pScriptPath, rstrno pScriptResource = 0)
+		{
+			mNodeJsPath = pNodeJsPath;
+			mScriptPath = pScriptPath;
+			mScriptResource = pScriptResource;
+		}
+		rstrno			mScriptResource;
+		qfldval			mNodeJsPath;
+		qfldval			mScriptPath;
+	};
+#endif
+// End rmm_jsw
+
+#ifndef ismobile	// rmm_mobile
+	GCC_SET_BYTE_PACKING_OFF // MHMACH
+	#pragma	 SET_BYTE_PACKING_OFF
+#endif
+
+// Start rmm_rwslog: Log proc messages
+const UINT	LOG_MSG_OPEN_LOG = 1,		// Open log: pLogData1 = lsttype * (config row), pLogData2 = (str255 *) Omnis data folder path.Returns true or false - true if log was opened successfully
+						LOG_MSG_CLOSE_LOG = 2,	// Close log
+						LOG_MSG_LOG = 3,				// Log data: pLogData1 = (const char *) log data, pLogData2 = (qlong) log data length, pLogData3 = (char *) log date time if this is the start of a new log record (%Y%m%d %H:%M:%S)
+						LOG_MSG_FLUSH = 4;			// Flush log (useful for file logs - only called for log record type eLogRecordSeqnLog)
+#ifdef iswin32
+	typedef LRESULT (WINAPI *OMNIS_LOGPROC)(UINT pMessage, void *pLogData1, void *pLogData2, void *pLogData3);
+#else
+	typedef LRESULT (*OMNIS_LOGPROC)(UINT pMessage, void *pLogData1, void *pLogData2, void *pLogData3);
+#endif
+// End rmm_rwslog
+
+// rmm8675: Indicates how the control handles data.  Passed to the core using the message SET_EXTCOMPDATA_MECHANISM
+enum eEXTcompData
+{
+	eEXTCompDataAllData = 0,				// Must always get and set all the data
+	eEXTCompDataMultipleSelect = 1,	// If the data is a list, only need to get selection and current line, since the control does not modify the list data (treated as eEXTCompDataHandlingAllData if data is not a list)
+	eEXTCompDataSingleSelect = 2		// If the data is a list, only need to current line, since the control does not modify the list data (treated as eEXTCompDataHandlingAllData if data is not a list)
+};
+
+// rmm9440: Used to select a converter for ECOtoUchar or ECOfromUchar
+enum ECOconverter
+{
+	eECOconverterUTF7 = 0,
+	eECOconverterIMAPmailBoxName = 1,
+	eECOconverterQchar = 2
+};
+
+#endif
+// End of file

@@ -1,0 +1,1053 @@
+/* $Header: svn://svn.omnis.net/trunk/Studio/O7EXE/INDY/callid.he 21615 2018-11-23 11:30:09Z bmitchell $ */
+
+//Q4 callid.he
+// external callback Id
+//Copyright (C) Raining Data Corp 2001
+
+/**************** Changes ******************
+Date			Edit				Bug					Description
+21-Nov-18	rmm_jsw									OW3 component - JavaScript Worker.
+12-Apr-18 pkcocoa_1194						Studio9 alpha extras
+12-Jan-18 pkcocoa_1179						Per pixel alpha supporting windows
+04-Sep-17	rmm9474									Removed csettype and hptrlock (many changes, not marked).
+28-Jul-17	rmm9440									OW3 component - IMAP Worker.
+25-Apr-17	rmm9347			ST/RC/1261	Added zoom capability to report class editor.
+19-Apr-17	rmm9333			ST/EC/1446	Added static methods: $listtoarrayarray and $arrayarraytolist.
+20-Feb-17	CR0424			ST/EC/1447	Need callback for WNDwindowFromDC on Cocoa.
+14-Feb-17	rmmheadless							Support for headless Omnis server. 
+16-Jan-17	rmm9199									Studio 9.0 HWND alpha support�- excluded via conditional compilation for Studio 8.1.x.
+30-Aug-16	rmm9025			ST/NV/059		Added support for long pathnames to FileOps and to core qfile.
+19-Aug-16	rmm9010			ST/EC/1416	Added support for large files (files with a size > maximum signed 32 bit integer).
+09-Jun-16	rmm8933			ST/WO/2367	If configured to to so,redirect obrowser JavaScript console log messages to the Omnis trace log.
+11-Apr-16	rmm8849									Cocoa printing issues.
+29-Jan-16	rmm8733			ST/FU/664		Added static methods: $listtoobjectarray and $objectarraytolist.
+28-Oct-15	rmm8675			ST/EC/1384	Initial implementation of obrowser xcomp.
+01-Jun-15	rmmhdpi									High DPI support for Windows.
+05-May-15	CR0213									Make GDIgetBitmapBounds a callback on Cocoa.
+29-Apr-15	rmm_dep									Replaced some calls to Cocoa deprecated functions.
+03-Mar-15	rmm8513			ST/EC/1357	Added CRBgetLong64 and CRBsetLong64.
+01-Dec-14	rmm8465									SMTP worker.
+04-Nov-14	rmm8451									Navigation menu control - JavaScript implementation.
+21-Oct-14	rmm8448									Memory leaks.
+02-Jun-14	jmg0113									JS Native Display Shortcuts/Comp Store menu options
+23-May-14	rmm8336			ST/WS/228		Added option to always reset Java class cache at startup.
+21-May-14	CRHIRES2								High resolution support. GDI device scale callbacks.
+20-May-14	rmm8328			ST/RC/1191	Text width in report list fields did not take styled text into account.
+07-May-14	CRCOCOA3								More Cocoa callback work.
+15-Apr-14	CRHIRES									High resolution support.
+11-Apr-14	rmm_rwslog							Logging (added as part of RESTful web services)
+10-Feb-14	rmm_rws									RESTful Web Services support.
+01-Oct-13	rmm8114			ST/EC/1333	Completion event for PDF reports; sorted out command sequencing for remote tasks in multi-threaded server.
+21-Aug-13	CRCOCOA									Cocoa target.
+03-Jun-13	rmm7990			ST/RC/1175	Added PDF device support for styled text icons.
+14-Jan-13 gra0866                 Added callback for WNDgetMainHWnd      
+11-Jan-13 gra0866                 Added callback for ECOdoMethodWait
+21-Nov-12	rmm7722									64 bit integer calls added to EXTfldval.
+11-Jul-12	gra0858									Added DAMgetThreadLocalStorage
+05-Jan-12	gra0838									Added DAMreleasePoolRef
+21-Jul-11 mpmBordRad3							Removed WNDpaintBorderEx (now using WNDpaintBorder)
+08-Jul-11 mpmPopMenu2							Implements popup menus
+08-Apr-11	rmm7101									JS tab strip component - design mode edge float.
+09-Feb-11	gra0778			ST/*A/082		Added callback to return Omnis separators
+25-Nov-10	rmm7002			ST/WS/151		Web services issue caused by uprCmp problem.
+15-Apr-10	rmm_oe									Omnis Eclipse changes.
+24-Mar-10	gra0703			ST/DC/459		Missing documentation
+22-Jan-10	jc0048									Support for Web Service clients to be generated in a runtime.
+15-Dec-09	rmm6812			ST/EC/1224	Added callback for GDIsetAlphaLevel.
+10-Dec-09 pkmacalpha							ECOclipboardGetPictureEx added
+17-Aug-09	rmm6736									Multi-line text class for GDI: implemented in chrbasic.cpp.
+27-Jul-09	rmm6672			ST/BE/463		Problems with list line highlighting in Classic mode XP/Vista external components.
+15-Jun-09	rmm_nc									New controls and supporting APIs.
+15-Jun-09	jc0026									Added JPIcallServiceMethod callback
+12-Jun-09	jc0025									Added addcolex, setcol callbacks
+03-Jun-09	rmm_loc5								String table editor integrated with catalog.
+26-May-09	rmm_loc4								Studio 5.0 localisation: C++ resource translation.
+07-Feb-08	gra0509			ST/*P/009		Added callback to return local IP address
+11-Sep-07	rmm6233			ST/WO/2020	Fixed crash caused by posted events remaining on event queue after HWND was destroyed.
+06-Jul-07	rmm6147									Vista UAC changes - separate install directory for directories containing writeable files.
+14-Jun-07	rmm6098			ST/WO/2011	Problems drawing JPEGs in complex grid.
+22-Mar-07	rmm6000									Windows Vista changes.
+26-Apr-06	ijtjperf		ST/EC/966		Improved performance of Known Java Object Arrays
+30-Jan-06	AE6647			ST/EC/951 	Added	PRIgetParmStruct callback
+28-Nov-05	rmm_wsk									Web Services server - wizard to create a client.
+03-Nov-05	rmm_wsg									Define web service method list and row parameters to have a table instance if required.
+18-May-05 MHnJava     ST/PF/337   Implemented Advanced Properties for Java
+06-Jan-05	gra0235			ST/*A/043		Enable V3 DAMs access to schema info
+20-Dec-04	AE6551			ST/HI/1423: Sped up #EXTCOMP dialog, moved automation to root & added ECOreloadLibData
+08-Oct-04 MHn0408			ST/EC/859		Added static method support to Java Objects
+17-Sep-04	AE6515									External constant support
+25-May-04 MHn0368			ST/GS/123		Fixed issue with GDIoffscreenpaintbegin callback on OS9
+14-May-04	rmm4933									Added GDIcgContextFlush callback.
+17-Dec-03	rmmuni_fnt2							Mac OSX Unicode Port: more changes to support Unicode fonts and ATSUI.
+08-Dec-03	AE6379									Added GDImakeHilited
+17-Nov-03	pkisalpha2							alpha icons
+28-Oct-03 ijt218			ST/NV/037		Added callback to core versions of convertHFStoPosix and convertPosixToHFS.
+10-Oct-03	rmm4763									ICU 2.6 for Unicode version.
+06-Aug-03 pkalpha									OSX alpha changes.
+11-Jun-03 MHn0237									OSX alpha changes.
+15-May-03	rmm4487									Windows platform list highlighting now uses a different colour when the field does not have the focus.
+																	Added $oldlisthiliting preference to disable the new behaviour if desired
+30-Apr-03	AE6231									Added GDIdrawAlphaBitmap & GDIalphaBitmapToPIXMAP
+28-Apr-03	AE6219									32bit icon page support
+16-Dec-02	AE6184			ST/EC/713: 	Added ECOmessageBox to external component interface
+27-Nov-02 MHINST									Added ECOgetNVObject
+18-Nov-02	rmm4305			ST/EC/706		Timer events were still generated when at a debugger breakpoint.
+24-Oct-02 MHJOBJ2									Added getclassname callback
+10-Oct-02 MHJOBJ1									Added Introspective Java callbacks
+23-Sep-02 MHJB1										Added GetJavaEnvironment callback
+16-Sep-02	rmmv4obj								Added support for pointer-style objects (object reference variables).
+23 Aug 02 MHOFC										Added EXTfile callback for getOmnisFolder
+26 Jul 02 MHUNI1									Unicode changes
+23 Jul 02 MHJMAC									Java OSX changes.
+17 Jun 01 MHJCORE									Java support for Studio 4.0
+21 DEC 01 mpmOMSQL								Non-visual omnis sql dam implementation
+29-Oct-01 MHn0163									OSX Serial Port Changes
+23-Oct-01	AEXP										XP Modifications
+05-Jul-01	AE5246									Added callback GDItextWidthJst (3.1)
+25 JUN 01 mpmCarbon69							Fixes tightloop tracking on OSX which was killing CPU
+23 MAY 01 mpmCarbon57	st/wo/1256	Fixes problem with transparent controls and accumulating shadows
+30 APR 01 mpmCarbon49							Missing callbacks
+23-Apr-01 AE5203									Added ECOinvalBackObj
+09 APR 01 mpmCarbon40							Implements CGContext
+01 DEC 00 mpmCarbon11							New callbacks for carbon
+29 NOV 00 mpmCarbon								Implements openResources
+20 OCT 00 mpmCarbon								OSX Changes NOT MARKED
+11-Aug-00 MHn0124									Added ECOisSerialised callback.
+07-Aug-00	ijt063			DM/*O/006				Added putBindVariableValues for Non-Visual Dams
+04 AUG 00 mpm4727									New navigation for OS8/9
+03 MAY 00 mpm4617									Implements new qlist constructor from disk data
+03-Apr-00	rmm3693									RPCs.
+13-Mar-00	rmm3679									$sessions
+13-Mar-00	cr1031									Added getDateString for NVD Date to Char mapping
+09-Mar-00	cr1030									Added convcset for NVD character mapping
+06-Jan-00	rmm3582									Added ability to get type and name information about external component method parameters.
+15-Dec-99	rmm3568									Added meta-data methods to new ODBC DAM.
+15-Dec-99	AE4998									Added EXTfldval setempty & setnull
+06-Dec-99	rmm3551									Added $picturealign and $keepaspectratio picture field properties.
+06-Dec-99	AEECBS									External Clipboard support
+30-Nov-99	rmm3542									Non-visual DAM callbacks for processing SQL statements.
+24-Nov-99 PKICON									24 bit icon editor support
+01 NOV 99 mpmCarbon2							Implemens new callback
+13-Oct-99	AE4973									Thin-client cursors
+18-Mar-99	AE4936			ST/WT/031FC	Added date & time display formatting to the orfc edit field
+11-Jan-99	AE4892									Field styles for thin client
+15-Jun-98	AE4762									Additional Cursor functions
+26-May-98	rmm3101									Added $winlistfonts and $replistfonts to FontOps NVC.
+27-Apr-98	mt40472									WNDsetTimer can now take a FARPROC
+20-Apr-98	AE4724									Added ECOdoMethod for external objects
+06 Apr 98 mt40455									evalulating calculations made available
+03-Apr-98	AENVC2									External Non-Visual Components - Stage 2
+02 APR 98 mt40450									added strxxx& callback
+28-Jan-98	mpm4426									new ECOgetFont
+28-Jan-98	AE4688									Added GDIbitmapToPIXMAP
+16 JAN 98 mpm4425									Implements new callbacks to support external printing code 
+04 DEC 97 mpm_rmm2797							Added more pri functions
+19 NOV 97 mpmPRIs									External interface implementation
+20-Nov-97	mt40388									addcol can now set the columns name
+31-Oct-97	mt40372			st/gf/140		WNDsendMessage checks all external calls are good HWNDs
+27-Oct-97	mt40368									added GDImakeMask
+24-Oct-97	mt40367									HCURSOR Support callbacks
+06-Oct-97	mt40314									System Drag & Drop
+13-Jun-97	mt40295									fixed WNDenumChildWindows && GDIsetOptionClick thru exteral component interface
+30-May-97	mt40281									handle now in interface
+13-May-97	mt40261									Dragging with Different color for masks 
+11-Mar-97	mt40225									added doCreateRoundRectRgn && doCreatePolyRgn
+11-Mar-97	mt40224									added GDIgetFontName
+03-Mar-97	mt40217									more qlist callbacks (=qnil,isRowSelected)
+08-Feb-97	mt40188									now general purpose information proc
+05-Feb-97	mt40180									removed WNDpaintGrowBox call
+23-Jan-97	rmm2207									Win32 sizing grip functionality.
+23-Jan-96	mt40171									Missing GDI callbacks
+16-Dec-96	mt40114									more qlist callbacks (dup,addcol,copydef)
+15-Nov-96	 												GDIcreateHPIXMAP
+07-Nov-96	mt40056									getAttribute callback
+29-Oct-96	mt40040									added picture callbacks
+********************************************/
+
+
+#ifndef _CALLBACK_IDS_HE_
+#define _CALLBACK_IDS_HE_
+
+//	NB.
+//	~~
+//	These are call back id for every module function. They must be UNIQUE
+// and REMEMBER to update the MAX_<module>_CallBkIDs item as well, when you add one
+//
+//
+// DON"T FORGET TO UPDATE XCALLCB.HE (mac) as well 
+
+// --------------------------------  GDI Callback Ids -------------------------------
+
+#define	GDIgetMenubarHeight_CallBkID						0
+#define	GDIgetTempDC1_CallBkID									1
+#define	GDIcreateScreenDC_CallBkID							2
+#define	GDIdeleteScreenDC_CallBkID							3
+#define	GDIcreateFont1_CallBkID									4 // mpmCarbon3
+#define	GDIcreatePen1_CallBkID									5		
+#define	GDIcreatePen2_CallBkID									6
+#define	GDIcreateBrush_CallBkID									7
+#define	GDIdeleteObject1_CallBkID								8
+#define	GDIdeleteObject2_CallBkID								9
+#define	GDIdeleteObject3_CallBkID								10
+#define	GDIselectObject1_CallBkID								11
+#define	GDIselectObject2_CallBkID								12
+#define	GDIselectObject3_CallBkID								13
+#define	GDIgetStockBrush_CallBkID								14
+#define	GDIgetStockPen_CallBkID									15
+#define	GDIsetDrawingMode_CallBkID							16
+#define	GDIsetOptionClick1_CallBkID							17	// mt40295
+#define	GDIcheckPort_CallBkID										18
+#define	GDIsetClipRect_CallBkID									19
+#define	GDIgetClipRect_CallBkID									20
+#define	GDIexcludeClipRect_CallBkID							21
+#define	GDIunionClipRect_CallBkID								22
+#define	GDIintersectClipRect_CallBkID						23
+#define	GDIsetClipRgn_CallBkID									24
+#define	GDIgetClipRgn_CallBkID									25
+#define	GDIexcludeClipRgn_CallBkID							26
+#define	GDIunionClipRgn_CallBkID								27
+#define	GDIintersectClipRgn_CallBkID						28
+#define	GDIclearClip_CallBkID										29
+#define	GDImoveTo_CallBkID											30
+#define	GDImoveTo2_CallBkID											31
+#define	GDIlineTo1_CallBkID											32
+#define	GDIlineTo2_CallBkID											33
+#define	GDIcopyRect_CallBkID										34
+#define	GDIinflateRect_CallBkID									35
+#define	GDIinsetRect_CallBkID										36	
+#define	GDIoffsetRect_CallBkID									37
+#define	GDIsetRect_CallBkID											38
+#define	GDIsetRectEmpty_CallBkID								39
+#define	GDIintersectRect_CallBkID								40
+#define	GDIunionRect_CallBkID										41
+#define	GDIequalRect_CallBkID										42
+#define	GDIisRectEmpty_CallBkID									43
+#define	GDIptInRect_CallBkID										44
+#define	GDIframeRect_CallBkID										45
+#define	GDIframeRoundRect_CallBkID							46
+#define	GDIfillRect_CallBkID										47
+#define	GDIfillRoundRect_CallBkID								48
+#define	GDIinvertRect_CallBkID									49
+#define	GDIhiliteRect_CallBkID									50
+#define	GDIdrawFocusRect_CallBkID								51
+#define	GDIframeEllipse_CallBkID								52
+#define	GDIfillEllipse_CallBkID									53
+#define	GDIrgnAnd_CallBkID											54
+#define	GDIrgnCopy_CallBkID											55
+#define	GDIrgnDiff_CallBkID											56
+#define	GDIrgnOr_CallBkID												57
+#define	GDIrgnXor_CallBkID											58
+#define	GDIcreateRectRgn1_CallBkID							59	// CRCOCOA3
+#define	GDIcreateRectRgn2_CallBkID							60
+#define	doCreateRoundRectRgn_CallBkID						61	// mt40225
+#define	GDIgetRgnBox_CallBkID										62
+#define	GDIoffsetRgn_CallBkID										63
+#define	GDIsetRectRgn1_CallBkID									64	// CRCOCOA3
+#define	GDIsetRectRgn2_CallBkID									65
+#define	GDIequalRgn_CallBkID										66
+#define	GDIptInRegion1_CallBkID									67	// CRCOCOA3
+#define	GDIptInRegion2_CallBkID									68
+#define	GDIrectInRegion_CallBkID								69
+#define	GDIframeRgn_CallBkID										70
+#define	GDIfillRgn_CallBkID											71
+#define	GDIinvertRgn_CallBkID										72
+#define	GDIhiliteRgn_CallBkID										73
+#define	GDIframePoly_CallBkID										74
+#define	GDIfillPoly_CallBkID										75
+#define	GDIgetRealColor1_CallBkID								76
+#define	GDIsetBkColor_CallBkID									77
+#define	GDIgetBkColor_CallBkID									78
+#define	GDIsetTextColor_CallBkID								79
+#define	GDIgetTextColor_CallBkID								80
+#define	GDIgetLighterShade_CallBkID							81
+#define	GDIgetDarkerShade_CallBkID							82
+#define	GDIinflateButtonRect_CallBkID						83
+#define	GDIinsetButtonRect_CallBkID							84
+#define	GDIdrawSystemPushButton_CallBkID				85
+#define	GDIdrawSystem3dPushButton_CallBkID			86
+#define	GDIdraw3dPushButton_CallBkID						87
+#define	GDIdrawHeadingButton_CallBkID						88
+#define	GDIdrawComboButton_CallBkID							89
+#define	GDIsetFontName_CallBkID									90
+#define GDIgetFontName_CallBkID									91			// mt40224
+#define	doCreatePolyRgn_CallBkID								100			// mt40225
+#define	GDIfontDecSize_CallBkID									101
+#define	GDIfontIncSize_CallBkID									102
+#define	GDIfontSetSize_CallBkID									103
+#define	GDIfontSetExtra_CallBkID								104
+#define	GDIfontGetSize_CallBkID									105
+#define	GDIfontGetExtra_CallBkID								106
+#define	GDIfontIsTrueType1_CallBkID							107
+#define	GDIfontIsReal1_CallBkID									108
+#define	GDIfontHeight1_CallBkID									109
+#define	GDIfontIsTrueType2_CallBkID							110
+#define	GDIfontIsReal2_CallBkID									111
+#define	GDIfontHeight2_CallBkID									112
+#define	GDIfontPart1_CallBkID										113
+#define	GDIfontPart2_CallBkID										114
+#define	GDIcharWidth1_CallBkID									115
+#define	GDItextWidth1_CallBkID									116
+#define	GDIcharWidth2_CallBkID									117
+#define	GDItextWidth2_CallBkID									118
+#define	GDIcharWidth3_CallBkID									119
+#define	GDItextWidth3_CallBkID									120
+#define	GDIdrawText1_CallBkID										121
+#define	GDIdrawText2_CallBkID										122
+#define	GDIdrawTextJst_CallBkID									123
+#define	GDItextBox_CallBkID											124
+#define	GDIcreateBitmap_CallBkID								125
+#define	GDIdeleteBitmap_CallBkID								126
+#define	GDIselectBitmap_CallBkID								127
+#define	GDIdrawBitmapChiselOLD_CallBkID					128			// CRHIRES
+#define	GDIdrawBitmapOLD_CallBkID								129			// CRHIRES
+#define	GDIcopyBits_CallBkID										130
+#define	GDIhiliteBitmapOLD_CallBkID							131
+#define	GDImaskFromBitmapOLD_CallBkID						132			// mt40261
+#define	GDIdrawIcon_CallBkID										133
+#define	GDIdrawPicture_CallBkID									134
+#define	GDIdrawHPIXMAPchisel_CallBkID						135
+#define	GDIdrawHPIXMAPmask_CallBkID							136
+#define	GDIdrawHPIXMAPOLD_CallBkID							137			// CRHIRES
+#define	GDIHPIXMAPfromSharedPicture_CallBkID		138
+#define	GDIdeleteHPIXMAP_CallBkID								139
+#define	GDIrestrictScreenRect_CallBkID					140
+#define	GDIgetScreenRestriction_CallBkID				141
+#define	GDIgetScreenRect_CallBkID								142
+#define	GDIgetScreenResolution1_CallBkID				143
+#define	GDIptInScreen_CallBkID									144
+#define	GDIconv_CallBkID												145
+#define	GDIconv2_CallBkID												146
+#define	GDIconv3_CallBkID												147
+#define	GDIconv4_CallBkID												148
+#define GDIsetViewportOrg_CallBkID							149
+#define GDIgetViewportOrg_CallBkID							150
+#define sGDIgetFontNameIndex_CallBkID						151
+#define GDIconvToSysPict_CallBkID								152
+#define GDIconvToOmnisPict1_CallBkID						153
+#define GDIconvToSharedPict1_CallBkID						154
+#define GDIpictGetBounds1_CallBkID							155
+#define GDIbitmapToColorShared1_CallBkID				156
+#define GDIcreateHPIXMAP_CallBkID								157
+#define GDIgetPixel_CallBkID										158			// mt40171
+#define GDIsetPixel_CallBkID										159			// mt40171
+#define GDIfloodFill_CallBkID										161			// mt40171
+#define	GDImaskFromBitmap_CallBkID							162			// mt40261	
+#define	GDIhiliteBitmapOLD1_CallBkID						163			// mt40270	// CRHIRES
+#define	GDIdeleteCursor_CallBkID								164			// mt40367	mt40382
+#define	GDIcreateCursor_CallBkID								165			// mt40367
+#define	GDImakeMask_CallBkID										166			// mt40368
+#define GDIbitmapToPIXMAP_CallBkID							167			// AE4688
+#define GDIpixmapToColorShared_CallBkID					168			// PKICON2
+#define GDIalignPicture_CallBkID								169			// rmm3551
+#define GDIoffscreenPaintBegin_CallBkID					170			// mpmCarbon
+#define GDIoffscreenPaintBeginOS9_CallBkID			170			// mpmCarbon // MHn0368
+#define GDIoffscreenPaintEnd_CallBkID						171			// mpmCarbon
+#define GDIcreateFont2_CallBkID									172			// mpmCarbon11
+#define GDIcreateDcFont2_CallBkID								173			// mpmCarbon11
+#define GDIhiliteTextStart_CallBkID							174			// mpmCarbon11
+#define GDIhiliteTextEnd_CallBkID								175			// mpmCarbon11
+#define	GDIsetPortClipRegion_CallBkID						176			// mpmCarbon40
+#define	GDIflushDC_CallBkID											177			// mpmCarbon40
+#define GDIthemeText1_CallBkID									178			// mpmCarbon49
+#define GDIthemeText2_CallBkID									179			// mpmCarbon49
+#define	GDIsetFlush_CallBkID										180			// mpmCarbon57
+#define	GDItextWidthJst_CallBkID								181			// AE5246
+#define GDIbitmapToMonoPIXMAP_CallBkID					182			// AE6219
+#define GDIalphaBitmapToPIXMAP_CallBkID					183			// AE6231
+#define GDIdrawAlphaBitmapOLD_CallBkID					184			// AE6231		//CRHIRES
+#define GDIhiliteTextStartEx_CallBkID						185			// rmm4487
+#define	GDIdeleteObject4_CallBkID								186			// MHn0237
+#define GDIcreateBitmapEx_CallBkID							187			// pkalpha pkalpha
+#define GDIhasAlphaSupport_CallBkID							188			// pkisalpha2
+#define GDIisAlphaImage_CallBkID								189			// pkisalpha2
+#define GDIalphaPixmapToBitmap_CallBkID					190			// pkisalpha2
+#define GDImakeGrayScale_CallBkID								191			// pkisalpha2
+#define GDImakeHilited_CallBkID									192			// AE6379
+#define	GDIqfnt_CallBkID												193			// rmmuni_fnt2
+#define GDIcgContextFlush1_CallBkID							194			// rmm4933
+#define GDIbitmapToPIXMAP1_CallBkID							195 
+#define GDIcreateAlphaDC_CallBkID								196			// rmm_nc
+#define GDIdeleteAlphaDC_CallBkID								197			// rmm_nc
+#define GDIgetTextColorAlpha_CallBkID						198			// rmm_nc
+#define GDIsetTextColorAlpha_CallBkID						199			// rmm_nc
+#define GDIgetBkColorAlpha_CallBkID							200			// rmm_nc
+#define GDIsetBkColorAlpha_CallBkID							201			// rmm_nc
+#define GDIdrawTextFastAlpha_CallBkID						202			// rmm_nc
+#define GDIclearClipAlpha_CallBkID							203			// rmm_nc
+#define GDIgetFlagsForAlphaDC_CallBkID					204			// rmm_nc
+#define GDIsetFlagsForAlphaDC_CallBkID					205			// rmm_nc
+#define GDIgetNativeGraphicsObjectForAlphaDC_CallBkID		206			// rmm_nc
+#define GDIstartText_CallBkID										207			// rmm6736
+#define GDIendText_CallBkID											208			// rmm6736
+#define GDIcalcJstEscLen_CallBkID								209			// rmm6736
+#define GDIsetAlphaLevel_CallBkID								210			// rmm6812
+#define	GDIdrawSystemPopup_CallBkID							211			// mpmPopMenu2
+#define GDInewRegion_CallBkID										212			// CRCOCOA
+#define GDIdeleteRegion_CallBkID								213			// CRCOCOA
+#define	GDIdrawBitmap_CallBkID									214			// CRHIRES
+#define GDIdrawBitmapChisel_CallBkID						215			// CRHIRES
+#define GDIhiliteBitmap_CallBkID								216			// CRHIRES
+#define GDIdrawHPIXMAP_CallBkID									217			// CRHIRES
+#define GDIdrawAlphaBitmap_CallBkID							218			// CRHIRES
+#define GDIsetPixel1_CallBkID										219			// CRCOCOA3
+#define GDIgetPixel1_CallBkID										220			// CRCOCOA3
+#define GDIfloodFill1_CallBkID									221			// CRCOCOA3
+#define GDIsetDeviceScale_CallBkID							222			// CRHIRES2
+#define GDIgetDeviceScale_CallBkID							223			// CRHIRES2
+#define GDIgetBitmapBounds_CallBkID							224			// CR0213
+// Start rmmhdpi: Note that these callbacks are only available for windows
+#define GDIconv_qrect_RECT_CallBkID							225
+#define GDIconv_RECT_qrect_CallBkID							226
+#define GDIconv_qpoint_POINT_CallBkID						227
+#define GDIconv_POINT_qpoint_CallBkID						228
+#define GDIconvToScreen_int_CallBkID						229
+#define GDIconvToDesign_int_CallBkID						230
+#define GDIconvToScreen_qrect_CallBkID					231
+#define GDIconvToDesign_qrect_CallBkID					232
+#define GDIconvToScreen_qpoint_CallBkID					233
+#define GDIconvToDesign_qpoint_CallBkID					234
+#define GDIgetScalingResolution_CallBkID				235
+#define GDIisScaled_CallBkID										236
+#define GDIsetScalingDisabled_CallBkID					237
+// End rmmhdpi
+// Start rmmhdpi: New cross-platform callbacks
+#define GDIcreateDcFont1_CallBkID								238
+#define GDIcreateDcFontDPI_CallBkID							239
+#define GDIdeleteFontsCachedForDc_CallBkID			240
+// End rmmhdpi
+// Start rmm8849: Callback only available for Cocoa
+#define GDIgetNativeGraphicsObjectForDC_CallBkID	241			// rmm_nc
+// End rmm8849
+// Start rmm9347
+#define GDIconstructOverrideHDCDPI_CallBkID				242
+#define GDIdestructOverrideHDCDPI_CallBkID				243
+// End rmm9347
+//pkcocoa_1194
+#define GDIclipEllipse_CallBkID                 244
+#define GDIdrawArc_CallBkID                     245
+
+#define MAX_GDI_CallBkIDs													245			// AE5246 // MHn0237 pkalpha pkisalpha2 // rmm4933 // rmm_nc // rmm6736 // rmm6812 // mpmPopMenu2 //CRCOCOA	//CRHIRES // CRCOCOA3	// CRHIRES2 // CR0213 // rmmhdpi // rmm8849 // rmm9347 pkcocoa_1194
+//gra0703: If you add a callback, please raise a fault containing the relevant documentation
+
+// --------------------------------  HWND Callback Ids -------------------------------
+
+#define HWNDdefWindowProc_CallBkID						0
+#define WNDcreateWindow1_CallBkID							1
+#define WNDdestroyWindow_CallBkID							2
+#define WNDbringWindowToTop_CallBkID					3
+#define WNDshowWindow_CallBkID								4
+#define WNDmoveWindow_CallBkID								5
+#define WNDisWindowVisible_CallBkID						6
+#define WNDfloatChildren_CallBkID							7
+#define WNDsetWindowPos_CallBkID							8
+#define WNDsetWindowPosEx_CallBkID						9
+#define WNDgetFloat_CallBkID									10
+#define WNDsetFloat_CallBkID									11
+#define WNDgetBorderSpec_CallBkID							12
+#define WNDsetBorderSpec_CallBkID							13
+#define WNDsetTopLevelParent_CallBkID					14
+#define WNDmakePoint_CallBkID									15
+#define WNDmakeLong_CallBkID									16
+#define WNDgetWindowFromPt_CallBkID						17
+#define WNDmapWindowPoint_CallBkID						18
+#define WNDmapWindowRect_CallBkID							19
+#define WNDgetWindowRect_CallBkID							20
+#define WNDgetClientRect_CallBkID							21
+#define WNDinsetBorderRect1_CallBkID					22
+#define WNDinflateBorderRect1_CallBkID				23
+#define WNDgetMinMaxInfo_CallBkID							24
+#define WNDgetParent_CallBkID									25
+#define WNDsetParent_CallBkID									26
+#define WNDaddWindowComponent1_CallBkID				27
+#define WNDremoveWindowComponents_CallBkID		28
+#define WNDgetWindowComponent_CallBkID				29
+#define WNDnextWindowComponent_CallBkID				30
+#define WNDsetWindowCursor1_CallBkID					31	// mt40367
+#define WNDgetWindowCursor1_CallBkID					32	// mt40367
+#define WNDcheckCursor1_CallBkID							33
+#define WNDsetCursor1_CallBkID								34
+#define WNDgetCursor1_CallBkID								35
+#define WNDgetCursorPos_CallBkID							36
+#define WNDsetCursorPos_CallBkID							37
+#define WNDclipCursor_CallBkID								38
+#define WNDmouseLeftButtonDown_CallBkID				39
+#define WNDmouseRightButtonDown_CallBkID			40
+#define WNDgetWindowLong_CallBkID							41
+#define WNDsetWindowLong_CallBkID							42
+#define WNDsetScrollRange_CallBkID						43
+#define WNDsetScrollPos_CallBkID							44
+#define WNDgetScrollRange_CallBkID						45
+#define WNDgetScrollPos_CallBkID							46
+#define WNDbeginPaint_CallBkID								47
+#define WNDendPaint_CallBkID									48
+#define WNDstartDraw_CallBkID									49
+#define WNDendDraw_CallBkID										50
+#define WNDpaintBorder_CallBkID								51
+#define WNDgetOS_CallBkID											52	// mt40188
+#define WNDsetWindowCursor_CallBkID						53	// mt40367
+#define WNDupdateWindow_CallBkID							54
+#define WNDupdateWindowCO_CallBkID						55
+#define WNDredrawWindow_CallBkID							56
+#define WNDredrawWindowCO_CallBkID						57
+#define WNDredrawChildren_CallBkID						58
+#define WNDgetUpdateRgn_CallBkID							59
+#define WNDinvalidateRect_CallBkID						60
+#define WNDinvalidateRgn_CallBkID							61
+#define WNDscrollWindow_CallBkID							62
+#define WNDsetRedraw_CallBkID									63
+#define WNDsetCapture_CallBkID								64
+#define WNDgetCapture_CallBkID								65
+#define WNDreleaseCapture_CallBkID						66
+#define WNDhasCapture_CallBkID								67
+#define WNDcreateCaret_CallBkID								68
+#define WNDdestroyCaret1_CallBkID							69
+#define WNDdestroyCaret2_CallBkID							70
+#define WNDshowCaret_CallBkID									71
+#define WNDhideCaret_CallBkID									72
+#define WNDgetCaretPos_CallBkID								73
+#define WNDsetCaretPos_CallBkID								74
+#define WNDgetProcInst_CallBkID								75
+#define WNDsetProcInst_CallBkID								76
+#define WNDsendMessage1_CallBkID							77
+#define WNDenumChildWindows1_CallBkID					78	// mt40295
+#define WNDgetWindow_CallBkID									79
+#define WNDdelay_CallBkID											80
+#define WNDsetTimerOLD_CallBkID								81		// mt40472
+#define WNDkillTimerOLD_CallBkID							82
+#define DefWindowProc_CallBkID								83
+#define WNDaddWindowComponent2_CallBkID				84		// mtCall001
+#define WNDgetGrowBoxRect_CallBkID						85		// rmm2207 -- mt40180
+#define WNDdragAcceptFiles_CallBkID						86		// mt40314
+#define WNDgetWindowCursor_CallBkID						87		// mt40367
+#define WNDsetCursor_CallBkID									88		// mt40367
+#define WNDgetCursor_CallBkID									89		// mt40367
+#define WNDsetTimer_CallBkID									90		// mt40472
+#define WNDkillTimer_CallBkID									91		// mt40472
+#define WNDsetCanSetCursorProc_CallBkID				92 		// AE4762
+#define WNDdrawThemeBackground_CallBkID				93		// mpmCarbon11
+#define WNDmouseTrackLeftButton_CallBkID			94		// mpmCarbon69
+#define WNDdrawThemeControl_CallBkID					95		// AEXP
+#define WNDgetThemeControlSize_CallBkID			  96    // AEXP
+#define WNDgetThemeState_CallBkID							97    // AEXP
+#define WNDgetThemeColor_CallBkID							98		// rmm6000
+#define WNDisPaintInProgress_CallBkID					99		// rmm6098
+#define WNDpostMessage1_CallBkID							100		// rmm6233
+#define WNDupdateLayeredWindow_CallBkID				101		// rmm_nc
+#define WNDsetTimerAttributesOSX_CallBkID			102		// rmm_nc
+#define WNDabortMouseCapture_CallBkID					103		// rmm_nc
+#define WNDisVistaTheme_CallBkID							104		// rmm6672
+#define WNDchangeComponentId_CallBkID					105		// rmm7101
+#define WNDgetMainHwnd_CallBkID						  	106		// gra0866
+#define WNDsetTimerEx_CallBkID								107		// rmm8448
+#define WNDkillTimerEx_CallBkID								108		// rmm8448
+#define WNDgetWindowPos_CallBkID							109		// rmmhdpi
+#define WNDsetAlpha_CallBkID									110		// rmm9199
+#define WNDwindowFromDC1_CallBkID							111		// CR0424
+#define WNDupdateLayeredChild_CallBkID        112   // pkcocoa_1179
+
+#define MAX_HWND_CallBkIDs										112		// pkcocoa_1179 rmm6233 // rmm_nc // rmm7101 //gra0866 // rmm8448 // rmmhdpi // rmm9199 // CR0424
+//gra0703: If you add a callback, please raise a fault containing the relevant documentation
+
+// --------------------------------  FVAL Callback Ids -------------------------------
+
+#define	 FVALConstruct_CallBkID							0
+#define	 FVALDestruct_CallBkID							1
+#define  FVALisempty_CallBkID								2
+#define  FVALisnull_CallBkID								3
+#define  FVALislist_CallBkID								4
+#define  FVALgetchar1_CallBkID							5
+#define  FVALgetchar2_CallBkID							6
+#define  FVALsetchar1_CallBkID							7
+#define  FVALsetchar2_CallBkID							8
+#define  FVALislongchar_CallBkID						9
+#define  FVALgetnum_CallBkID								10
+#define  FVALsetnum_CallBkID								11
+#define  FVALgetlong_CallBkID								12
+#define  FVALsetlong_CallBkID								13
+#define  FVALgetdate_CallBkID								14
+#define  FVALsetdate_CallBkID								15
+#define  FVALgetbool_CallBkID								16
+#define  FVALsetbool_CallBkID								17
+#define  FVALgetlist_CallBkID								18
+#define  FVALsetlist_CallBkID								19
+#define  FVALgetbinary_CallBkID							20
+#define  FVALgetbinlen_CallBkID							21
+#define  FVALsetbinary_CallBkID							22
+#define  FVALconv_CallBkID									23
+#define  FVALconcat1_CallBkID								24
+#define  FVALconcat2_CallBkID								25
+#define  FVALconcat3_CallBkID								26
+#define  FVALconcat4_CallBkID								27
+#define  FVALcompare1_CallBkID							28
+#define  FVALcompare2_CallBkID							29
+#define  FVALcompare3_CallBkID							30
+#define  FVALpos1_CallBkID									31
+#define  FVALpos2_CallBkID									32
+#define  FVALpos3_CallBkID									33
+#define  FVALpos4_CallBkID									34
+#define  FVALinsertstr_CallBkID							35
+#define  FVALreplacestr1_CallBkID						36
+#define  FVALreplacestr2_CallBkID						37
+#define	 FVALgetType_CallBkID								38
+#define	 FVALgetOmnisField_CallBkID					39
+#define	 FVALgetHandle_CallBkID							40	// mt40281
+#define	 FVALsetHandle_CallBkID							41	// mt40281
+#define  FVALgetCrbRef_CallBkID							42	// mpmPRIs
+#define  FVALsetCrbRef_CallBkID							43	// mpmPRIs
+#define	 FVALgetOmnisField2_CallBkID				44	// mpm4425
+#define  FVALgetchar3_CallBkID							45	// mt40450
+#define  FVALgetObjInst_CallBkID						46	// AENVC2
+#define  FVALsetObjInst_CallBkID						47	// AENVC2
+#define  FVALsetCalculation_CallBkID				48	// mt40455
+#define  FVALgetCalculation_CallBkID				49	// mt40455
+#define  FVALevalCalculation_CallBkID				50	// mt40455
+#define  FVALoperatorAssign_CallBkID				51	// mt40455
+#define  FVALgetchar4_CallBkID							52	// mt40455
+#define  FVALsetchar3_CallBkID							53	// mt40455
+#define  FVALsetEmpty_CallBkID							54	// AE4998
+#define  FVALsetNull_CallBkID								55	// AE4998
+#define	 FVALgetConstant_CallBkID						56	// rmm3568
+#define	 FVALgetLong2_CallBkID							57	// rmm3568
+#define	 FVALsetConstant1_CallBkID					58	// rmm3568
+#define	 FVALsetConstant2_CallBkID					59	// rmm3568
+#define  FVALgetcharlen_CallBkID						60	// rmmuni
+#define  FVALgetObjRef_CallBkID							61	// rmmv4obj
+#define  FVALsetObjRef_CallBkID							62	// rmmv4obj
+#define  FVALsetConstant3_CallBkID					63	// AE6515
+#define  FVALgetlong64_CallBkID							64	// rmm7222
+#define  FVALsetlong64_CallBkID							65	// rmm7222
+#define  FVALgetlongptr_CallBkID						66	// rmm7222
+#define  FVALsetlongptr_CallBkID						67	// rmm7222
+#define	 FVALsetUtf8Chars_CallBkID					68	// rmm_rws
+#define	 FVALconcatBinary_CallBkID					69	// rmm8675
+#define	 FVALconcatBase64_CallBkID					70	// rmm8675
+#define  FVALlastPos_CallBkID								71	// rmm9025
+#define	 FVALreduceCharLen_CallBkID					72	// rmm9025
+#define	 FVALdeleet_CallBkID								73	// rmm9025
+#define	 FVALtakelist_CallBkID							74	// rmm_jsw
+#define	 FVALtakefrom_CallBkID							75	// rmm_jsw
+
+#define	 MAX_FVAL_CallBkIDs									75	// mt40450 	mt40455 // rmmuni // rmmv4obj	AE6515 // rmm7222 // rmm8675 // rmm9025 // rmm_jsw
+//gra0703: If you add a callback, please raise a fault containing the relevant documentation
+
+// --------------------------------  QLIST Callback Ids -------------------------------
+
+#define	 QLISTConstruct_CallBkID							0
+#define	 QLISTDestruct_CallBkID								1
+#define	 QLISTgetlstptr_CallBkID							2
+#define	 QLISTclear_CallBkID									3
+#define	 QLISTempty1_CallBkID									4
+#define	 QLISTempty2_CallBkID									5
+#define	 QLISTgetdisklen_CallBkID							6
+#define	 QLISTtodisk_CallBkID									7
+#define	 QLISTgetcval_CallBkID								8
+#define	 QLISTgetcvalp_CallBkID								9
+#define	 QLISTputcval_CallBkID								10
+#define	 QLISTgetctyp_CallBkID								11
+#define	 QLISTgetcol_CallBkID									12
+#define	 QLISTinsline_CallBkID								13
+#define	 QLISTdelline_CallBkID								14
+#define	 QLISTputline_CallBkID								15
+#define	 QLISTclrline_CallBkID								16
+#define	 QLISTsetfinalline_CallBkID						17
+#define	 QLISTsetcurline_CallBkID							18
+#define	 QLISTsetlinemax_CallBkID							19
+#define	 QLISTselline_CallBkID								21
+#define	 QLISTgetline1_CallBkID								22
+#define	 QLISTgetline2_CallBkID								23
+#define	 QLISTcolcnt_CallBkID									24
+#define	 QLISTlinecnt_CallBkID								25
+#define	 QLISTlinemax_CallBkID								26
+#define	 QLISTcurline_CallBkID								27
+#define	 QLISTloadLines_CallBkID							28
+#define	 QLISTsort_CallBkID										29
+#define	 QLISTdup_CallBkID										30
+#define	 QLISTaddcolOLD_CallBkID							31	// mt40388
+#define	 QLISTcopydef_CallBkID								32
+#define	 QLISTisRowSelected_CallBkID					33
+#define	 QLISTassignQNIL_CallBkID							34
+#define	 QLISTaddcol_CallBkID									35	// mt40388
+#define	 QLISTgetRowCrb_CallBkID							36  // mpmPRIs
+#define	 QLISTgetctyp2_CallBkID								37	// rmm3582
+#define	 QLISTConstruct2_CallBkID							38  // mpm4617
+#define  QLISTgetNullInfo_CallBkID						39	//gra0235
+#define  QLISTgetTableFlags_CallBkID					40	//gra0235
+#define	 QLISTdefineFromSQLClass_CallBkID			41	// rmm_wsg
+#define  OBSOLETE_QLISTconvertEncoding_CallBkID	42	// rmm_wsk // rmm9474
+#define  QLISTaddcolex_CallBkID								43	// jc0025
+#define  QLISTsetcol_CallBkID									44	// jc0026
+#define	 QLISTfindCol_CallBkID								45	// rmm_rws
+#define	 QLISTinslineptr_CallBkID							46	// pkcocoa_1050
+#define	 QLISTgetlineptr_CallBkID							47	// pkcocoa_1050
+#define	 QLISTsetrow_CallBkID									48	// rmm8675
+#define	 QLISTisrow_CallBkID									49	// rmm8675
+
+#define  MAX_QLIST_CallBkIDs									49	// pkcocoa_1050 // rmm8675
+//gra0703: If you add a callback, please raise a fault containing the relevant documentation
+
+// --------------------------------  BMPREF Callback Ids -------------------------------
+
+#define	 BMPREFConstruct_CallBkID							0
+#define	 BMPREFDestruct_CallBkID							1
+#define	 BMPREFgetPicId_CallBkID							2
+#define	 BMPREFgetRect_CallBkID								3
+#define	 BMPREFhasSize_CallBkID								4
+#define	 BMPREFhasMode_CallBkID								5	
+#define	 BMPREFgetBMPOLD_CallBkID							6
+#define	 BMPREFcopyMask_CallBkID							7
+#define	 BMPREFcopyImage_CallBkID							8
+#define	 BMPREFdrawMask_CallBkID							9
+#define	 BMPREFdraw1_CallBkID									10
+#define	 BMPREFtransColor_CallBkID						11
+#define	 BMPREFgetBMP_CallBkID								12
+#define	 BMPREFcopyImage2_CallBkID						13 // mpm4425
+#define  BMPREFcursConstruct_CallBkID							14 // AE4973
+#define  BMPREFcursDestruct_CallBkID							15 // AE4973
+#define  BMPREFcursGetCursor_CallBkID							16 // AE4973
+#define  BMPREFcursGetCursorId_CallBkID							17 // AE4973
+#define	 BMPREFgetBMP2_CallBkID								18	// rmm7990
+
+#define  MAX_BMPREF_CallBkIDs									18 // mpm4425 // rmm7990
+//gra0703: If you add a callback, please raise a fault containing the relevant documentation
+
+// --------------------------------  ECO General Callback Ids -------------------------------
+
+// AE4234
+#define  ECO_old_CallBkID											0
+#define  ECOextCompEvent_CallBkID							1
+#define  ECOaddTraceStr_CallBkID							2
+#define  ECOgetFont_CallBkID									3			// PKEXT2
+#define  ECOgetAttribute_CallBkID							4		// mt40056
+#define  ECOsetError_CallBkID									5  // AE4424
+#define  ECOudAttrib_CallBkID									6  // mt40270
+#define  ECOhandleAlloc_CallBkID							7  // mt40281
+#define  ECOhandleReAlloc_CallBkID						8  // mt40281
+#define  ECOhandleFree_CallBkID								9  // mt40281
+#define  ECOgetApp_CallBkID										10  // mpm4425
+#define  ECOgetDeviceParms_CallBkID						11  // mpm4425
+#define  ECOudAttrib2_CallBkID								12  // mpm4425
+#define  ECOgetAttribute2_CallBkID						13  // mpm4425
+#define  ECOgetFont2_CallBkID									14  // mpm4426
+#define  ECOnewObjInst_CallBkID				 				15	// AENVC2
+#define  ECOresetObjDetails_CallBkID					16	// AENVC2
+#define  ECOdoMethod_CallBkID									17	// AE4724
+#define	 ECOlistFonts_CallBkID								18	// rmm3101
+#define  ECOgetStyle_CallBkID									19			// AE4892
+#define  ECOsetDTformat_CallBkID							20  // AE4936
+#define  ECOclipboardHasFormat_CallBkID				21	// AEECBS
+#define  ECOclipboardSetText_CallBkID					22	// AEECBS
+#define  ECOclipboardGetText_CallBkID					23	// AEECBS
+#define  ECOclipboardSetPicture_CallBkID			24	// AEECBS
+#define  ECOclipboardGetPicture_CallBkID			25	// AEECBS
+#define	 ECOgetParamInfo_CallBkID							26	// rmm3582
+#define	 ECOisSerialised_CallBkID							27	// MHn0124
+#define	 ECOinvalBackObj_CallBkID							28	// AE5203
+#define	 ECOgetBundleRef_CallBkID							29	// MHn0163
+#define	 ECOisOMNISinTrueRuntime_CallBkID			30	// rmm4305
+#define	 ECOgetNVObject_CallBkID							31	// MHINST
+#define  ECOmessageBox_CallBkID								32	// AE6184
+#define	 ECOconvFromLatin1ApiBytes_CallBkID		33	// rmm4763
+#define  ECOconvToLatin1ApiBytes_CallBkID			34	// rmm4763
+#define	 ECOdeleteBuffer1_CallBkID						35	// rmm4763
+#define	 ECOdeleteBuffer2_CallBkID						36	// rmm4763
+#define  ECOconvertHFSToPosix_CallBkID				37	//<ijt218>
+#define	 ECOconvertPosixToHFS_CallBkID				38	//<ijt218>
+#define	 ECOreloadLibData_CallBkID						39	//<AE6551>
+#define	 ECOconvKnownJavaObjs_CallBkID				40	//<ijtjperf>
+#define  ECOgetLocalIpAddress_CallBkID				41	//gra0509
+#define	 ECOmapString_CallBkID								42	//rmm_loc4
+#define	 ECOfindString_CallBkID								43	//rmm_loc5
+#define  ECOpaintGrayFrame_CallBkID						44	// rmm_nc
+#define  ECOclipboardGetPictureEx_CallBkID		45	// pkmacalpha
+#define	 ECOuprCmp_CallBkID										46	// rmm7002
+#define	 ECOnotifyObject_CallBkID							47  // gra0866 // rmm8114: Was ECOdoMethodWait
+#define	 ECOpostTaskMessage_CallBkID					48	// rmm8114
+// Start rmm_rws
+#define	 ECOparseJSON_CallBkID								49
+#define	 ECOsaveToJSON_CallBkID								50
+#define	 ECOgetFirstCharFromJSON_CallBkID			51
+#define	 ECOformatJSON_CallBkID								52
+#define	 ECOresolveJSONMember_CallBkID				53
+#define	 ECOlistJSONmembers_CallBkID					54
+#define  ECOisJSONArray_CallBkID							55
+#define  ECOisJSONObject_CallBkID							56
+#define  ECOupdateJSON_CallBkID								57
+#define  ECOupdateJSONArray_CallBkID					58
+#define  ECOpushWorkerCallback_CallBkID				59
+// End rmm_rws
+// Start rmm8336
+#define  ECOreadStringConfigurationItem_CallBkID		60
+#define  ECOwriteStringConfigurationItem_CallBkID		61
+#define  ECOreadIntegerConfigurationItem_CallBkID		62
+#define  ECOwriteIntegerConfigurationItem_CallBkID	63
+#define  ECOreadBooleanConfigurationItem_CallBkID		64
+#define  ECOwriteBooleanConfigurationItem_CallBkID	65
+#define	 ECOhasConfigurationItem_CallBkID						66
+// End rmm8336
+#define	 ECOgetJSNativeDisplay_CallBkID							67	// jmg0113
+#define	 ECOjsGetFontName_CallBkID									68	// rmm8451
+#define	 ECOpromptForInput_CallBkID									69	// rmm8465
+#define	 ECOencrypt_CallBkID												70	// rmm8465
+#define	 ECOdecrypt_CallBkID												71	// rmm8465
+#define  ECOtlsSetValue_CallBkID										72	// rmm_dep
+#define	 ECOopenTraceLog_CallBkID										73	// rmm8675
+#define	 ECOparseClientJSON_CallBkID								74	// rmm8675
+#define	 ECOsaveToClientJSON_CallBkID								75	// rmm8675
+#define	 ECOgetJavaScriptFontTableEntry_CallBkID		76	// rmm8675
+// Start rmm8733
+#define	 ECOparseJSONObjectArray_CallBkID						77
+#define	 ECOsaveToJSONObjectArray_CallBkID					78
+// End rmm8733
+#define  ECOaddTraceStr2_CallBkID										79
+#define	 ECOgetOmnisErrorText_CallBkID							80	// rmm9010
+#define  ECOconvertHFSToPosix_fldval_CallBkID				81	// rmm9025
+#define	 ECOconvertPosixToHFS_fldval_CallBkID				82	// rmm9025
+#define	 ECOrunningInHeadlessServer_CallBkID				83	// rmmheadless
+// Start rmm9333
+#define	 ECOparseJSONArrayArray_CallBkID						84
+#define	 ECOsaveToJSONArrayArray_CallBkID						85
+// End rmm9333
+// Start rmm9440
+#define	 ECOtoUChar_CallBkID												86
+#define	 ECOfromUChar_CallBkID											87
+#define	 ECOnormalizeUChar_CallBkID									88
+// End rmm9440
+
+#define  MAX_ECO_CallBkIDs													88	// pkmacalpha mpm4426 // rmm3101	 AE4936 // rmm3582 // MHn0124 // MHn0163 // rmm4305 // MHINST // rmm4763 //<ijt218> // rmm_loc4 // rmm_loc5 // rmm_nc // rmm7002 // rmm8114 // rmm_rws // rmm8336 // jmg0113 // rmm8451 // rmm8465 // rmm_dep // rmm8733 // rmm8933 // rmm9010 // rmm9025 // rmmheadless // rmm9333 // rmm9440
+//gra0703: If you add a callback, please raise a fault containing the relevant documentation
+
+// --------------------------------  CRB General Callback Ids ------------------------------- // mpmPRIs
+
+#define  CRBcreate_CallBkID					0
+#define  CRBdestroy_CallBkID				1
+#define  CRBduplicate_CallBkID			2
+#define  CRBflatten_CallBkID				3
+#define  CRBunflatten_CallBkID			4
+#define  CRBgetFlatSize_CallBkID		5
+#define  CRBgetIndexCount_CallBkID	6
+#define  CRBgetData_CallBkID				7
+#define  CRBsetData_CallBkID				8
+#define  CRBgetLong_CallBkID				9
+#define  CRBsetLong_CallBkID				10
+#define  CRBgetReal_CallBkID				11
+#define  CRBsetReal_CallBkID				12
+#define  CRBgetDataRef_CallBkID			13
+#define  CRBgetCrbRef_CallBkID			14
+#define  CRBgetLong64_CallBkID			15	// rmm8513
+#define  CRBsetLong64_CallBkID			16	// rmm8513
+
+#define  MAX_CRB_CallBkIDs					16	// rmm8513
+//gra0703: If you add a callback, please raise a fault containing the relevant documentation
+
+// --------------------------------  PRI General Callback Ids ------------------------------- // mpmPRIs
+
+#define  PRIconvFromDC_CallBkID								0
+#define  PRIconvFromScreen_CallBkID						1
+#define  PRIconvFromCMorINCH_CallBkID					2
+#define  PRIconvToDC_CallBkID									3
+#define  PRIconvToScreen_CallBkID							4
+#define  PRIconvToCMorINCH_CallBkID						5
+#define  PRIconvRectFromDC_CallBkID						6
+#define  PRIconvRectFromScreen_CallBkID				7
+#define  PRIconvRectToDC_CallBkID							8
+#define  PRIconvRectToScreen_CallBkID					9
+#define  PRInormPos_CallBkID									10
+#define  PRIconvPos_CallBkID									11
+#define  PRIopen_CallBkID											12
+#define  PRIclose_CallBkID										13
+#define  PRIstartJob_CallBkID									14
+#define  PRIendJob_CallBkID										15
+#define  PRIkillJob_CallBkID									16
+#define  PRIredirectJob_CallBkID							17
+#define  PRIloadJob1_CallBkID									18
+#define  PRIloadJob2_CallBkID									19
+#define  PRIselectProc_CallBkID								20
+#define  PRIgetProc_CallBkID									21
+#define  PRIstartPage_CallBkID								22
+#define  PRIendPage_CallBkID									23
+#define  PRIejectPage_CallBkID								24
+#define  PRIgetPageInfo_CallBkID							25
+#define  PRIsetPageInfo_CallBkID							26
+#define  PRIaddObject_CallBkID								27
+#define  PRIcreateSection_CallBkID						28
+#define  PRIdeleteSection_CallBkID						29
+#define  PRIgetSectionInfo_CallBkID						30
+#define  PRIsetSectionInfo_CallBkID						31
+#define  PRIgrowSection_CallBkID							32
+#define  PRIgetError_CallBkID									33
+#define  PRIgetSysError_CallBkID							34
+#define  PRIshowError_CallBkID								35
+#define  PRIgetErrorText_CallBkID							36
+#define  PRIsetError_CallBkID									37
+#define  PRIopenDestinationDialog_CallBkID		38
+#define  PRIinitDestinationParms_CallBkID			39
+#define  PRIvalidateDest_CallBkID							40
+#define  PRIopenDevice_CallBkID								41
+#define  PRIcloseDevice_CallBkID							42
+#define  PRIsendTextToDevice_CallBkID					43
+#define  PRIsendDataToDevice_CallBkID					44
+#define  PRIflushDevice_CallBkID							45
+#define  PRIisDeviceOpen_CallBkID							46
+#define  PRIgetDeviceName_CallBkID						47
+#define  PRIgetDeviceInfo_CallBkID						48
+#define  PRIsetDeviceInfo_CallBkID						49
+#define  PRIgetDeviceEOLchars_CallBkID				50
+#define  PRIgetPageSetup_CallBkID							51
+#define  PRIsetPageSetup_CallBkID							52
+#define  PRIcopyPageSetup_CallBkID						53
+#define  PRIdestroyPageSetup_CallBkID					54
+#define  PRIchangeJobPageSetup_CallBkID				55
+#define  PRIpageSetupFromCRB_CallBkID					56
+#define  PRIpageSetupToCRB_CallBkID						57
+#define  PRIsetPageSetupItem1_CallBkID				58
+#define  PRIgetPageSetupItem1_CallBkID				59
+#define  PRIsetPageSetupItem2_CallBkID				60
+#define  PRIgetPageSetupItem2_CallBkID				61
+#define  PRIregisterOutput_CallBkID						62
+#define  PRIunregisterOutput_CallBkID					63
+#define  PRIdefOutputProc_CallBkID						64
+
+#define  xPRIextended_CallBkID								66
+#define  xPRIopenPageSetupDialog_CallBkID			67
+#define  xPRIopenJobSetupDialog_CallBkID			68
+#define  xPRIbuildPrinterList_CallBkID				69
+#define  xPRIopenChangePrinterDialog_CallBkID	70
+#define  xPRIopenGetFileDialog_CallBkID				71
+#define  xPRIbrowseOutput_CallBkID						72
+#define  xPRIgetPaperDimensions1_CallBkID			73
+#define  xPRIgetPaperDimensions2_CallBkID			74
+#define  xPRIgetDriverSigniture_CallBkID			75
+#define  xPRIgetFlattDriverInfoSize_CallBkID	76
+#define  xPRIflattenDriverInfoOld_CallBkID		77 // mpmCarbon2
+#define  xPRIunflattenDriverInfoOld_CallBkID	78 // mpmCarbon2
+
+#define  PRItextWidth_CallBkID								79  // mpm_rmm2797
+#define  PRItextHeight_CallBkID								80  // mpm_rmm2797
+
+#define  xPRIflattenDriverInfo_CallBkID				81 // mpmCarbon2
+#define  xPRIunflattenDriverInfo_CallBkID			82 // mpmCarbon2
+
+#define  PRIgetParmStruct_CallBkID						83 // AE6647
+#define  PRItextWidthEx_CallBkID							84 // rmm8308
+
+#define  MAX_PRI_CallBkIDs						84	// rmm8328
+//gra0703: If you add a callback, please raise a fault containing the relevant documentation
+
+// --------------------------------  QFILE General Callback Ids ------------------------------- // mt40408
+
+
+#define 	QFILEconstruct_CallBkID								0
+#define 	QFILEdestruct_CallBkID								1
+#define 	QFILEcreateFile_CallBkID							2
+#define 	QFILEcreateTemp_CallBkID							3
+#define 	QFILEopenFile_CallBkID								4
+#define 	QFILEcloseFile_CallBkID								5
+#define 	QFILEdeleteFile_CallBkID							6
+#define 	QFILEsetMacTypeCreator_CallBkID				7
+#define 	QFILEfullname_CallBkID								8
+#define 	QFILEexists_CallBkID									9
+#define 	QFILEreadFile1_CallBkID								10
+#define 	QFILEreadFile2_CallBkID								11	
+#define 	QFILEwriteFile_CallBkID								12
+#define 	QFILEgetPosition_CallBkID							13
+#define 	QFILEsetPosition_CallBkID							14	
+#define 	QFILEgetLength_CallBkID								15
+#define 	QFILEsetLength_CallBkID								16
+#define 	QFILEsetEmpty_CallBkID								17
+#define 	QFILEgetName_CallBkID									18
+#define 	QFILEnavigate_CallBkID								19
+#define		QFILEopenResources_CallBkID						20
+#define		QFILEgetOmnisFolder_CallBkID					21 // MHOFC
+#define		QFILEgetOmnisProgramFolder_CallBkID		22 // rmm6147
+#define		QFILElistFiles_CallBkID								23 // rmm_rwslog
+#define		QFILEcreateFolder_CallBkID						24
+#define		QFILEflush_CallBkID										25
+// Start rmm9010
+#define 	QFILEreadFile1_64_CallBkID						26
+#define 	QFILEreadFile2_64_CallBkID						27	
+#define 	QFILEwriteFile_64_CallBkID						28
+#define 	QFILEgetPosition_64_CallBkID					29
+#define 	QFILEsetPosition_64_CallBkID					30	
+#define 	QFILEgetLength_64_CallBkID						31
+#define 	QFILEsetLength_64_CallBkID						32
+// End rmm9010
+// Start rmm9025
+#define 	QFILEcreateFile_fldval_CallBkID				33
+#define 	QFILEopenFile_fldval_CallBkID					34
+#define 	QFILEdeleteFile_fldval_CallBkID				35
+#define 	QFILEfullname_fldval_CallBkID					36
+#define 	QFILEexists_fldval_CallBkID						37
+#define 	QFILEgetName_fldval_CallBkID					38
+#define		QFILElistFiles_fldval_CallBkID				39
+#define		QFILEcreateFolder_fldval_CallBkID			40
+// End rmm9025
+#define  	MAX_QFILE_CallBkIDs										40 // MHOFC // rmm6147 // rmm_rwslog // rmm9010
+//gra0703: If you add a callback, please raise a fault containing the relevant documentation
+
+// --------------------------------  Non-visual DAM General Callback Ids ---------------------- // rmm3542
+#define		DAMprepareBindVariables_CallBkID			0
+#define		DAMfreeBindVariables_CallBkID					1
+#define		DAMgetBindVariableValues_CallBkID			2
+#define		DAMgetDataTypeText_CallBkID						3			// rmm3568
+#define		OBSOLETE_DAMconvcset_CallBkID					4			// cr1030 // rmm9474
+#define		DAMgetDateString_CallBkID							5			// cr1031
+#define		DAMregisterSession_CallBkID						6			// rmm3679
+#define		DAMunregisterSession_CallBkID					7			// rmm3679
+#define		DAMallocBindVariables_CallBkID				8			// rmm3693
+#define		DAMputBindVariableValues_CallBkID			9			//<ijt063>
+#define		DAMcallBackSQL_CallBkID								10		// mpmOMSQL
+#define		DAMgetSeparators_CallBkID							11		// gra0778
+#define		DAMreleasePoolRef_CallBkID						12		// gra0838
+#define		DAMgetThreadLocalStorage_CallBkID			13		// gra0858
+
+#define		MAX_DAM_CallBkIDs											13
+//gra0703: If you add a callback, please raise a fault containing the relevant documentation
+
+// MHJCORE begins
+// --------------------------------  JavaCore General Callback Ids ---------------------- 
+#define		JPIgetCurrentJavaSession_CallBkID			0 // defined by the Omnis core.
+#define		JPIisJCoreLoaded_CallBkID							1 
+#define		JPIstartJVM_CallBkID									2 
+#define		JPIstopJVM_CallBkID										3 
+#define		JPIcreateJavaSession_CallBkID					4
+#define		JPIcreateJavaObject_CallBkID					5
+#define		JPIcreateJavaClass_CallBkID						6
+#define		JPIconstructJavaObject1_CallBkID			7			
+#define		JPIconstructJavaObject2_CallBkID			8			 			
+#define		JPIcallJavaMethod1_CallBkID						9			
+#define		JPIcallJavaMethod2_CallBkID						10		
+#define		JPIcallJavaMethod3_CallBkID						11			
+#define		JPIcallJavaMethod4_CallBkID						12			
+#define		JPIgetObjectValue_CallBkID						13			
+#define		JPIdisposeJavaObject_CallBkID					14			
+#define		JPIdisposeJavaClass_CallBkID					15			
+#define		JPIdisposeJavaSession_CallBkID				16			
+#define		JPIgetLastJavaError_CallBkID					17			
+#define		JPIgetLastJavaErrorText_CallBkID			18			
+#define		JPIgetLastJVMErrorText_CallBkID				19			
+#define		JPIisJVMrunning_CallBkID							20			
+#define		JPIsetPackagePath_CallBkID						21			
+#define		JPIsetClassPath_CallBkID							22			
+#define		JPIsetJVMPath_CallBkID								23			
+#define		JPIstartCoreJVM_CallBkID							24			
+#define		JPIgetJavaEnvironment_CallBkID				25 // MHJB1		
+#define		JPIcreateObjectsFromArray_CallBkID		26 // MHJB1	// MHJOBJ1	
+#define		JPIisPrimitive_CallBkID								27 // MHJB1	// MHJOBJ1	
+#define		JPIisArray_CallBkID										28 // MHJB1	// MHJOBJ1	
+#define		JPIgetClassName_CallBkID							29 // MHJOBJ2	
+#define		JPIcallStaticJavaMethod_CallBkID			30 // MHn0408			
+#define		JPIsetJVMOptions_CallBkID						  31 // MHnJava		
+#define		JPIcallServiceMethod_CallBkID					32 // jc0024		
+#define		JPIeclipseSetCoreJVM_CallBkID					33 // rmm_oe
+
+#define		MAX_JPI_CallBkIDs											33 // MHn0408 // MHUNI // MHJB1 // MHJOBJ1 // MHJOBJ2 // MHnJava // jc0024 // rmm_oe
+//gra0703: If you add a callback, please raise a fault containing the relevant documentation
+// MHJCORE ends
+
+// Start jc0048
+#define		WSCcallStartupMethod_CallBkID					1
+#define		MAX_WSC_CallBkIDs											1
+// End jc0048
+
+#endif
+/* EOF */

@@ -1,0 +1,59 @@
+/* $Header: svn://svn.omnis.net/trunk/Studio/O7EXE/INDY/ThreadTimer.he 16574 2017-01-26 13:52:21Z bmitchell $ */
+/*
+  Omnis Studio - Common thread timer class
+	Copyright (C) Omnis Software Ltd 2017
+
+FILENAME:	threadtimer.he
+
+DESCRIPTION:	ThreadTimer implementation for use with Worker class
+DETAILS:		
+*/
+/* Changes
+Date				Edit		Fault				Description
+15-Oct-12		rmm64bit4						More 64 bit portability changes.
+17-Apr-12		gra									Initial implementation
+Dec 11			Adapted from code created by David McKeone 11-Oct-09	
+*/
+
+#ifndef TIMERSTATE 
+#define TIMERSTATE
+	enum eTimerState {	kTimerContinue = 0,	kTimerStop = 1 };
+#endif
+
+#ifndef THREAD_TIMER_HE_
+#define THREAD_TIMER_HE_
+
+#include "extcomp.he"
+#include "worker.he"
+
+class Worker;
+
+class ThreadTimer 
+{
+	public:
+		
+		struct sTimerProc
+		{
+			Worker *obj;
+			eTimerState state;
+			sTimerProc *next;
+		};
+		
+	private:
+		static FARPROC _omnisTimer;
+		static sTimerProc *subscribers;
+		static UINT_PTR _timerID; // rmm64bit4
+		static int _threadCount;
+		
+	public:
+		ThreadTimer();
+		~ThreadTimer();
+    
+		static ThreadTimer& instance();
+		static void OMNISWNDPROC timerMsgProc( HWND hwnd, UINT Msg, UINT idTimer, qulong time );
+		eTimerState *subscribe(Worker *obj); 
+		void unsubscribe(Worker *obj);
+		qlong threadCount() { return _threadCount; }
+};
+
+#endif // THREAD_TIMER_HE_

@@ -1,0 +1,392 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 42;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		2D01EDD3222D878000ECE7A4 /* osxhelp.rc in Resources */ = {isa = PBXBuildFile; fileRef = 2D01EDD1222D878000ECE7A4 /* osxhelp.rc */; };
+		2D01EDD6222D890B00ECE7A4 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C167DFE841241C02AAC07 /* InfoPlist.strings */; };
+		2D01EDDC222D89AF00ECE7A4 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2D01EDD9222D898B00ECE7A4 /* Cocoa.framework */; };
+		2D79E46C223177C100C39055 /* osxhelp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2D79E46B223177C000C39055 /* osxhelp.cpp */; };
+		2D79E46E2231784000C39055 /* xosxhelp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2D79E46D2231784000C39055 /* xosxhelp.cpp */; };
+		96CA4E660907EB0700C234AA /* u_complib.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 96CA4E650907EB0700C234AA /* u_complib.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXBuildRule section */
+		96CA4E5C0907E8CC00C234AA /* PBXBuildRule */ = {
+			isa = PBXBuildRule;
+			compilerSpec = com.apple.compilers.proxy.script;
+			filePatterns = "*.rc";
+			fileType = pattern.proxy;
+			isEditable = 1;
+			outputFiles = (
+				"$(TEMP_FILE_DIR)/omnisrc/Localizable.strings",
+			);
+			script = "$DEVELOPER_TOOLS_DIR/omnisrc64.app/Contents/MacOS/omnisrc64 INPUT_FILE_PATH TEMP_FILE_DIR REZ_SEARCH_PATHS XCOMP\nif [ -f $TEMP_FILE_DIR/omnisrc/Bitmap.strings ]; then\ncp $TEMP_FILE_DIR/omnisrc/Bitmap.strings $INSTALL_DIR/$CONTENTS_FOLDER_PATH/Resources\nfi\nshopt -s nullglob\nif [ ! -z \"`echo $TEMP_FILE_DIR/omnisrc/*.PNG`\" ]; then\ncp $TEMP_FILE_DIR/omnisrc/*.PNG $INSTALL_DIR/$CONTENTS_FOLDER_PATH/Resources\nfi";
+		};
+/* End PBXBuildRule section */
+
+/* Begin PBXFileReference section */
+		089C167EFE841241C02AAC07 /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		2D01EDCE222D875400ECE7A4 /* osxhelp.he */ = {isa = PBXFileReference; lastKnownFileType = text; name = osxhelp.he; path = src/osxhelp.he; sourceTree = "<group>"; };
+		2D01EDD7222D891900ECE7A4 /* english */ = {isa = PBXFileReference; lastKnownFileType = text; name = english; path = english.lproj/osxhelp.rc; sourceTree = "<group>"; };
+		2D01EDD9222D898B00ECE7A4 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.13.sdk/System/Library/Frameworks/Cocoa.framework; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		2D79E46B223177C000C39055 /* osxhelp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = osxhelp.cpp; path = src/osxhelp.cpp; sourceTree = "<group>"; };
+		2D79E46D2231784000C39055 /* xosxhelp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = xosxhelp.cpp; path = src/xosxhelp.cpp; sourceTree = "<group>"; };
+		2D79E46F2231794E00C39055 /* xosxhelp.he */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = xosxhelp.he; path = src/xosxhelp.he; sourceTree = "<group>"; };
+		96CA4E610907E8CC00C234AA /* osxhelp.u_xcomp */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = osxhelp.u_xcomp; sourceTree = BUILT_PRODUCTS_DIR; };
+		96CA4E650907EB0700C234AA /* u_complib.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = u_complib.framework; path = ../complib/u_complib.framework; sourceTree = SOURCE_ROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		96CA4E590907E8CC00C234AA /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2D01EDDC222D89AF00ECE7A4 /* Cocoa.framework in Frameworks */,
+				96CA4E660907EB0700C234AA /* u_complib.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		089C166AFE841209C02AAC07 /* xrandom */ = {
+			isa = PBXGroup;
+			children = (
+				96D631340905093100E0F291 /* Headers */,
+				08FB77ADFE841716C02AAC07 /* Source */,
+				089C167CFE841241C02AAC07 /* Resources */,
+				089C1671FE841209C02AAC07 /* External Frameworks and Libraries */,
+				2D01EDD8222D898B00ECE7A4 /* Frameworks */,
+				19C28FB4FE9D528D11CA2CBB /* Products */,
+			);
+			name = xrandom;
+			sourceTree = "<group>";
+		};
+		089C1671FE841209C02AAC07 /* External Frameworks and Libraries */ = {
+			isa = PBXGroup;
+			children = (
+				96CA4E650907EB0700C234AA /* u_complib.framework */,
+			);
+			name = "External Frameworks and Libraries";
+			sourceTree = "<group>";
+		};
+		089C167CFE841241C02AAC07 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				2D01EDD1222D878000ECE7A4 /* osxhelp.rc */,
+				089C167DFE841241C02AAC07 /* InfoPlist.strings */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
+		08FB77ADFE841716C02AAC07 /* Source */ = {
+			isa = PBXGroup;
+			children = (
+				2D79E46B223177C000C39055 /* osxhelp.cpp */,
+				2D79E46D2231784000C39055 /* xosxhelp.cpp */,
+			);
+			name = Source;
+			sourceTree = "<group>";
+		};
+		19C28FB4FE9D528D11CA2CBB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				96CA4E610907E8CC00C234AA /* osxhelp.u_xcomp */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		2D01EDD8222D898B00ECE7A4 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				2D01EDD9222D898B00ECE7A4 /* Cocoa.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		96D631340905093100E0F291 /* Headers */ = {
+			isa = PBXGroup;
+			children = (
+				2D01EDCE222D875400ECE7A4 /* osxhelp.he */,
+				2D79E46F2231794E00C39055 /* xosxhelp.he */,
+			);
+			name = Headers;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		96CA4E530907E8CC00C234AA /* UnicodeCore */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 96CA4E5D0907E8CC00C234AA /* Build configuration list for PBXNativeTarget "UnicodeCore" */;
+			buildPhases = (
+				96CA4E540907E8CC00C234AA /* Resources */,
+				96CA4E570907E8CC00C234AA /* Sources */,
+				96CA4E590907E8CC00C234AA /* Frameworks */,
+			);
+			buildRules = (
+				96CA4E5C0907E8CC00C234AA /* PBXBuildRule */,
+			);
+			dependencies = (
+			);
+			name = UnicodeCore;
+			productInstallPath = "$(HOME)/Library/Bundles";
+			productName = xrandom;
+			productReference = 96CA4E610907E8CC00C234AA /* osxhelp.u_xcomp */;
+			productType = "com.apple.product-type.bundle";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		089C1669FE841209C02AAC07 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 1010;
+			};
+			buildConfigurationList = 96CF455E08FBABD1003AA3FE /* Build configuration list for PBXProject "osxhelp" */;
+			compatibilityVersion = "Xcode 2.4";
+			developmentRegion = English;
+			hasScannedForEncodings = 1;
+			knownRegions = (
+				English,
+				Japanese,
+				French,
+				German,
+				english,
+				en,
+			);
+			mainGroup = 089C166AFE841209C02AAC07 /* xrandom */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				96CA4E530907E8CC00C234AA /* UnicodeCore */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		96CA4E540907E8CC00C234AA /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2D01EDD3222D878000ECE7A4 /* osxhelp.rc in Resources */,
+				2D01EDD6222D890B00ECE7A4 /* InfoPlist.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		96CA4E570907E8CC00C234AA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2D79E46E2231784000C39055 /* xosxhelp.cpp in Sources */,
+				2D79E46C223177C100C39055 /* osxhelp.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		089C167DFE841241C02AAC07 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				089C167EFE841241C02AAC07 /* English */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		2D01EDD1222D878000ECE7A4 /* osxhelp.rc */ = {
+			isa = PBXVariantGroup;
+			children = (
+				2D01EDD7222D891900ECE7A4 /* english */,
+			);
+			name = osxhelp.rc;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		96CA4E5E0907E8CC00C234AA /* Development */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUILD_VARIANTS = normal;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEPLOYMENT_LOCATION = YES;
+				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/../complib";
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INPUT_FILETYPE = sourcecode.cpp.objcpp;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = NO;
+				GCC_PREFIX_HEADER = $PROJECT_DIR/../complib/u_complib.framework/Headers/carbnuni.h;
+				GENERATE_PKGINFO_FILE = YES;
+				HEADER_SEARCH_PATHS = $PROJECT_DIR/../complib/u_complib.framework/Headers;
+				INFOPLIST_FILE = $PROJECT_DIR/Info.plist;
+				INIT_ROUTINE = "";
+				INSTALL_PATH = "$(PROJECT_DIR)/../_OSXUnicodeDbg";
+				LIBRARY_SEARCH_PATHS = "";
+				LIBRARY_STYLE = DYNAMIC;
+				OTHER_CFLAGS = (
+					"-fshort-wchar",
+					"-Dismach_o",
+					"-Wno-comment",
+				);
+				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = osxhelp;
+				RESMERGER_SOURCES_FORK = data;
+				REZ_SEARCH_PATHS = (
+					$PROJECT_DIR,
+					$PROJECT_DIR/English.lproj,
+				);
+				SDKROOT = macosx;
+				WRAPPER_EXTENSION = u_xcomp;
+				ZERO_LINK = NO;
+			};
+			name = Development;
+		};
+		96CA4E5F0907E8CC00C234AA /* Deployment */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = YES;
+				DEPLOYMENT_LOCATION = YES;
+				DSTROOT = /;
+				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/../complib";
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_INPUT_FILETYPE = sourcecode.cpp.objcpp;
+				GCC_PRECOMPILE_PREFIX_HEADER = NO;
+				GCC_PREFIX_HEADER = $PROJECT_DIR/../complib/u_complib.framework/Headers/carbnuni.h;
+				GENERATE_PKGINFO_FILE = YES;
+				HEADER_SEARCH_PATHS = $PROJECT_DIR/../complib/u_complib.framework/Headers;
+				INFOPLIST_FILE = $PROJECT_DIR/Info.plist;
+				INSTALL_PATH = "$(PROJECT_DIR)/../_OSXUnicode";
+				LIBRARY_SEARCH_PATHS = "";
+				LIBRARY_STYLE = DYNAMIC;
+				OTHER_CFLAGS = (
+					"-fshort-wchar",
+					"-Dismach_o",
+					"-Wno-comment",
+				);
+				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
+				PRODUCT_NAME = osxhelp;
+				RESMERGER_SOURCES_FORK = data;
+				REZ_SEARCH_PATHS = (
+					$PROJECT_DIR,
+					$PROJECT_DIR/English.lproj,
+				);
+				SDKROOT = macosx;
+				SKIP_INSTALL = NO;
+				WRAPPER_EXTENSION = u_xcomp;
+				ZERO_LINK = NO;
+			};
+			name = Deployment;
+		};
+		96CF455F08FBABD1003AA3FE /* Development */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DSTROOT = /;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = NO;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LIBRARY_STYLE = DYNAMIC;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.6.sdk";
+			};
+			name = Development;
+		};
+		96CF456008FBABD1003AA3FE /* Deployment */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = NO;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.6.sdk";
+			};
+			name = Deployment;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		96CA4E5D0907E8CC00C234AA /* Build configuration list for PBXNativeTarget "UnicodeCore" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				96CA4E5E0907E8CC00C234AA /* Development */,
+				96CA4E5F0907E8CC00C234AA /* Deployment */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Development;
+		};
+		96CF455E08FBABD1003AA3FE /* Build configuration list for PBXProject "osxhelp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				96CF455F08FBABD1003AA3FE /* Development */,
+				96CF456008FBABD1003AA3FE /* Deployment */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Development;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 089C1669FE841209C02AAC07 /* Project object */;
+}

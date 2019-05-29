@@ -1,0 +1,388 @@
+/* $Header: svn://svn.omnis.net/trunk/Studio/EXTCOMP/CALLBACK/extfval.he 21615 2018-11-23 11:30:09Z bmitchell $ */
+
+//Q4 EXTFVAL.HE
+// external fvals
+//Copyright (C) Blyth Holdings Inc 1996
+
+/**************** Changes ******************
+Date			Edit				Bug					Description
+21-Nov-18	rmm_jsw									OW3 component - JavaScript Worker.
+10-Aug-18	rmm9760									Debug logging for core and components.
+30-Aug-16	rmm9025			ST/NV/059		Added support for long pathnames to FileOps and to core qfile.
+19-Aug-16	rmm9010			ST/EC/1416	Added support for large files (files with a size > maximum signed 32 bit integer).
+28-Oct-15	rmm8675			ST/EC/1384	Initial implementation of obrowser xcomp.
+04-May-15	rmm8565									Deprecated global handle functions (these are also not available for Cocoa).
+10-Feb-14	rmm_rws									RESTful Web Services support.
+12-Apr-13	rmm64bit1								First set of changes for 64 bit support: 64 bit Omnis data type.
+21-Nov-12	rmm7722									64 bit integer calls added to EXTfldval.
+13-Jun-11	CR0037									iphone build issues.
+15-Jun-09	jc0024									Added a new setList callback
+31-Mar-09	rmm_iphone21						Segmented control.
+09-Mar-09	rmm_iphone13						Text field controls.
+01-Sep-08	rmm6447			ST/EC/1131	Problems with spreadsheet grid column heading.
+14-Aug-08	pkiphone								iphone pass 1
+18-Feb-08	rmm_mobile							Mobile device support.
+09-Dec-05 MHMACH4                 Mach-O changes
+26-Oct-05 MHMACH2                 Mach-o changes
+17-Sep-04	AE6515									External constant support
+16-Sep-02	rmmv4obj								Added support for pointer-style objects (object reference variables).
+11-Aug-00 MHn0124									Added ECOisSerialised callback
+21-Apr-00	rmm3735			ST/FU/252		Use localised day names for the calendar (non-Web) component.
+09-Feb-00	rmm3618									Mac callback issues.
+06-Jan-00	rmm3582									Added ability to get type and name information about external component method parameters.
+16-Dec-99	rmm3568									Added meta-data methods to new ODBC DAM.
+15-Dec-99	AE4998									Added EXTfldval setempty & setnull
+02 SEP 99 mpm4576			st/wt/061		Fixes decimal point and thousand seperator problems with web client
+02-Aug-99	DRS5100									Client method execution for ORFC
+16-Jun-99 PKMACCLIENT							Macclient changes
+08 JAN 99 MHn0006									changed ffttype definition to enum.
+06 NOV 98	mpmTHINe								Instance vars
+18-Aug-98	DRSfval									Version for self contained fldval and list classes (changes mostly unmarked)
+12 MAY 98 mpm4496									Allow calculations to be evaluated on current row on list
+06 Apr 98 mt40455									evalulating calculations made available
+03-Apr-98	AENVC2									External Non-Visual Components
+19 JAN 98 mpm4425									Implements new callbacks to support external printing code and fixes locp problem
+05 DEC 97 mpmPRIv									New crb and pri api callbacks
+10-Jul-97	AE4575									Renamed EXTqlist::getColVal to getColValRef for clarity
+********************************************/
+
+
+#ifndef EXTfldval_he
+#define	EXTfldval_he
+#define _EXTFVAL_HE_
+
+#ifndef _basics_
+#	include "basics.h"
+#endif
+
+#ifndef	_GDI_HE_
+#	include "gdi.he"	//CR0037
+#endif
+
+#ifndef _EXTCRB_HE_
+#	include "extcrb.he"
+#endif
+
+#ifndef _EXTFUNCS_HE_
+#	include "extfuncs.he"
+#endif
+
+// PKMACCLIENT
+#if defined(ismac) && defined(isRCCLIB)
+GCC_EXPORT_ON // MHMACH4
+#pragma export on
+#endif
+
+#ifndef ismobile	// rmm_mobile: avoid packing on mobile devices as alignment issues cause crashes
+	GCC_SET_BYTE_PACKING_ON // MHMACH2
+	#pragma SET_BYTE_PACKING_ON
+#endif
+
+// MHn0006 begins.
+enum ffttype {         	//	file format and data file field types
+        fftNone=20,
+				fftCharacter=21,  	// 	character or national
+        fftBoolean=22,    	// 	boolean
+        fftDate=23,       	// 	date, time, or datetime
+
+        fftNumber=25,     	//	real number
+        fftInteger=26,    	//	four byte integers (stored as xlong)
+        fftPicture=27,    	//	pictures
+        fftBinary=28,     	//	binary data
+        fftList=29,       	//	lists
+        fftCrb=31,        	//	record data (data for a crb)
+        fftCalc=34,       	//	field holds a tokenized calculation or field name
+        fftConstant=35,   	//	field holds a predefined constant
+				fftRow=36,					//	row variable	
+				fftObject=37,				//object variable //DRS4132
+				fftObjref=38,				//rmmv4obj: object reference variable
+				fftLast=38,
+
+				fftLong=64,					// //rmm9010: Used internally (never as a data type) and to mark 64 bit external component integer parameters and return values
+
+// The following enums have been moved here from dmfval.h.
+
+// THE FOLLOWING TYPES ARE FOR INTERNAL USE ONLY.
+
+        fftSequence=24,   	//	sequence number
+        fftRdef=30,       	//	record definition
+        fftFieldname=32,  	//	field holds a reference to another field
+        fftItemref=33,    	//	field holds an item reference
+
+	      fftUnknown=126,   	//	internal value to denote an unknown type
+        fftQuickest=127,  	//	internal value used with fldvals to denote the quickest return type is required
+        fftNegative=255			//	invalid fldval (used to prevent calls to nulldata on destruction) mpm4065
+};
+// MHn0006 ends.
+
+const  qshort 
+        dpFcharacter=0,             //with fftCharacter => character field
+        dpFnational=1,              //with fftCharacter => national field
+        dpFmask=31,                 //mask to get real dps for a number field
+        dpFsnumber=32,              //with fftNumber => short number field
+        dpFsinteger=32,             //with fftInteger => short integer field (0..255)
+        dpF64bitinteger=64,					//rmm64bit1: with fftInteger => 64 bit integer field
+        dpFdate1900=0,              //low 3 bits of dps for dates and times
+        dpFdate1980=1,              //for datetimes this is combined with date table entry*8
+        dpFdate2000=2,
+        dpFdtime1900=3,
+        dpFdtime1980=4,
+        dpFdtime2000=5,
+        dpFtime=6,
+        dpFdtimeC=7,								//date time including a century
+        dpFdtimedefault=dpFdtime1980,
+				dpFrow=1,		  							//with fftList => row field
+				dpFloat=24,									//dp value which represents a floating number // rmm3568
+				dpDefault=255;
+
+#ifndef isRCCLIB
+	const qshort          			//	types to tokenized calculation
+	        ctySquare=0,                //	square bracket notation
+	        ctyCalculation=1,           //	standard calculation
+					ctyLocDataItem=45;					//	rmm3735: localisation data item
+#endif
+
+// structure holding information about a crb fields definition
+struct crbFieldInfo // mpm4576
+{
+  ffttype     fft;                        //field type
+  qshort      fdp;                        //decimal places
+  qlong       fln;                        //field length
+  qbool       fdx;                        //true if indexed
+  qshort      iln;                        //index length
+  qshort      private1,private2;
+};
+
+class str255;
+class strxxx;
+class EXTqlist;
+struct EXTCompInfo;
+
+#if defined(isRCCLIB) || defined (isEXECLIB)				//DRS5100
+
+	//internal date and/or time type
+	typedef struct
+	{             
+	  qshort year; 
+	  char 		month,day,hour,min,sec,hun,dateok,timeok,secok,hunok; // rmm0243
+	} datestamptype;
+	
+#else
+
+	const qret  //common return values, others are in const.h, xfile.h, dminterface.h
+		e_ok=0,             //no error (must be 0)
+		e_negative=1,       //used when a simple negative is required
+		e_altered=2,        //used when a 'value changed' return is necessary
+		e_cancel=3,         //used when a 'user has cancelled' return is necessary
+	
+		e_quitone=11,       //return value from sequence execution, quit current sequence
+		e_quitall=12,       //return value from sequence execution, quit all sequences
+		e_deleted=14,       //return value from sequence execution, current procedure has been deleted //NNNe
+	
+		e_warning=99,       // pewm10 return value from tqcSeqn::exec1() when #ecode has warning number
+		e_firsttext=100,    //messages not displayed for returns less than this
+		e_errstring=101,    //global string errstring is displayed
+		e_toofewparameters=808,	// rmm9010
+		e_nomemory=1109,    //out of memory
+		e_semaphore=1028,   //interrupted when waiting for semaphore
+		e_init = 1100,      // initialization
+		e_invalidparameters= 1657,	// rmm9010: Invalid parameters
+		e_createfile = 23190,				// rmm9010: Cannot create file
+		e_filenotopen = 23191,			// rmm9010: File is not open
+		e_readtoolarge = 23192,			// rmm9010: Attempt to read too much data
+		e_nodatatoread = 23193,			// rmm9010: No data to read
+		e_readonly = 23194;					// rmm9010: File is read-only
+	
+	//internal date and/or time type
+	typedef struct
+	{             
+	  qshort mYear; 
+	  char mMonth,mDay,mHour,mMin,mSec,mHun,mDateOk,mTimeOk,mSecOk,mHunOk;
+	} datestamptype;
+	
+#endif
+
+const char EXTFLDVAL_FOR_LIST = '1';	// rmm_iphone21
+
+// PKMACCLIENT
+class	ECOAPI EXTfldval // MHMACH4
+{
+private:
+	qfldval mData; // mpmPRIv
+	qbool mDeleteInOmnis;
+	qbool	mIsReadOnly;			// AE4575 If true calls to change data (eg setChar,setLong) will fail
+													// EXTqlist::getColVal(qlong,qshort,EXTfldval&) sets the mIsReadOnly to qtrue
+													// EXTqlist::getColValRef() sets mIsReadOnly to the value of willalter
+public:	
+  EXTfldval( qfldval pData=0 ); // mpmPRIv
+	// Use to retrieve  data value from inside Omnis
+  EXTfldval( strxxx &pVariableName, qbool pWillAlter =qfalse, locptype* pLocp = NULL ); // mpmTHINe
+	// Start rmm_iphone21: called with EXTfldval fval(EXTFLDVAL_FOR_LIST) - avoid unnecessary construction and deletion of fldval when fval will be used to get a list column; 
+	// Note that you must check the return value from getColValRef if you use this constructor
+	EXTfldval( char pForList ) { GDIignore(&pForList); mData = 0; mDeleteInOmnis = mIsReadOnly = qfalse; } // mpm_cw
+	// End rmm_iphone21
+
+  ~EXTfldval();
+
+  qbool   isEmpty(); // return true if fval contains an empty value for its type
+  qbool   isNull ();
+	qbool		isList (); //  returns true if the value is stored as a list
+
+  void    operator =(EXTfldval& pFval);
+	void		takeFrom(EXTfldval &pFval);	// rmm_jsw: Take the contents of pFval and transfer ownership to this
+
+	void		setEmpty(ffttype fft1, qshort fdp1);										 						// AE4998
+	void    setNull(ffttype fft1=fftCharacter, qshort fdp1=(qshort)dpDefault);	// AE4998
+
+  void    getChar(strxxx& s, qbool zeroempty=qfalse); //get character value and return in s
+	void		getChar(qlong maxlen, qchar* add, qlong& len, qbool zeroempty = qfalse ); //move character value to buffer at add, maxlen is length of buffer
+	strxxx& getChar(qbool zeroempty=qfalse);
+	
+  void    setChar(const strxxx& s, qshort fdp1=(qshort)dpDefault );  //set character value
+	void		setChar(qchar* add, qlong len);					//set character value
+	void		setChar(qoschar* add, qlong len);				//set character value // rmm9025
+	#if defined(isRCCLIB) || defined (isEXECLIB) || defined(isRCC)
+		void		setChar( csettype cset, qchar* add, qlong len );				//set character value
+	#endif
+	void		setUtf8Chars(qbyte *add, qlong len);	// rmm_rws: Set fldval to character after converting from UTF-8 data at address add with byte length len
+	void		setchar(const std::string &pString)	// rmm9760
+	{
+		setUtf8Chars((qbyte *)pString.c_str(), (qlong)pString.length());
+	}
+
+  qbool		isLongChar();													//return true if fftCharacter and length is >255
+
+	void    getNum(qreal& x, qshort& xdp, qbool* ret=0);  //get numeric value, convert if necessary
+  void    setNum(qreal x, qshort xdp=dpDefault);        //set numeric value
+
+  qlong   getLong();                                    //get long value, convert & round if necessary
+  void    setLong(qlong x);                             //set long value
+  // Start rmm7722
+  qlong64 getLong64();                                  //get 64 bit long value, convert & round if necessary
+  void    setLong64(qlong64 x);                         //set 64 bit long value
+  qlongptr getLongPtr();                                //get long ptr value, convert & round if necessary
+  void    setLongPtr(qlongptr x);                       //set long ptr value
+  // End rmm7722
+
+#ifndef isRCCLIB
+	qobjinst getObjInst(qbool duplicate);															// Get Object inst
+	void		 setObjInst( qobjinst pObjInst, qbool transferOwnership );// Set object inst
+
+	qobjinst getObjRef();											// rmmv4obj: get an object instance from an object reference
+	void		 setObjRef(qobjinst pObjInst);		// rmmv4obj: create an object reference to an object instance
+
+  preconst getConstant(preconst pMin, preconst pMax, qbool *pRet = 0);	// get predefined constant numeric value	// Start rmm3568
+  qlong		 getLong(preconst pMin, preconst pMax, qbool *pRet);
+  void		 setConstant(preconst pX);																		// set predefined constant value
+  void     setConstant(preconst pMin, preconst pMax, qlong pVal);																									// End rmm3568
+  qbool		 setConstant(strxxx& pX);																		// AE6515 set predefined constant value
+#endif
+
+  void    getDate(datestamptype& x, qshort fdp1=(qshort)dpDefault, qbool* ret=0);     //get date value 
+  void    setDate(const datestamptype& x, qshort xdp=(qshort)dpDefault);  //set date value 
+  qshort  getBool(qbool* ret=0);     //get boolean value, returns 0,1, or 2
+  void    setBool(qshort x);  //set boolean value 
+
+#if defined(isXCOMPLIB) || defined(ismobile) && defined(ismacosx)	// pkiphone
+	EXTqlist* getList(qbool duplicate);
+	EXTqlist* getList(qbool duplicate, qbool canbezero, qbool isrow);	// rmm6447
+	EXTqlist*	takeList();	// rmm_jsw: Like getList, except ownership transfers to the caller and only duplicates the list if necessary
+#endif
+	void			getList(EXTqlist* pList, qbool duplicate);
+  void    	setList(EXTqlist* plst, qbool transferOwnership );
+	void			setList(EXTqlist* plst, qbool transferOwnership, qbool isRow); // jc0024
+
+  qcrb		getCrbRef( qbool pDuplicate ); // mpmPRIv
+  void		setCrbRef( qcrb pCrb, qbool pTransferOwnership ); // mpmPRIv
+
+  void    getBinary(qlong maxlen, qbyte* add, qlong& len);
+  qlong   getBinLen();                      //return length of data
+	qlong		getCharLen();											//return the length in characters of character data
+	void		reduceCharLen(qlong pLen);				//rmm9025: reduce length of character item to pLen
+	void		deleet(qlong pOffset, qlong pLen);//rmm9025: delete the character data from 1-based position pOffset, for pLen characters
+  void    setBinary(ffttype fft1, qbyte* add, qlong len, qshort fdp1=(qshort)dpDefault);  //set binary value 
+
+	#ifndef isCOCOA // rmm8565: Global handle functions are deprecated for 6.2 - and not available for Cocoa
+		HGLOBAL	getHandle();	// returns moveable block of memory, which is a copy of the data.
+		void 		setHandle(ffttype fft1, HGLOBAL han, qshort fdp1 = (qshort)dpDefault);
+	#else
+		CFStringRef getCFStringRef();			// rmm9025
+		void setChar(CFStringRef pRef);		// rmm9025
+	#endif
+
+	qHandle	getHandle (qbool pMakeCopy);
+	void 		setHandle	(ffttype fft1, qHandle pHandle, qbool pTakeACopy, qshort fdp1=(qshort)dpDefault);
+#ifdef isiphone
+	void 		setOrfcHandle(ffttype fft1, handle &pHandle, qbool pTakeACopy, qshort fdp1=(qshort)dpDefault); // rmm_iphone13
+	handle  getOrfcHandle(qbool pMakeCopy);
+#endif
+
+#ifndef isRCCLIB
+	qret		setCalculation(	locptype* pLocp, qshort pCalculationType, qchar* pBuffer, qlong pLen, qlong* pError1=NULL, qlong* pError2=NULL);
+	void		getCalculation(	locptype* pLocp, qshort &pCalculationType, EXTfldval &pText );
+	qbool		evalCalculation( EXTfldval& pResult, locptype* pLocp, EXTqlist* pList = NULL, qbool pUseCache = qtrue ); // mpm4496
+#endif
+
+  qbool   conv(ffttype fft1, qshort fdp1=(qshort)dpDefault);    //convert to fval with type fft1, implemented in dmfval.cp //JS9001 cast
+
+	void		concat(qchar c) { concat ((qchar*)&c, 1); }
+	void		concat(qchar* add, qlong len);				 // concat with character value
+	void		concat(qoschar* add, qlong len);			 // rmm9025: concat with character value
+	void    concat(EXTfldval& fval1);              // concat two character values
+	void		concat(const strxxx &s);							 // concatenate a string to a fldval  
+	
+	void		concatBinary(qbyte *pAdd, qlong pLen);											// rmm8675
+	void		concatBinary(EXTfldval &pFval);															// rmm8675
+	void		concatBinary(qbyte pByte) { concatBinary(&pByte, 1); }			// rmm8675
+	void		concatBase64(EXTfldval &pFval);															// rmm8675: concatBinary the base64 equivalent of the supplied data
+	void		concatBase64(qbyte *pAdd, qlong pLen);											// rmm8675: concatBinary the base64 equivalent of the supplied data
+	
+	qshort  compare(EXTfldval& fval1);           //compare two fldvals
+	qshort	compare( EXTfldval& fval1, qbool igncase );
+	qshort	compare( const strxxx& s, qbool igncase );
+  qlong   pos(EXTfldval& fval1);                 //rmm1303: reversed meaning: return substring position of fval1 in *this; this is consistent with all other pos methods
+
+	qlong		pos(qchar* add, qlong len);	//return position of ch1 in *this comparing len chars 
+	qlong		pos(qchar ch);							//return position of ch in *this
+  qlong   pos(const strxxx& s);       //return position of str1 in *this
+	qlong		lastPos(qchar ch);					//rmm9025: return last position of ch in *this
+
+	void		insertStr (qlong pos, const strxxx &s);																							//  insert s before position (1 based) pos; 1 <= pos <= len
+	qbool 	replaceStr (strxxx &pFindStr, const strxxx &pReplaceStr, qbool pIgnCase = qfalse);	//  replace the first instance of pFindStr with pReplaceStr; return qtrue if replace occurred
+	void		replaceStr (EXTfldval &pFindStr, EXTfldval &pReplaceStr, qbool pAll);								//  replace the first or all instances of pFindStr with pReplaceStr
+
+	void 		getType(ffttype& fft1, qshort* fdp1=0); 
+
+	qfldval	getFldVal() { return mData; } // mpmPRIv
+	void		setFldVal( qfldval pData ); // mpmPRIv
+	void		setOmnisData(qbool pIsOmnisData) { mDeleteInOmnis = pIsOmnisData; }
+	qbool		isOmnisData() { return mDeleteInOmnis; }
+
+#ifndef isRCCLIB
+	qbool		getOmnisField ( strxxx &pVariableName, qbool pWillAlter =qfalse, locptype* pLocp = NULL ); // mpm4425
+#endif
+
+	void		setReadOnly(qbool pIsReadOnly) { mIsReadOnly = pIsReadOnly; } // AE4575
+	qbool		isReadOnly() { return mIsReadOnly; }			// AE4575
+};
+
+#if !defined(isRCCLIB) && !defined(isEXECLIB)
+	qobjinst EXTobjinst(EXTCompInfo* pEci); 					// Create new instance object 
+	qobjinst EXTobjinst(qobjinst pObjInst); 					// Duplicate the instance object
+	qobjinst EXTobjinst(qapp pApp,str255* pObjName);	// Create a new instance object from the name supplied  
+	qbool		 ECOgetParamInfo( EXTParamInfo *pParam, EXTparamTypeInfo &pInfo );	// rmm3582 // rmm3618
+	qbool		 ECOisSerialised( qchar *pProductCode, qchar *pFunctionCode = NULL, qchar *pSerial = NULL, qchar *pNotes = NULL); // MHn0124
+#endif
+
+#ifndef ismobile	// rmm_mobile
+	#pragma SET_BYTE_PACKING_OFF
+	GCC_SET_BYTE_PACKING_OFF // MHMACH2
+#endif
+
+// PKMACCLIENT
+#if defined(ismac) && defined(isRCCLIB)
+GCC_EXPORT_OFF // MHMACH4
+#pragma export off
+#endif
+
+#endif

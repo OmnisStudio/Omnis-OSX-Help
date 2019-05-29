@@ -1,0 +1,246 @@
+ /* $Header: svn://svn.omnis.net/trunk/Studio/O7EXE/INDY/gdipict.he 15498 2016-09-28 09:21:19Z bmitchell $ */
+
+//Q4 gdipict.he
+//Omnis GDI Picture interface
+//Copyright (C) Blyth Holdings Inc 1996
+
+/**************** Changes ******************
+Date			Edit				Bug					Description
+28-Sep-16	rmm9059			ST/AD/061		Problems generating icons for picture data files and #ICONS.
+24-Feb-15	CR0325			ST/WO/2330	Support for Cocoa GIF and 8 bit bitmaps with color tables.
+30-Mar-15	rmm_ccb			ST/HE/1259	Cocoa clipboard implementation.
+09-Apr-14	CRHIRES									High resolution support
+19-Aug-13	rmm64bitux							Linux 64 bit port.
+10-Jun-13	CRCOCOA									Cocoa target
+07-Apr-09	rmm_iphone23						Tabbar field.
+28-Sep-05 MHMACH                  Mach-o changes
+14-Jan-04 MHn0302			ST/EC/793		Fixed drawing of Hyperlinks on OSX.
+11-Dec-03 pkisalpha6							Alpha hilite
+01-Dec-03 pkisalpha4							Alpha hilite
+14-Nov-03 pkisalpha								Client alpha support
+23-may-03 pkiconeditor7						Alpha support
+30-Apr-03	AE6231									Added GDIdrawAlphaBitmap & GDIalphaBitmapToPIXMAP
+28-Apr-03	AE6219									32bit icon page support
+11 SEP 02 mpmBackPic							Implements $backpicture for reports
+03-May-00 PK6017									PPC problems with 1bit images
+06-Dec-99	rmm3551									Added $picturealign and $keepaspectratio picture field properties.
+24-Nov-99 PKICON									24 bit icon editor support
+17 NOV 98 mpmTHINg								Thin client notation
+01-Oct-98	AE4836									XCOMP GPF due to GDIpictGetBounds passing EXTfldval on stack & not by reference
+01-Sep-98	rmm3209									Added 24 bit colour option to GDIbitmapToColorShared.
+18-Aug-98	rmm3199									24 Bit Colour Shared Pictures.
+17-Aug-98 PK4778									Added OMEX and various defines ( isOMNISCORE ) for RCC
+26-Jan-98	mt40428									now have SET_CORE_PACKING && SET_BYTE_PACKING directives
+04-Nov-96	mt40046									68k Code fragment
+09-Sep-96	rmm1712			PR/PI/005		GPF using convert to shared option for libraries.
+13-Aug-96	AE4064									Enhanced metafile support for Win32
+********************************************/
+ 
+#ifndef _GDIPICT_HE_
+#define _GDIPICT_HE_
+
+#ifndef _basics_
+  #include "basics.h"
+#endif
+
+#ifndef _GDI_HE_
+  #include "gdi.he"
+#endif
+
+#ifndef _HWND_HE_
+  #include "hwnd.he"
+#endif
+
+const qbyte 
+			cColDepth256 = 0,
+			cColDepthMax = 1,		// 24 or 32bit depending on O/S
+			cColDepth24	 = 2;
+
+//picture types
+const int
+			ptypShared    = 0,         // black and white Mac bitmap
+      ptypMpict     = 1,         // Mac pict
+      ptypDbmap     = 2,         // Dos bitmap
+      ptypMetafile  = 3,         // Dos metafile
+      ptypDIDbmap   = 4,
+      ptypColShared = 5,         // new color shared picture
+			ptypOBitmap		= 6,				 // OS/2 (1.x or 2.x) Bitmap.
+      ptypOMetafile = 7,                               // OS/2 Metafile.
+			ptypEnhMetafile = 8,			 // Win32 Enhanced metafile AE4064
+			ptypExternal = 9,			 		 // External component data (eg OLE)
+			ptypColShared24 = 10;			 // rmm3199: 24 bit colour shared
+ 
+// rmm3199: Shared picture modes
+const qbool cSharedPicMode8bit = 1,		// 8 bit (256 colour) mode
+						cSharedPicMode24bit = 2;		// 24-bit colour mode
+ 
+//format of pictures in application and data files
+ 
+GCC_SET_BYTE_PACKING_ON // MHMACH
+#pragma SET_BYTE_PACKING_ON
+ 
+struct tqgpict {
+  qint1   pver;                 //version, always 0 for now
+  qint1   ptyp;                 //picture type, a ptypXxx constant
+  qword2  psig;                 //signature used by applets
+  qint1   pspr[12];
+};
+typedef tqgpict *qgpict;
+ 
+typedef struct 
+{
+	qbyte    	mBlue;
+  qbyte   	mGreen;
+  qbyte   	mRed;
+  qbyte    	mReserved;
+} qColorEntry;
+
+typedef struct 
+{
+	qdim 			mWidth;
+	qdim 			mHeight;
+	qdim 			mNumColors;
+	qdim 			mBitCount;
+} HPIXMAPinfo;
+
+// Start rmm3551: added support for picture alignment
+const qshort	GDIpictVertAlignTop = 0,			// Alignment values; these are stored and used in a byte: the left-hand nibble is the vertical alignment
+							GDIpictVertAlignCenter = 1,		// and the right-hand nibble the horizontal alignment.
+							GDIpictVertAlignBottom = 2,
+							GDIpictHorzAlignLeft = 0,
+							GDIpictHorzAlignCenter = 1,
+							GDIpictHorzAlignRight = 2;
+
+#define PICT_VERT_ALIGN(_align) (((_align) >> 4) & 0xf)
+#define PICT_HORZ_ALIGN(_align) ((_align) & 0xf)
+#define PICT_STRETCH_ALIGN(_align) ((_align) & 0x40) // mpmBackPic
+#define PICT_TILE_ALIGN(_align) ((_align) & 0x80) // mpmBackPic
+
+GDIPICTAPI qbool OMNISAPI GDIalignPicture(qrect &pRect, qrect &pPictureRect, qshort pPictureAlignment, 
+																					qbool pStretch, qbool pKeepAspectRatio, qbool pHasHscroll, qbool pHasVscroll);
+// End rmm3551
+
+// rmm64bitux: (qlong) for GDInextRow, rather than (long)
+#ifdef ismac
+	#define GDIbitsAddr( pBitsBase, pXpos, pYpos, pRowBytes ) ( pBitsBase + pXpos + ( (qlong)pYpos * (qlong)pRowBytes ) )
+	#define GDInextRow( pStartBase, pRowBytes ) ( pStartBase + (qlong)pRowBytes )
+#else
+	#if defined(isGDIHWNDLIB) || defined(isOMNISCORE)				// 	pkisalpha #ifdef isOMNISCORE
+		#define GDIbitsAddr( pBitsBase, pXpos, pYpos, pRowBytes ) ( incads(pBitsBase, pXpos - ( (qlong)pYpos * (qlong)pRowBytes ) ) )
+		#define GDInextRow( pStartBase, pRowBytes ) ( decads( pStartBase, (qlong)pRowBytes ) )
+	#else 
+		#define GDIbitsAddr( pBitsBase, pXpos, pYpos, pRowBytes ) ( MEMincAddr(pBitsBase, pXpos - ( (qlong)pYpos * (qlong)pRowBytes ) ) )
+		#define GDInextRow( pStartBase, pRowBytes ) ( MEMdecAddr( pStartBase, (qlong)pRowBytes ) )
+	#endif
+#endif
+
+#ifdef isCOCOA	// CR0325 : bitmaps are byte aligned
+#define GDIrowBytes(i) (i/8)
+#else
+#define GDIrowBytes(i) ((i+31)/32*4)
+#endif
+
+//PK6017
+#if defined(ismac) && !defined(isCOCOA)	//CRCOCOA
+#define GDIrowBytesEx(pWidth,pDepth) pDepth==1 ? ((pWidth+7)/8) : (((pWidth*pDepth)+31)/32*4)
+#else
+#define GDIrowBytesEx(i,y) GDIrowBytes((i*y))
+#endif
+
+#define GDIgetGreenPart(pColor) ((qbyte)(((qshort)(pColor)) >> 8))
+#define GDIgetBluePart(pColor)  ((qbyte)((pColor)>>16))
+#define GDIgetRedPart(pColor)  	((qbyte)(pColor))
+
+GCC_SET_BYTE_PACKING_OFF // MHMACH
+#pragma SET_BYTE_PACKING_OFF
+#pragma SET_RETURN_REGISTER_ON
+
+GDIPICTAPI void 		OMNISAPI GDIpictGetMaskSettings( qword2& testval, qword2& relaceval, qbyte& fillval );
+#if defined(ismacosx) && !defined(isCOCOA) // rmm_ccb: Exclude this from all OS except Carbon (the only implementation is for Carbon)
+	GDIPICTAPI qbool		OMNISAPI GDIconvToSysPict(qbyte* add, qlong len, qlong& phan);	  // AEUNI
+#endif
+inline qbool GDIisPNG(qbyte *pAdd, qlong pLen)	// rmm_ccb
+{
+	static qbyte png_sig[8] = {137, 80, 78, 71, 13, 10, 26, 10};
+	return pLen > (qlong) sizeof(png_sig) && !memcmp(pAdd, &png_sig[0], sizeof(png_sig));
+}
+
+#if  defined(isXCOMPLIB)
+class EXTfldval;
+GDIPICTAPI void			OMNISAPI GDIconvToOmnisPict(qbyte* add, qlong len, EXTfldval& pPicture);// AEUNI
+GDIPICTAPI qbool		OMNISAPI GDIconvToSharedPict( EXTfldval &pPictureToConvert );
+GDIPICTAPI void 		OMNISAPI GDIpictGetBounds( EXTfldval& pPicture, qrect* pBounds ); // AE4836
+GDIPICTAPI qbool		OMNISAPI GDIbitmapToColorShared( HBITMAP pSource, EXTfldval& pData );
+GDIPICTAPI HPIXMAP	OMNISAPI GDIbitmapToPIXMAP( HBITMAP pBitmap, quint pDepth ); // AE6648
+#endif
+#if defined(isRCCLIB)
+class EXTfldval;
+RCCAPI void			OMNISAPI GDIconvToOmnisPict(qbyte* add, qlong len, EXTfldval& pPicture);// AEUNI
+RCCAPI qbool		OMNISAPI GDIconvToSharedPict( EXTfldval &pPictureToConvert );
+RCCAPI void 		OMNISAPI GDIpictGetBounds( EXTfldval& pPicture, qrect* pBounds ); // AE4836
+RCCAPI qbool		OMNISAPI GDIbitmapToColorShared( HBITMAP pSource, EXTfldval& pData );
+#endif
+#if defined(isGDIHWNDLIB) || defined(isRCCLIB) || defined(isOMNISCORE)
+class handle;
+GDIPICTAPI void			OMNISAPI GDIconvToOmnisPict(qbyte* add, qlong len, handle& han);// AEUNI
+GDIPICTAPI qbool 		OMNISAPI GDIconvToSharedPict( handle &pPictureToConvert, qbool fromreorg=qfalse, qbyte pColorDepth=cColDepthMax); // rmm1712: pass a reference // rmm3199
+GDIPICTAPI void 		OMNISAPI GDIpictGetBounds( handle pPicture, qrect* pBounds );
+GDIPICTAPI qbool		OMNISAPI GDIbitmapToColorShared( HBITMAP pSource, handle& pHan, qbyte pColorDepth=cColDepthMax);	// PK4200 // rmm3209
+#endif
+GDIPICTAPI void			OMNISAPI GDIdrawPicture( HDC pHdc, void* pPictData, qlong pPictDataLen, qjst pJst, qrect* pRect, qbool pStretch, qbool pUsePalette ); 
+
+GDIPICTAPI qbool		OMNISAPI GDIpixmapToColorShared( HPIXMAP pSource, qHandle& pHan,qbyte pColorDepth=cColDepthMax );	// PKICON
+
+GDIPICTAPI void 		OMNISAPI GDIdrawHPIXMAPchisel( HDC pHdc, HPIXMAP pHPIXMAP, qrect* pDestRect, qcol pTransparent = colWhite );  // PK4544a
+GDIPICTAPI void 		OMNISAPI GDIdrawHPIXMAPmask( HDC pHdc, HPIXMAP pDib, qrect* pDestRect, qcol pTransparent = colWhite );  // PK4544
+// Start CRHIRES : add scale for source pixmap ( currently only used for COCOA )
+#if defined(isCOCOA) || defined(isXCOMPLIB)
+GDIPICTAPI void 		OMNISAPI GDIdrawHPIXMAP( HDC pHdc, HPIXMAP pHPIXMAP, qrect* pSrcRect, qrect* pDestRect, qbool pStretch, qreal pSrcScale = 0 );	// mt40073
+#elif !defined(isGDIPLUS)	// Not needed by xgdiplus.cpp (will not compile as xgdiplus.cpp undefs NO_STRICT)
+GDIPICTAPI void 		OMNISAPI GDIdrawHPIXMAP( HDC pHdc, HPIXMAP pHPIXMAP, qrect* pSrcRect, qrect* pDestRect, qbool pStretch );	// mt40073
+inline GDIPICTAPI void 		OMNISAPI GDIdrawHPIXMAP( HDC pHdc, HPIXMAP pHPIXMAP, qrect* pSrcRect, qrect* pDestRect, qbool pStretch, qreal pSrcScale )
+																		{ GDIdrawHPIXMAP(pHdc, pHPIXMAP, pSrcRect, pDestRect, pStretch); }
+#endif
+// End CRHIRES
+GDIPICTAPI HPIXMAP	OMNISAPI GDIHPIXMAPfromSharedPicture( void* pPictData, qlong pPictDataLen );
+GDIPICTAPI void 		OMNISAPI GDIdeleteHPIXMAP( HPIXMAP pHPIXMAP );
+GDIPICTAPI HPIXMAP	OMNISAPI GDIcreateHPIXMAP( qdim pWidth, qdim pHeight, qbyte pDepth, qbool pOmnisColors );
+GDIPICTAPI HPIXMAP	OMNISAPI GDIbitmapToPIXMAP( HBITMAP pBitmap ); // AE4688
+GDIPICTAPI HPIXMAP	OMNISAPI GDIbitmapToMonoPIXMAP( HBITMAP pBitmap ); // AE6219
+GDIPICTAPI HPIXMAP	OMNISAPI GDIalphaBitmapToPIXMAP( HBITMAP pBitmap ); // AE6231
+void GDIgetPixmapBounds( HPIXMAP pPixmap, qrect* pBounds ); // mpmPRI
+
+GDIPICTAPI qbool OMNISAPI GDIisAlphaImage( void* pPictData, qlong pPictDataLen ); // pkiconeditor7
+GDIPICTAPI HBITMAP OMNISAPI GDIalphaPixmapToBitmap(HPIXMAP pPixmap);	//pkisalpha
+GDIPICTAPI HBITMAP OMNISAPI GDImakeGrayScale( HPIXMAP pSource ); //pkisalpha
+GDIPICTAPI HBITMAP OMNISAPI GDImakeHilited( HPIXMAP pSource, qbyte pPercent, qcol pHiliteCol ); // pkisalpha4
+
+// pkisalpha6
+GDIPICTAPI HBITMAP OMNISAPI GDIsetAlphaLevel( HBITMAP pSourceBMP, qbyte pAlphaLevel );
+GDIPICTAPI HBITMAP OMNISAPI GDIreplaceColors( HBITMAP pSourceBMP, qcol pSearch, qcol pReplace, qbyte pRepAlpha, qbyte pRepAlpha1, qbool pIs24 = qfalse, qcol pMaskCol = GDI_COLOR_QDEFAULT); // MHn0302
+				
+void GDIapplyColorToHPIXMAP(HPIXMAP pAlphaPixmap, qcol pColor);	// rmm_iphone23
+
+// Manipulation of HPIXMAPs
+GDIPICTAPI void* 	OMNISAPI GDIlockHPIXMAP( HPIXMAP pPixMap );
+GDIPICTAPI void 		OMNISAPI GDIunlockHPIXMAP( HPIXMAP pPixMap ); 
+GDIPICTAPI void 		OMNISAPI GDIgetHPIXMAPinfo( HPIXMAP pPixMap, HPIXMAPinfo* pPixMapInfo );
+GDIPICTAPI qshort 	OMNISAPI GDIsetColorEntries( HPIXMAP pPixMap, qshort pStart, qshort pCount, qColorEntry* pEntries );
+GDIPICTAPI qshort	OMNISAPI GDIgetColorEntries( HPIXMAP pPixMap, qshort pStart, qshort pCount, qColorEntry* pEntries );
+
+// Manipulation of HPALETTEs
+GDIPICTAPI qbool 		OMNISAPI GDIsetPalette(HWND pHwnd,HPALETTE pPalette);
+GDIPICTAPI HPALETTE	OMNISAPI GDIcreatePalette( qshort pCount, qColorEntry* pEntries );
+GDIPICTAPI void			OMNISAPI GDIdeletePalette( HPALETTE	pPalette );
+GDIPICTAPI void 			OMNISAPI GDIanimatePalette( HPALETTE pPalette, qshort pStart, qshort pCount, qColorEntry* pEntries );
+GDIPICTAPI qshort		OMNISAPI GDIsetPaletteEntries( HPALETTE pPalette, qshort pStart, qshort pCount, qColorEntry* pEntries );
+GDIPICTAPI qshort		OMNISAPI GDIgetPaletteEntries( HPALETTE pPalette, qshort pStart, qshort pCount, qColorEntry* pEntries );
+
+// Start rmm9059: Cross platform PNG methods
+BOOL GDIPNGtoRGBAbytes(unsigned char *pPNGadd, qlong pPNGlen, qlong pPNGwidth, qlong pPNGheight, unsigned char *pRGBAbytes, qlong pRGBAbytesLen);
+BOOL GDIRGBAbytesToPNG(unsigned char *pRGBAbytes, qlong pRGBAbytesLen, qlong pPNGwidth, qlong pPNGheight, qlong pLeft, qlong pTop, qlong pWidth, qlong pHeight, void *pOutputPNG);
+// End rmm9059
+
+#pragma SET_RETURN_REGISTER_OFF
+ 
+#endif

@@ -1,0 +1,193 @@
+/* $Header: svn://svn.omnis.net/trunk/Studio/O7EXE/INDY/Worker.he 20170 2018-06-22 12:05:49Z bmitchell $ */
+/*
+  Omnis Studio - "Worker Main" object class header
+	Copyright (C) Omnis Software Ltd 2017
+
+FILENAME:	worker.he
+
+DESCRIPTION:	Implements a generic 'worker' class.
+
+DETAILS:		
+*/
+/* Changes
+Date				Edit			Fault				Description
+20-Jun-18		rmm9720								OW3 component - Crypto Worker.
+23-May-17		rmm9425								OWWW component.
+08-Mar-17   gra1111               $threadcount relies on timer completion
+24-Oct-16		rmm9120								Added optional method name parameter to pushWorkerCallback.
+11-Jul-16		gra1088								Struct mis-alignment on Linux
+27-Apr-16		rmm8892								Re-used web worker could not be cancelled; $run() did not work with $callbackinst.
+14-May-15   gra1036   ST/*A/109   Enable execution of multiple SQL statements
+05-Mar-15		rmm8517								Call CloseHandle for workers.
+04-Sep-14		rmm_rws8							Timer worker object.
+09-Jul-14		gra0981		ST/*A/105		No error returned from dInit
+31-Mar-14		gra0964		ST/PF/807		Return additional error information
+10-Feb-14		rmm_rws								RESTful Web Services support.
+19-Aug-13		rmm64bitux						Linux 64 bit port.
+04-Jul-13		gra0902								Bind variable enhancements
+03-Sep-12		gra0863								Mac compile issue
+24-Apr-12		gra0846								Generic props/methods moved to worker
+17-Apr-12		gra										Initial implementation
+Dec 11			Adapted from code created by David McKeone 11-Oct-09	
+*/
+#ifndef WORKER_H_
+#define WORKER_H_
+
+#include "extcomp.he"
+#include "threadtimer.he"
+#include "xthreads.he" //EXTthreadHandle
+
+#if defined(ismac) || defined(isunix)
+	#define DWORD unsigned int //gra0863 // rmm64bitux: Use int rather than long
+	#define WINAPI void *
+	#define LPVOID void *
+#endif
+
+namespace worker
+{
+	enum eWorkerState
+	{
+		kStateClear,	//the worker is in a pre-initialised state (ready for init)
+		kStateInit,	//the worker has been initialised (ready for start)
+		kStateCancelled, //the worker was cancelled (ready for init)
+		kStateRunning, //the worker is busy (waiting for complete)
+		kStateComplete, //the worker has finished (ready for init/start)
+		kStateCompleteNoCallback // rmm_rws8: worker has finished, but no callback is required - must not be used with timer completion
+	};
+}
+
+//eWorkerError encompasses several session and statement error constants
+//in addition to worker-specific constants. This is intentional as it allows
+//any type of error to be described.
+enum eWorkerError
+	{
+		kWorkerNoError = 0,
+		kWorkerLogonFailed = -30,
+		kWorkerPrepareFailed = -80,
+		kWorkerExecuteFailed = -81,
+		kWorkerDescribeFailed = -82,
+		kWorkerInputVarError = -101, //gra0902
+		kWorkerBindInputVarFailed = -103,
+		kWorkerBadPool = -137,
+		kWorkerPoolFailed = -138,
+		kWorkerBadSession = -139,
+		kWorkerMissingParams = -140,
+		kWorkerAlreadyRunning = -141,
+		kWorkerNotInitialized = -142
+	};
+	
+	extern ECOparam StmtWorkerParamInit[];
+	extern ECOparam StmtWorkerParamSessRef[];
+
+class Worker;
+
+#pragma pack(1) //gra1088
+class WorkerErrorInfo
+{
+private:
+	eWorkerError				mErrorCode;								// error code
+	qlong								mNativeErrorCode;					// native error code
+	EXTfldval						mNativeErrorText;					// native error text
+	Worker							*mWorker;
+	EXTCompInfo					*mCurrCompInfo; //gra0964
+public:
+	WorkerErrorInfo();
+	~WorkerErrorInfo();
+	void						setCompInfo(EXTCompInfo *pEci) { mCurrCompInfo = pEci; } //gra0964
+	void						setWorker(Worker *pWorker) { mWorker = pWorker; }
+	void						clearError();
+	void						setErrorCode(eWorkerError pErrorCode); 
+	void						setErrorCodeOnly(eWorkerError pErrorCode) { mErrorCode = pErrorCode; } // rmm9720
+	eWorkerError		getErrorCode() { return mErrorCode; }
+	qbool						getErrorText(EXTfldval &pErrText); //gra0964	
+	qlong						getNativeErrorCode() { return mNativeErrorCode; }
+	void						getNativeErrorText(EXTfldval &pErrorText) {pErrorText = mNativeErrorText; }
+	void						setNativeErrorCode(qlong pErrorCode) {mNativeErrorCode = pErrorCode; }
+	void						setNativeErrorText(EXTfldval &pErrorText) {mNativeErrorText = pErrorText; }
+};
+
+//###### Worker Class ######
+class Worker
+{
+	public:
+		// Start rmm9425
+		const qbool cPushWorkerCallbackFlag_AlwaysCallComplete = qtrue,
+								cPushWorkerCallbackFlag_cDoNotCreateNewResultRow = 2;
+		// End rmm9425
+		Worker();
+		Worker(qobjinst objptr);
+		Worker(Worker *pWorker);
+		virtual ~Worker(); 
+	
+		qbool run(EXTCompInfo *pEci); 
+		qbool start(EXTCompInfo *pEci);	//gra0902
+		void clearParams();
+		worker::eWorkerState getState() { return mState; }
+		void setState(worker::eWorkerState state) { mState = state; }
+		qlong getErrorCode() { return mErrorInfo.getErrorCode(); }
+		void getNativeErrorText(EXTfldval &pErrText);
+		qlong getNativeErrorCode() { return mErrorInfo.getNativeErrorCode(); } //gra0964
+		void getErrorText(EXTfldval &pErrText) { mErrorInfo.getErrorText(pErrText); } //gra0964
+		void notify(eTimerState *pState);
+		void cancel();
+		qbool isOrphaned() { return mOrphaned; }
+		qbool	getCancelIfRunning() { return mCancelIfRunning; }
+		void setCancelIfRunning(qbool pCancel) { mCancelIfRunning = pCancel; }
+		qbool getWaitForComplete() { return mWaitForComplete; }
+		void setWaitForComplete(qbool pWait) { mWaitForComplete = pWait; }
+		void setOrphaned() { mOrphaned = qtrue; }
+		qbool	extractParameter(str255 &pParamName, EXTfldval &pFval);
+		EXTqlist *getResultRow(qbool pTransferOwnership);
+		void clearResultRow();
+		qbool parseInputParams(EXTfldval *pQuery, EXTqlist *pBindVars, qshort **pBindIndexes); //gra0902 //gra1036-params added
+		qbool init(EXTCompInfo* pEci); // Code to be run prior to entering the thread
+		// Start rmm_rws
+		void setWorkerObjectId(qlong pWorkerObjectId) { mWorkerObjectId = pWorkerObjectId; }	
+		qlong getWorkerObjectId() { return mWorkerObjectId; }
+		void pushWorkerCallback(ECOpushWorkerCallback_Ptr pFunctionPtr, qbool pFlags = 0, strxxx *pCallbackMethodName = 0); // rmm_rws8 // rmm9120 // rmm9425: Renamed parameter to pFlags
+		void pushWorkerCallbackFromRunMethod();	// rmm8892
+		qbool getTimerCompletion() { return mTimerCompletion; }
+		void clearThreadHandle() { mThreadHandleCleared = qtrue; } // rmm8517
+		EXTthreadHandle getThreadHandle() { return mThreadHandleCleared ? 0 : mThreadHandle; } // rmm8517
+		// End rmm_rws
+		qbool needTLS() { return mNeedTLS; } // rmm_rws8
+		
+		virtual worker::eWorkerState dRun() = 0; //accessible from threadProc
+		virtual void dGetNativeError() = 0; //accessible from mErrorInfo
+		
+		void		**_params;			// rmm_rws8: Allows worker thread dRun method to access the worker thread parameters
+		static qlong  _threadCount; //gra1111
+	protected:
+		WorkerErrorInfo mErrorInfo;
+		EXTqlist *mParams; 
+		EXTqlist *mResultRow; 
+		EXTqlist *mBindVars;	
+		EXTqlist *mWorkList; //gra1036
+		qshort **mWorkBindIndexes; //gra1036- an array of qshort pointers(arrays)
+		qobjinst mObjPtr;
+		qbool	mResultRowIsMine; //qtrue if worker should delete the result row
+		qbool mOrphaned;				//qtrue if the worker has been detached from the Interface Object
+		qbool mCancelIfRunning; //If qtrue, running threads are cancelled on reuse/destruct
+		qbool mWaitForComplete; //If qtrue, worker cannot be reused until delegate completes
+		qbool	mTimerCompletion;	//rmm_rws: If true,use threadTimer to handle completion (deprecated - setting mTimerCompletion to qfalse and not using the timer is now preferred)
+		qshort *mBindIndexes;		//gra0902- a dynamic array that matches bind markers up with supplied list columns		
+		qlong		mWorkerObjectId;// rmm_rws: optional type, defaults to zero - used when an external component supports more than one worker object type
+		qbool		mNoParamsOk;		// rmm_rws: True if mParams is not required
+		qbool		mWaitsForCancelToComplete;	// rmm_rws: If true, no need to make orphan objects
+		qbool		mNeedTLS;				// rmm_rws8: True (default) when the worker needs the core thread local storage
+
+		virtual qbool dPrepareParams(EXTCompInfo* pEci, eWorkerError &pErrorCode);	// rmm_rws
+		virtual eWorkerError dInit(EXTCompInfo* pEci, EXTqlist* pParams) = 0; //gra0981
+		virtual void dCancel() = 0;
+		virtual qbool dPrepare(EXTCompInfo* pEci, EXTqlist* pParams) { return qfalse; } //gra1036- deprecated	
+		virtual	void	dAbortFetch() = 0;
+		
+	private:
+		worker::eWorkerState mState; //A constant representing the current state of the worker instance
+		EXTthreadHandle mThreadHandle;	// rmm8517: Made private
+		qbool		mThreadHandleCleared;		// rmm8517: Set to qtrue once the thread handle has been "cleared", leaving the handle to be closed by the Worker destructor
+};
+
+#pragma pack() //gra0188
+
+#endif // WORKER_H_

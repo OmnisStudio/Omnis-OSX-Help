@@ -1,0 +1,1186 @@
+/* $Header: svn://svn.omnis.net/trunk/Studio/O7EXE/INDY/hwnd.he 21397 2018-11-07 10:09:03Z bmitchell $ */
+
+//Q4 HWND.HE
+//Mac HWND interface
+//Copyright (C) Blyth Holdings Inc 1996
+
+/**************** Changes ******************
+Date			Edit				Bug					Description
+28-Jun-18	rmm_rd									Studio 9.0 remote debugger
+07-Jun-18	CR0514			ST/HE/1572	System drag and drop extended type support.
+23-May-18	rmm9680			ST/DB/981		Configurable debugger interrupt key.
+21-May-18	CR0515			ST/WO/2456	Fix Cocoa parent background skin bitmap positioning and scaling.
+12-Jan-18 pkcocoa_1179 						Per pixel alpha supporting windows
+19-Dec-17	rmm_emat								Text editor for Omnis language.
+18-Dec-17 pkcocoa_1176 						Dragdrop changes
+05-May-17	rmm9362			ST/JS/1498	Paged pane issue with border radius.
+21-Mar-17	CR0425			ST/BE/1325	Dragged border of method list HWND in method editor sometimes positioned incorrectly due to min/max calculation of siblings.
+14-Feb-17	rmmheadless							Support for headless Omnis server.
+16-Jan-17	rmm9199									Studio 9.0 HWND alpha support - excluded via conditional compilation for Studio 8.1.x.
+03-Jan-17	rmm9174			ST/HE/1493	Complex grid issue with a scrollbox in the header.
+18-Jul-16	rmm8982									Responsive design for JS client remote forms.
+17-Jun-16	rmm8945									Removed HWNDGROUP (was only present for Eclipse, and is now redundant) and other redundant Eclipse-related changes.
+06-May-16	rmm8909			ST/HE/1376	Issues with ctrl shadow borders - GWL_INFLATE... is no longer supported.
+04-May-16	rmm8903									Renamed dragcursor to nodropcursor (the notation already used the latter name, and this made reading the drag and drop code for cursors confusing).
+29-Apr-16	rmm8899									Removed old q q qs so we can see what needs to be tidied up.
+04-Apr-16	rmm8828									More colour configuration for menus.
+23-Mar-16	rmm8816									Scroll bar colours are now configurable.
+18-Mar-16	rmm8805									More appearance issues.
+29-Feb-16	rmm8752			ST/EC/1394	Redraw issue re-sizing obrowser on Windows platform.
+08-Feb-16	rmm8745									Changes to make appearance.json work nicely.
+18-Jan-16	rmm8713									Edge float center values kEFcenterLeftRight,kEFcenterTopBottom,kEFcenterAll) now apply to all HWNDs.
+27-Oct-15	CR0283			ST/BE/1082	Implement Cocoa square tabs (for multi-line display).
+01-Jun-15	rmmhdpi									High DPI support for Windows.
+07-May-15	rmm8573									Various COCOA issues.
+05-May-15	rmm8568			ST/WT/1864	Cocoa server comms re-implemented.
+26-Mar-15	rmm8537			ST/HI/1756	Resize drag rectangle issues: implemented layered windows for Cocoa.
+10-Mar-15	rmm_cwo									Re-implemented Cocoa port top level window ordering.
+02-Feb-15	rmm8497			ST/JS/1093	Added kEFruntimeLeftRightCenter, kEFruntimeTopBottomCenter and kEFruntimeAllCenter.
+21-Oct-14	rmm8448									Memory leaks.
+05-Jun-14	jmg0114									Made $defaultappearance a form property. (Replaces much of jmg0113)
+02-Jun-14	jmg0113									JS Native Display Shortcuts/Comp Store menu options (moved to hwnd.he)
+19-Aug-13	rmm64bitux							Linux 64 bit port.
+22-Feb-13	rmm_icon6								Studio 6.0 icon support changes.
+14-Jan-13 gra0866                 Added WNDgetMainHwnd callback
+26-Apr-12	rmm64bit2								64 bit portability changes.
+21-Jul-11 mpmBordRad3							Removed WNDpaintBorderEx (now using WNDpaintBorder)
+08-Jul-11 mpmBordRad							Implements border radius
+08-Apr-11	rmm7101									JS tab strip component.
+01-Feb-11	CR0006			ST/WO/2206	Set the system drag/drop cursors.
+09-Sep-10	rmm_jsc									JavaScript client core changes.
+15-Apr-10	rmm_oe									Omnis Eclipse changes.
+29-Oct-09	rmm_win7								Windows 7 appearance changes.
+15-Jun-09	rmm_nc									New controls and supporting APIs.
+09-Mar-09	rmm_iphone13						Text field controls.
+23-Feb-09	rmm_iphone9							Sorted out standard properties e.g. colours, effect etc.
+18-Feb-08	rmm_mobile							Mobile device support.
+27-Dec-07	rmm6280									Added support for OSX full keyboard access.
+14-Aug-07	rmm6216									OSX look and feel improvements (required for Leopard).
+14-Jun-07	rmm6098			ST/WO/2011	Problems drawing JPEGs in complex grid.
+13-Jun-07	rmm6096			ST/BE/053		Issues when scrolling icon id field in property inspector.
+08-May-07	rmmunilnx3							Unicode Linux stage 3.
+03-May-07	pkvista									Vista changes
+12-Mar-07	rmm6000									Windows Vista changes.
+15-Feb-07	pkvista									Vista changes - part 1
+28-Sep-05 MHMACH                  Mach-o changes
+22-Sep-05	rmm5509									Continuous thread processing was causing poor performance due to lost timeslice allocation.
+01-Feb-05	rmm5261			UN/WO/1774	$righttoleft now has additional functionality.
+22-Nov-04	AE6535			ST/EC/866: 	Added OLE drag&drop
+05-Aug-04	rmmuni_mk								Added support for multiple characters received in a single keyboard event on OSX.
+10-Jun-04	rmm4986									Draw size-grip using the theme on XP.
+13-Jun-03	rmm4550									Use theme to draw XP group box.
+10-Jun-03	rmm4544									XP progress bar.
+22-May-03	rmm4503									Correct borders for group boxes, lists and edit fields with XP themes.
+15-May-03	rmm4487									Windows platform list highlighting now uses a different colour when the field does not have the focus.
+																	Added $oldlisthiliting preference to disable the new behaviour if desired
+07-May-03	rmm4483									In toolbar variable text width mode, display icons beside the text on Windows and Unix.
+																	Also, make toolbars look more like XP on XP.
+06-May-03	rmm4476									Correct tree expand-collapse icons for XP.
+14-Nov-02	rmm4302			ST/HI/1348	Draw dotted border around certain fields in design mode, when they are to have no border in runtime mode.
+16 JUL 02 mpmHideSecs							Implements collapsing for report sections in design mode
+17-Jun-02 AE6100									V4: Added Skins
+15-Mar-02 MHn0188									Fixed inline function problem for Linux.
+08-Feb-01	AE6051									Few XP fixes
+23-Nov-01	AE6028									More XP changes
+23-Oct-01	AEXP										XP Modifications (changed gridline colors to be default)
+25 JUN 01 mpmCarbon69							Fixes tightloop tracking on OSX which was killing CPU
+15 JUN 01 mpm4732b								Complex grid painting/performance changes (hiliting changes)
+14 JUN 01 mpm4732									Complex grid painting/performance changes
+07-Jun-01	rmm4135			ST/WC/280		Problem with subwindows and background themes.
+12 JAN 01 MHCARBONQT							OSX QuickTime changes
+02 JAN 01 mpmCarbon19							Implements new way of dealing with OSX shadows
+29-Dec-00	rmm3987			ST/EC/536		Problems drawing borders for transparent windows on Linux.
+02 Nov 00 MHSERVER								OSX Server Changes
+20 OCT 00 mpmCarbon								OSX Changes NOT MARKED
+03-Dec-98 PK4857									Support for extra border drawing - os8
+03 NOV 98 mpmTHINd								Thin client
+09-Sep-98	rmm3224			ST/WC/214		Allow alt/option key to prevent floating of non-component windows when sizing window design tqwnd.
+17-Aug-98 PK4778									Added OMEX and various defines ( isOMNISCORE ) for RCC
+16 Jun 98 PK4760									WM_MOUSEWHEEL support
+15-Jun-98	AE4762									Additional Cursor functions
+27-Apr-98	mt40472									WNDsetTimer can now take a FARPROC
+26-Jan-98	mt40428									added SET_CORE_PACKING and SET_BYTE_PACKING directives
+22-Jan-98	mt40427									added WNDborderStruct set functions and removed temporay constructions of it
+07-Oct-97	mt40377									HCURSOR callback crash win16
+07-Oct-97	mt40338									HCURSOR Support
+06-Oct-97	mt40314									System Drag & Drop
+11-Jul-96	mt40310									changes to mt40295 coz of MFC
+13-Jun-97	mt40295									fixed WNDenumChildWindows && GDIsetOptionClick thru exteral component interface
+11-Mar-97	rmm2361									$style97 for toolbars.
+25 FEB 97 mpm4176									Changes to fix updates on Mac (make more like windows)
+18-Feb-97 PK4524									WND_OSMESSAGES added
+07-Feb-96	mt40188									implementation of WNDgetOS
+05-Feb-96	mt40180									removed WNDpaintGrowBox call & changed WNDgetGripBox
+22-Jan-97	rmm2207									Win32 sizing grip functionality.
+04-Nov-96	mt40046									68k Code fragment
+02-Nov-96 PK4329		PR/IF/021FC		more cursor types
+23-Oct-96	AE4244									Packing of 1byte for win16/win32
+18 SEP 96 mpm4062									Made WNDprocClass more basic
+02 SEP 96	mpm4047d								Added additional flags WNDredrawWindow
+13 AUG 96 mpm4046									Changes for printer paper margins (Moved WNDsetWindowOrg to GDI)
+09-Aug-96	rmm1626									Added component ids to floating attributes.
+22 JUL 96	rmm1576									Palette mode for component store.
+17 JUL 96	mpm4031c								Complex Grid Field - Design mode
+28-May-96	rmm1407									Tooltips for Windows platform.
+04-May-96	DRS4057									fix up edwc with new gui
+10 MAY 96 mpm4023									Changed WS_EX_ flags WND_ exFlags
+10 MAY 96	mpm4020-4022						Table/Grid field implementation
+22 APR 96 mpm4019									Added WNDmakePoint
+02 APR 96	mpm4013									Fixes inconsistancies with scrollranges and pages
+
+********************************************/
+
+#ifndef	_HWND_HE_
+#define _HWND_HE_
+
+// Start rmm64bit2
+#if defined(ismacosx)
+	#ifndef _basics_
+		#include "basics.h"
+	#endif
+	typedef qlongptr LRESULT;
+	typedef qlongptr UINT_PTR;
+#elif defined(isunix)
+	#ifndef _basics_
+		#include "basics.h"
+	#endif
+#endif
+// End rmm64bit2
+
+// rmm_iphone9: moved these to the start of the file
+/* hwnd border styles */
+#define WND_BORD_NONE							0
+#define WND_BORD_PLAIN						1
+#define WND_BORD_INSET						2
+#define WND_BORD_EMBOSSED					3
+#define WND_BORD_BEVEL						4
+#define WND_BORD_INSETBEVEL				5
+#define WND_BORD_CHISEL						6
+#define WND_BORD_EMBOSSEDCHISEL		7
+#define WND_BORD_SHADOW						8
+#define WND_BORD_SINGLE_INSET			9						// rmm2361
+#define WND_BORD_SINGLE_EMBOSSED	10					// rmm2361
+#define WND_BORD_3DFACE						11					// rmm2361
+#define WND_BORD_3DHILITE					12					// rmm2361
+#define WND_BORD_CTRL_EDIT				32					// mpmCarbon begins
+#define WND_BORD_CTRL_LIST				33
+#define WND_BORD_CRTL_LISTCELL		34					
+#define WND_BORD_CTRL_TABPANE			35
+#define WND_BORD_CTRL_SHADOW			36
+#define WND_BORD_CTRL_SHADOW_EX		37					// mpmCarbon ends
+#define WND_BORD_CTRL_GROUPBOX		38					// rmm4503: roundrect on XP, chisel on all other platforms
+#define WND_BORD_CTRL_DROPLIST		39					// rmm6000: WND_BORD_CTRL_EDIT on all platforms except Vista; WND_BORD_NONE on Vista
+#define WND_BORD_CTRL_COMBOBOX		40					// rmm6000: WND_BORD_CTRL_EDIT on all platforms except Vista; WND_BORD_NONE on Vista
+
+// rmm_iphone9: iPhone borders for design mode
+#define WND_BORD_IPHONE_ROUNDRECT	60					// rmm_iphone9
+#define WND_BORD_IPHONE_LINE			61					// rmm_iphone13
+#define WND_BORD_IPHONE_BEZEL			62					// rmm_iphone13
+
+#define WND_BORD_JAVASCRIPT_DEFAULT	100				// rmm_jsc: Default client border for control
+#if !defined(ismobile) || defined(isGDIHWNDLIB)	// rmm_mobile
+	#define WND_BORD_CUSTOM						255   			// PK4063
+#else
+	// rmm_mobile:
+	// WND_BORD_CUSTOM is not supported for mobile devices because there is no non-client area for HWNDs, so do not define it
+#endif
+
+// Start rmm_cwo: Top level window ordering types
+enum eWNDOrder
+{
+	eWNDtop = 0,
+	eWNDbottom = 1,
+	eWNDaboveWindow = 2
+};
+// End rmm_cwo
+
+// Start CR0425
+enum eWNDdragBorder
+{
+	eWNDdragBorderNone		= -1,
+	eWNDdragBorderTop			= 0,
+	eWNDdragBorderLeft		= 1,
+	eWNDdragBorderBottom	= 2,
+	eWNDdragBorderRight		= 3
+};
+// End CR0425
+
+#ifndef isiphone	// rmm_iphone9
+#ifndef _XHWND_HE_
+#	include "xhwnd.he"
+#endif
+// Start rmm9362: Moved to here
+HWNDAPI qulong	OMNISAPI 	WNDgetWindowLong(HWND pHwnd, qlong pOffset);
+HWNDAPI qulong	OMNISAPI 	WNDsetWindowLong(HWND pHwnd, qlong pOffset, qulong pVal);
+// End rmm9362
+
+// ##################### OMNIS API addition defines #################
+
+/* Window field offsets for WNDGetWindowLong() */
+#define GWL_NOCALCSIZE						(-36)			// rmm3987
+#define GWL_IGNORE_BORDER_RADIUS	(-32)			// rmm9362: Indicates if the border radius is to be ignored when calculating and drawing the HWND borders
+#define GWL_FADED_APPEARANCE			(-31)			// rmm8982: Indicates if the HWND has a faded appearance
+#define GWL_COMPONENT_AREA_HEIGHT (-30)			// rmm8982: Height of area for components when using the HWND as a parent
+#define GWL_COMPONENT_AREA_WIDTH	(-29)			// rmm8982: Width of area for components when using the HWND as a parent
+#define GWL_BKTHEME_HILITECOL			(-28)			// rmm4487: Win32 and Unix only
+#define GWL_BKTHEME_SKINALIGN			(-27)			// AE6100
+#define GWL_BKTHEME_SKINID				(-26)
+#define GWL_BKTHEME_NOINVAL				(-25)			// rmm4135
+#define GWL_BKTHEME								(-22)
+#define GWL_EXCOMPONENTID					(-21)
+#define GWL_EXSTYLE								(-20)
+#define GWL_USER									0
+
+// PK4760
+#ifndef WM_MOUSEWHEEL
+#define WM_MOUSEWHEEL                   0x020A
+#endif
+
+/* Flags used by WNDsetCapture for specifying keyboard or mouse */
+#define WND_CAPTURE_MOUSE		0x0001
+#define WND_CAPTURE_KEY			0x0002
+
+/* Flags used by WNDfloatChildren (stored in HWND->mEx.mExStyleFlags) */
+#define WND_FLOAT_NONE					0x00000000L
+#define WND_FLOAT_LEFT					0x00000001L
+#define WND_FLOAT_RIGHT					0x00000002L
+#define WND_FLOAT_LEFT_RIGHT		0x00000003L
+#define WND_FLOAT_TOP						0x00000004L
+#define WND_FLOAT_BOTTOM				0x00000008L
+#define WND_FLOAT_TOP_BOTTOM		0x0000000CL
+// Start rmm8497: special values reserved for centered floating (these are never used on their own in a float bit mask)
+#define WND_FLOAT_LEFT_RIGHT_CENTER	1
+#define WND_FLOAT_TOP_BOTTOM_CENTER	4
+#define WND_FLOAT_ALL_CENTER				5
+// End rmm8497
+
+#define WND_FLOAT_MASK					0x0000000FL
+
+/* Window frame component constants, used by WNDcreateWindow and WNDaddWindowComponent (stored in HWND->mEx.mExStyleFlags) */
+/* the bit order is in correct order for calculation positions of components (doAdjustComponents) */
+#define WND_WC_FRAME						0x00000010L
+#define WND_WC_MENUBAR					0x00000020L
+#define WND_WC_TOOLBAR_TOP			0x00000040L
+#define WND_WC_STATUSBAR				0x00000080L
+#define WND_WC_TOOLBAR_BOTTOM		0x00000100L
+#define WND_WC_TOOLBAR_LEFT			0x00000200L
+#define WND_WC_TOOLBAR_RIGHT		0x00000400L
+#define WND_WC_MAIN_HEADER			0x00000800L
+#define WND_WC_HORZ_HEADER			0x00001000L
+#define	WND_WC_VERT_HEADER			0x00002000L
+#define WND_WC_HEADER_BUTTON		0x00004000L
+#define WND_WC_CLIENT						0x00008000L
+
+#define WND_WC_MASK							0x0000FFF0L
+#define WND_WC_FIRST						0x00000010L
+#define WND_WC_LAST							0x00008000L
+
+#define FRAME_NUM						0
+#define MENUBAR_NUM					1
+#define TOOLBAR_TOP_NUM			2
+#define STATUSBAR_NUM				3
+#define TOOLBAR_BOTTOM_NUM	4
+#define TOOLBAR_LEFT_NUM		5
+#define TOOLBAR_RIGHT_NUM		6
+#define MAIN_HEADER_NUM			7
+#define HORZ_HEADER_NUM			8
+#define	VERT_HEADER_NUM			9
+#define HEADER_BUTTON_NUM		10
+#define CLIENT_NUM					11
+
+#define LAST_COMPONENT_NUM	11
+
+/* additional extended window styles (stored in HWND->mEx.mExStyleFlags) */ // mpm4023 - mpm4025
+#define WND_MAC_GROWBOX					0x00010000L
+#define WND_TRANSPARENT					0x00020000L
+#define WND_REDRAWONSIZE				0x00040000L
+#define WND_DRAGBORDER					0x00080000L
+#define WND_KEYPREVIEW					0x00100000L
+#define WND_NOFLOATCHILDREN			0x00200000L  	// mpm4031c
+#define WND_NOADJUSTCOMPONENTS	0x00400000L		// rmm1626
+#define WND_HASGROWBOX					0x00800000L // AE4382
+#define WND_WINDOWS_NODEFAULTSCROLLBAR	0x01000000L // rmm_emat: Only supported when creating a window - disables default scrollbars for the HWND on the windows platform
+// rmm3224: defined in xhwnd.hi for Windows, so cannot use this bit: #define WND_INIT							0x02000000L
+#define	WND_ONLYADJCOMPONENTS		0x04000000L // rmm3224
+#define WND_THEMEBACKGROUND			0x08000000L // mpmCarbon2
+#define WND_LAYERED_CHILD       0x10000000L // pkcocoa_1179 rmm9199: Replaced unused style WND_PLAYMESSAGES. Spare for now
+#define WND_LEFTSCROLLBAR				0x20000000L	// rmm5261
+#define WND_DISABLESCROLLUPDATE	0x40000000L	// rmm6096: if true,disables update on call to WNDscrollWindow
+#define WND_LAYERED							0x80000000L	// AEEVC
+
+/* redraw flags for WNDredrawWindow function */
+#define WND_RW_NCPAINT	0x01
+#define WND_RW_PAINT		0x02
+#define WND_RW_ERASE		0x04
+#define WND_RW_ALLCHILDREN	0x08 // mpm4028l
+#define WND_RW_INVALIDATE		0x10 // mpm4047d
+#define WND_RW_UPDATE				0x20 // mpm4047d
+
+/* hwnd background themes */
+#define WND_BK_TESTSKIN						257	// AE6100
+#define WND_BK_TEST								256
+#define WND_BK_DEFAULT						255
+#define WND_BK_PARENT							254	// use parent hwnd's theme background
+#define WND_BK_HILITE							253 // hilite the background with standard hilite color // mpm4732b
+#define WND_BK_NONE								0
+#define WND_BK_WINDOW							1		// generic system window background
+#define WND_BK_CONTAINER					2		// generic system container background
+#define WND_BK_TABPANE						3		// generic system tab pane background
+#define WND_BK_TABSTRIP						4		// generic system tab strip background
+#define WND_BK_CONTROL						5		// generic system control background
+#define WND_BK_MENUBAR						6
+#define	WND_BK_MENU								7
+
+// Start rmmunilnx3: added _INT versions of these constants
+#define WND_CURS_DEFAULT_INT				0
+#define WND_CURS_ARROW_INT					1
+#define WND_CURS_IBEAM_INT					2
+#define WND_CURS_WATCH_INT					3
+#define WND_CURS_LOCK_INT						4
+#define WND_CURS_MOVE_INT						5
+#define WND_CURS_SIZE_VERT_INT			6
+#define WND_CURS_SIZE_HORZ_INT			7
+#define WND_CURS_SIZE_LTRB_INT			8
+#define WND_CURS_SIZE_LBRT_INT			9
+#define WND_CURS_INSERT_INT					10
+#define WND_CURS_COPY_SINGLE_INT		11
+#define WND_CURS_COPY_MULTI_INT			12
+#define WND_CURS_DRAG_OBJECT_INT		13
+#define WND_CURS_DRAG_DATA_INT			14
+#define WND_CURS_SPLITTER_VERT_INT	15
+#define WND_CURS_SPLITTER_HORZ_INT	16
+#define WND_CURS_NOGO_INT						17
+#define WND_CURS_HELP_INT						18
+#define WND_CURS_EXAMINE_INT				19
+#define WND_CURS_TRASH_INT					20
+#define WND_CURS_ARROW_WATCH_INT		21
+#define WND_CURS_CROSS_INT					22
+#define WND_CURS_DROPPER_INT				23
+#define WND_CURS_BUCKET_INT					24
+#define WND_CURS_PENCIL_INT					25
+#define WND_CURS_CONTEXTMENU_INT		26
+#define WND_CURS_FINGER_INT					27
+#define WND_CURS_LAST_INT						27
+
+/* Cursor id constants used by WNDsetWindowCursor */
+#define WND_CURS_DEFAULT						(HCURSOR) WND_CURS_DEFAULT_INT
+#define WND_CURS_ARROW							(HCURSOR)	WND_CURS_ARROW_INT
+#define WND_CURS_IBEAM							(HCURSOR)	WND_CURS_IBEAM_INT
+#define WND_CURS_WATCH							(HCURSOR)	WND_CURS_WATCH_INT
+#define WND_CURS_LOCK								(HCURSOR)	WND_CURS_LOCK_INT
+#define WND_CURS_MOVE								(HCURSOR)	WND_CURS_MOVE_INT
+#define WND_CURS_SIZE_VERT					(HCURSOR)	WND_CURS_SIZE_VERT_INT
+#define WND_CURS_SIZE_HORZ					(HCURSOR)	WND_CURS_SIZE_HORZ_INT
+#define WND_CURS_SIZE_LTRB					(HCURSOR)	WND_CURS_SIZE_LTRB_INT
+#define WND_CURS_SIZE_LBRT					(HCURSOR)	WND_CURS_SIZE_LBRT_INT
+#define WND_CURS_INSERT							(HCURSOR)	WND_CURS_INSERT_INT
+#define WND_CURS_COPY_SINGLE				(HCURSOR)	WND_CURS_COPY_SINGLE_INT
+#define WND_CURS_COPY_MULTI					(HCURSOR)	WND_CURS_COPY_MULTI_INT
+#define WND_CURS_DRAG_OBJECT				(HCURSOR)	WND_CURS_DRAG_OBJECT_INT
+#define WND_CURS_DRAG_DATA					(HCURSOR)	WND_CURS_DRAG_DATA_INT
+#define WND_CURS_SPLITTER_VERT			(HCURSOR)	WND_CURS_SPLITTER_VERT_INT
+#define WND_CURS_SPLITTER_HORZ			(HCURSOR)	WND_CURS_SPLITTER_HORZ_INT
+#define WND_CURS_NOGO								(HCURSOR) WND_CURS_NOGO_INT
+#define WND_CURS_HELP								(HCURSOR)	WND_CURS_HELP_INT
+#define WND_CURS_EXAMINE						(HCURSOR)	WND_CURS_EXAMINE_INT
+#define WND_CURS_TRASH							(HCURSOR) WND_CURS_TRASH_INT
+#define WND_CURS_ARROW_WATCH				(HCURSOR) WND_CURS_ARROW_WATCH_INT
+#define WND_CURS_CROSS							(HCURSOR)	WND_CURS_CROSS_INT				// rmm1576
+#define WND_CURS_DROPPER						(HCURSOR) WND_CURS_DROPPER_INT			// PK4328
+#define WND_CURS_BUCKET							(HCURSOR) WND_CURS_BUCKET_INT				// PK4328
+#define WND_CURS_PENCIL							(HCURSOR) WND_CURS_PENCIL_INT				// PK4328
+#define WND_CURS_CONTEXTMENU				(HCURSOR) WND_CURS_CONTEXTMENU_INT	// mt40338
+#define WND_CURS_FINGER							(HCURSOR) WND_CURS_FINGER_INT				// mpmHideSecs
+#define WND_CURS_LAST								(HCURSOR) WND_CURS_LAST_INT					// mpmHideSecs
+// End rmmunilnx3
+
+// MHMACH begins
+#define QSHORT_WND_CURS_DEFAULT				0
+#define QSHORT_WND_CURS_ARROW					1
+#define QSHORT_WND_CURS_IBEAM					2
+#define QSHORT_WND_CURS_WATCH					3
+#define QSHORT_WND_CURS_LOCK					4
+#define QSHORT_WND_CURS_MOVE					5
+#define QSHORT_WND_CURS_SIZE_VERT			6
+#define QSHORT_WND_CURS_SIZE_HORZ			7
+#define QSHORT_WND_CURS_SIZE_LTRB			8
+#define QSHORT_WND_CURS_SIZE_LBRT			9
+#define QSHORT_WND_CURS_INSERT				10
+#define QSHORT_WND_CURS_COPY_SINGLE		11
+#define QSHORT_WND_CURS_COPY_MULTI		12
+#define QSHORT_WND_CURS_DRAG_OBJECT		13
+#define QSHORT_WND_CURS_DRAG_DATA			14
+#define QSHORT_WND_CURS_SPLITTER_VERT	15
+#define QSHORT_WND_CURS_SPLITTER_HORZ	16
+#define QSHORT_WND_CURS_NOGO					17
+#define QSHORT_WND_CURS_HELP					18
+#define QSHORT_WND_CURS_EXAMINE				19
+#define QSHORT_WND_CURS_TRASH					20
+#define QSHORT_WND_CURS_ARROW_WATCH		21
+#define QSHORT_WND_CURS_CROSS					22	// rmm1576
+#define QSHORT_WND_CURS_DROPPER				23	// PK4328
+#define QSHORT_WND_CURS_BUCKET				24	// PK4328
+#define QSHORT_WND_CURS_PENCIL				25	// PK4328
+#define QSHORT_WND_CURS_CONTEXTMENU		26	// mt40338
+#define QSHORT_WND_CURS_FINGER				27 // mpmHideSecs
+#define QSHORT_WND_CURS_LAST					27	// mpmHideSecs
+// MHMACH ends
+
+/* rmm2207: wParam passed with WM_SHOWSIZEGRIP message */
+#define WND_GRIP_ALLOWED				0		// Return non-zero if the field has a sizing grip
+#define	WND_GRIP_GET_RECT				1		// Return non-zero if the field has a sizing grip, optionally filling in the
+																		// rectangle addressed by lParam, in screen coordinates
+#define	WND_GRIP_CHANGED				2		// Called when the grip is added to, or removed from, a field
+
+/* rmm2207: return from WM_SHOWSIZEGRIP,WND_GRIP_ALLOWED + WND_GRIP_GET_RECT message */
+#define WND_GRIP_ALLOW_NO				0		// Window does not allow grip
+#define	WND_GRIP_ALLOW_YES			1		// Window allows grip
+#define	WND_GRIP_ALLOW_STOP			2		// Window allows grip, but grip cannot be displayed
+
+// AEXP Theme flags
+#define THEME_STATE_NOTACTIVE			0x00000000L
+#define THEME_STATE_ACTIVE				0x00000001L
+#define THEME_STATE_HOTACTIVE			0x00000002L
+
+#define THEME_CONTROL_NORMAL   		0x00000000L
+#define THEME_CONTROL_ACTIVE	 		0x00000001L
+#define THEME_CONTROL_UNACTIVE 		0x00000000L
+#define THEME_CONTROL_PRESSED  		0x00000002L
+#define THEME_CONTROL_UNPRESSED		0x00000000L
+#define THEME_CONTROL_HOT					0x00000004L
+#define THEME_CONTROL_DISABLED		0x00000008L
+#define THEME_CONTROL_DEFAULT			0x00000010L
+#define THEME_CONTROL_OPENED			0x00000020L	// rmm4476: XP only
+#define THEME_CONTROL_CHECKED			0x00000040L	// rmm4483: XP only
+#define THEME_CONTROL_HOTCHECKED	0x00000080L	// rmm4483: XP only
+#define THEME_CONTROL_VERTICAL		0x00000100L	// rmm4544: XP only
+#define THEME_CONTROL_NOLEADSEP		0x00000100L	// rmm6216: OSX only
+#define THEME_CONTROL_WIN_LEFTTAB	0x00000100L	// rmm8805: Windows only for THEME_TABPANE: left-most unselected tab
+#define THEME_CONTROL_WIN_MENU_CHECK	0x00000100L	// rmm8828: Windows only for THEME_CHECKBOX: drawing check in a menu item, so use menu colours
+#define THEME_CONTROL_ARROWONLY		0x00000100L	// rmm8745: Windows only, combo box only
+#define THEME_CONTROL_ANIMATING		0x00000200L	// rmm6000: Vista only
+#define THEME_CONTROL_FOCUS				0x00000200L	// rmm6216: OSX and Windows Mobile only // rmm_mobile
+#define THEME_CONTROL_CLIENT      0x00100000L
+#define THEME_CONTROL_FRAME				0x00200000L
+#define THEME_CONTROL_POS				 	0x0f000000L
+#define THEME_CONTROL_POS_TOP		 	0x00000000L
+#define THEME_CONTROL_POS_BOTTOM 	0x01000000L
+#define THEME_CONTROL_POS_LEFT	 	0x02000000L
+#define THEME_CONTROL_POS_RIGHT	 	0x03000000L
+
+#define THEME_PUSHBUTTON					0x00000002L
+#define THEME_CHECKBOX						0x00000001L
+#define THEME_RADIOBUTTON					0x00000004L
+#define THEME_TABPANE							0x00000008L	// rmm6216: on OSX, this is a middle tab of a tab pane
+#define THEME_COMBOBOX						0x00000003L
+#define THEME_SCROLLBAR						0x00000005L
+#define THEME_HEADER							0x00000006L
+#define THEME_TOOLBAR							0x00000007L
+#define THEME_TREE								0x00000009L	// rmm4476: XP only
+#define THEME_TOOLBARBUTTON				0x0000000aL	// rmm4483: XP only
+#define THEME_EDIT								0x0000000bL	// rmm4483: XP only
+#define THEME_LIST								0x0000000cL	// rmm4503: XP only
+#define THEME_PROGRESS						0x0000000dL	// rmm4544: XP only
+#define THEME_GROUPBOX						0x0000000eL	// rmm4550: XP only
+#define THEME_STATUS							0x0000000fL	// rmm4986: XP only
+#define THEME_EXPLORER_LISTVIEW		0x00000010L	// pkvista: XP only
+#define THEME_EXPLORER_TREEVIEW		0x00000011L	// pkvista: XP only
+#define THEME_EXPLORER_MENUCHECK	0x00000012L	// pkvista: XP only
+#define THEME_EXPLORER_MENUBOX		0x00000013L	// pkvista: XP only
+#define THEME_EXPLORER_MENUSUBMENU 0x00000014L	// pkvista: XP only
+#define THEME_TASKBAR							0x00000015L	// rmm6000: Vista only
+#define THEME_EXPLORER_MENUBAR		0x00000016L	// rmm6000: Vista only
+#define THEME_TOOLTIP							0x00000017L	// rmm6000: Vista only
+#define THEME_CONTROLPANEL				0x00000018L	// rmm6000: Vista only
+#define THEME_COMBOBOX_BORDER			0x00000019L	// rmm6000: Vista only
+#define THEME_TRACKBAR						0x0000001aL	// PKvista13
+#define THEME_TABPANEFIRST				0x0000001bL	// rmm6216: OSX only - first tab of tab pane
+#define THEME_TABPANELAST					0x0000001cL	// rmm6216: OSX only - last tab of tab pane
+#define THEME_TABPANEONLY					0x0000001dL	// rmm6216: OSX only - only tab of tab pane
+#define THEME_TABSQUARE						0x0000001eL	// CR0283: OSX only - square tab of tab pane
+
+// Start rmm6000: theme color ids
+#define THEME_COLOR_TEXTCOLOR					3803
+#define THEME_COLOR_EDGESHADOWCOLOR		3806
+#define THEME_COLOR_EDGEDKSHADOWCOLOR	3807
+#define THEME_COLOR_EDGEFILLCOLOR			3808
+// End rmm6000
+
+// rmmhdpi: Changed HWND_VISTA_SHADOW_SPACE to zero to avoid drawing artifacts
+#define HWND_VISTA_SHADOW_SPACE	0						// rmm6000: space for shadow to the right and bottom of various windows (e.g. tooltip and dropped list) on Vista // rmmhdpi: 2 (was 3)
+#define HWND_VISTA_EXTRA_TOOLTIP_WIDTH	6		// rmm6000: a bit of extra width for tooltip windows on Vista
+
+#ifndef ismobile	// rmm_mobile: avoid packing on mobile devices as alignment issues cause crashes
+	GCC_SET_BYTE_PACKING_ON // MHMACH
+	#pragma	 SET_BYTE_PACKING_ON
+#endif
+
+// enum proc type for use by WNDenumChildWindows
+typedef qbool (*WNDenumProc)( HWND hwnd, LPARAM lParam );
+
+// timer proc type for use by WNDsetTimer
+typedef void (*WNDtimerProc)( HWND hwnd, UINT Msg, UINT_PTR idTimer, qulong time );	// mt40472 // rmm64bit2
+
+// cansetcursor proc type for use by WNDsetCanSetCursorProc
+typedef qbool (*WNDcanSetCursorProc)();		// AE4762
+
+// Start mm8537
+#ifdef isOMNISCORE
+	class WNDdisableSetCursor
+	{
+	public:
+		WNDdisableSetCursor();
+		~WNDdisableSetCursor();
+	private:
+		WNDcanSetCursorProc mOldCanSetCursorProc;
+	};
+
+	// rmm8573: Class used in COCOA version to disable events while tracking mouse in a loop
+	class WNDdisableEvents
+	{
+	public:
+		WNDdisableEvents();
+		~WNDdisableEvents();
+
+		static qbool disabled() { return smEventsDisabled; }
+	private:
+		qbool					mOldEventsDisabled;
+		static qbool	smEventsDisabled;
+};
+#endif
+// End rmm8537
+
+// ######################## cross platform structs ####################
+
+// mpmBordRad
+struct WNDborderRadiusStruct
+{
+	qdim		mTopLeft;
+	qdim		mTopRight;
+	qdim		mBottomRight;
+	qdim		mBottomLeft;
+	
+	WNDborderRadiusStruct() { mTopLeft=mTopRight=mBottomRight=mBottomLeft=0; }
+	WNDborderRadiusStruct( qdim pTopLeft, qdim pTopRight, qdim pBottomRight, qdim pBottomLeft ):mTopLeft(pTopLeft),mTopRight(pTopRight),mBottomRight(pBottomRight),mBottomLeft(pBottomLeft) {}
+	WNDborderRadiusStruct( const qchar* pRadString, qshort pRadStringLength ) { this->setString(pRadString,pRadStringLength); }
+	~WNDborderRadiusStruct() {}
+	
+	void	set( qdim pRadius ) { mTopLeft=mTopRight=mBottomRight=mBottomLeft=pRadius; }
+	void	set( qdim pTopLeft, qdim pTopRight, qdim pBottomRight, qdim pBottomLeft ) { mTopLeft=pTopLeft; mTopRight=pTopRight; mBottomRight=pBottomRight; mBottomLeft=pBottomLeft; }
+	
+	void		setString( const qchar* pRadString, qshort pRadStringLength ); // see implementation for supported combination of values
+	qshort	getString( qshort pMaxlen, qchar* pDestAdd ); // converts radius values to a string and returns the length
+	
+	void		setLong( qlong pValue ) { mTopLeft=((pValue>>24)&0xFF); mTopRight=((pValue>>16)&0xFF); mBottomRight=((pValue>>8)&0xFF); mBottomLeft=(pValue&0xFF); }
+	qlong		getLong() { return ((mTopLeft&0xFF)<<24)+((mTopRight&0xFF)<<16)+((mBottomRight&0xFF)<<8)+(mBottomLeft&0xFF); }
+	
+	qbool		hasRadius(HWND pHwnd = 0) { return ((mTopLeft+mTopRight+mBottomRight+mBottomLeft) == 0 ? qfalse : (!pHwnd || !WNDgetWindowLong(pHwnd, GWL_IGNORE_BORDER_RADIUS))); } // rmm9362
+};
+
+// mt40427 -- start
+struct WNDborderStruct
+{
+	qshort	mBorderStyle;
+	qpen		mLineStyle;
+	qdim		mSize1;
+	qdim		mSize2;
+	qdim		mSize3;
+	qcol		mColor;
+	WNDborderRadiusStruct mRadius; // mpmBordRad3
+	
+		// constructor for WND_BORD_NONE
+	WNDborderStruct() { set(); }
+	
+	// constructor for WND_BORD_NONE, WND_BORD_INSET, WND_BORD_EMBOSSED, WND_BORD_CHISEL, WND_BORD_EMBOSSEDCHISEL
+	WNDborderStruct( qshort pBorderStyle ){ set(pBorderStyle); }
+	
+	// constructor for WND_BORD_PLAIN
+	WNDborderStruct( qshort pBorderStyle, qpen pLineStyle ) { set( pBorderStyle, pLineStyle ); }
+
+	// constructor for WND_BORD_BEVEL, WND_BORD_INSETBEVEL
+	WNDborderStruct( qshort pBorderStyle, qdim pSize1, qdim pSize2, qdim pSize3 ) { set ( pBorderStyle, pSize1, pSize2, pSize3 ); }
+
+	// constructor for WND_BORD_SHADOW
+	WNDborderStruct( qshort pBorderStyle, qpen pLineStyle, qdim pSize1, qdim pSize2, qcol pColor ) { set ( pBorderStyle, pLineStyle, pSize1, pSize2, pColor) ; }
+
+	void set	() { mBorderStyle = WND_BORD_NONE; }
+	void set	( qshort pBorderStyle ) { mBorderStyle = pBorderStyle; }
+	void set 	( qshort pBorderStyle, qpen pLineStyle ) { mBorderStyle=pBorderStyle; mLineStyle=pLineStyle; }
+	void set 	( qshort pBorderStyle, qdim pSize1, qdim pSize2, qdim pSize3 )
+									{ mBorderStyle=pBorderStyle; mSize1=pSize1; mSize2=pSize2; mSize3=pSize3; }
+
+	void set 	( qshort pBorderStyle, qpen pLineStyle, qdim pSize1, qdim pSize2, qcol pColor )
+									{ mBorderStyle=pBorderStyle; mLineStyle=pLineStyle; mSize1=pSize1; mSize2=pSize2; mColor=pColor; }	
+	qbool noVisibleBorder() 
+				{ return qbool(WND_BORD_NONE == mBorderStyle || WND_BORD_CTRL_TABPANE == mBorderStyle || WND_BORD_3DFACE == mBorderStyle); }	// rmm4302
+	
+	// mpmBordRad3 begins
+	void setRadius( qdim pRadius ) { mRadius.set(pRadius); }
+	void setRadius( qdim pTopLeft, qdim pTopRight, qdim pBottomRight, qdim pBottomLeft ) { mRadius.set(pTopLeft,pTopRight,pBottomRight,pBottomLeft); }
+	
+	void		setRadiusString( const qchar* pRadString, qshort pRadStringLength ) { mRadius.setString( pRadString, pRadStringLength ); }
+	qshort	getRadiusString( qshort pMaxlen, qchar* pDestAdd ) { return mRadius.getString( pMaxlen, pDestAdd ); }
+	
+	void		setRadiusLong( qlong pValue ) { mRadius.setLong(pValue); }
+	qlong		getRadiusLong() { return mRadius.getLong(); }
+	
+	WNDborderRadiusStruct& getRadius() { return mRadius; }
+	
+	qbool hasRadius(HWND pHwnd = 0) { return mRadius.hasRadius(pHwnd); } // rmm9362
+	qbool canHaveRadius() { return qbool(mBorderStyle==WND_BORD_PLAIN || mBorderStyle==WND_BORD_INSET || 
+																				mBorderStyle==WND_BORD_EMBOSSED || mBorderStyle==WND_BORD_SINGLE_INSET || 
+																				mBorderStyle==WND_BORD_SINGLE_EMBOSSED || mBorderStyle==WND_BORD_JAVASCRIPT_DEFAULT || mBorderStyle==WND_BORD_CTRL_EDIT); }
+	// mpmBordRad3 ends
+};
+// mt40427 -- end
+
+
+// this structure is to be filled in on a WM_GETERASEINFO message
+// For example, the message is generated when a chisel or shadow border needs to be painted
+struct WNDeraseInfoStruct
+{
+	qcol		mBackColor;
+	qcol		mForeColor;
+	qpat		mFillPat;
+	qulong	mBKTheme; // mpmCarbon3
+	qulong	mFlags;		// rmm6216
+	
+	WNDeraseInfoStruct(qcol pBackColor = GDI_COLOR_3DFACE, qcol pForeColor = GDI_COLOR_3DFACE, qpat pFillPat = patFill, qulong pBKTheme = WND_BK_NONE) 
+		{ mBackColor = pBackColor; mForeColor = pForeColor; mFillPat = pFillPat; mBKTheme = pBKTheme; mFlags = 0; }	// rmm6216
+};
+
+// rmm6216: flags for WNDeraseInfoStruct - set by the sender of the message
+#define WND_GETERASEINFO_FLAG_FORGROWBOX	1	// The grow box corner is being filled on OSX
+
+// mt40314
+struct WNDdragFiles
+{
+   qpoint  	mMousePos;    // Position of mouse releative to HWND
+   qulong 	mNumFiles;    // The number of Files
+   qoschar*	mFiles;       //  n null terminated file path strings
+   qoschar*	mExtension;   //  n null terminated file extensions strings (MAC will be file types)
+#ifdef isCOCOA	// CR0514
+	 qbool		mFileDrag:1;			// qtrue if files have been processed, qfalse if only file data.
+	 qbool		mPromiseFiles:1;	// update file data at drop
+#endif
+};
+
+/* WM_DROPFILES sub messages in WPARAM */
+#define DF_CANDROP	        0x0001
+#define DF_DROP	       			0x0002
+#define DF_HILITE		        0x0003
+#define DF_UNHILITE	        0x0004
+#define DF_SETDROPCURSOR	  0x0005	//CR0006
+#define DF_SETNODROPCURSOR  0x0006	//CR0006
+#define DF_START            0x0007  //pkcocoa_1176
+#define DF_STOP             0x0008  //pkcocoa_1176
+
+class WNDprocClass;
+
+// rmm7101:
+struct WNDalphaBlendStruct
+{
+	qbool		mDoBackColor;			// Do the back color and alpha for the field (ignoring the other fields in this structure)
+	qcol		mDestColor;				// Color to blend onto
+	qcol		mSrcColor;				// Source color
+	qlong		mSrcAlpha;				// Source alpha
+};
+
+
+#ifndef ismobile	// rmm_mobile
+	GCC_SET_BYTE_PACKING_OFF // MHMACH
+	#pragma	 SET_BYTE_PACKING_OFF
+#endif
+
+// Start jmg0113/jmg0114
+enum eEXTnativeJSAppearance
+{
+	eEXTnativeJSAppearanceiOS =			0,
+	eEXTnativeJSAppearanceAndroid =		1,
+	eEXTnativeJSAppearanceWinRT =			2,
+	eEXTnativeJSAppearanceBB =				3
+};
+// End jmg0113/jmg0114
+
+#ifdef isheadless
+	// rmmheadless:
+	class WNDwindowPosMessageStruct
+	{
+	public:
+		HWND getHwnd() { throw NOGUIexception(); return 0; }
+		HWND getHwndInsertAfter() { throw NOGUIexception(); return 0; }
+		void setHwnd(HWND pHwnd) { throw NOGUIexception(); }
+		void setHwndInsertAfter(HWND pHwndInsertAfter) { throw NOGUIexception(); }
+
+		int getX() { throw NOGUIexception(); return 0; }
+		int	getY() { throw NOGUIexception(); return 0; }
+		int	getWidth() { throw NOGUIexception(); return 0; }
+		int	getHeight() { throw NOGUIexception(); return 0; }
+		UINT getFlags() { throw NOGUIexception(); return 0; }
+
+		qbool move() { throw NOGUIexception(); return qfalse; }
+		qbool size() { throw NOGUIexception(); return qfalse; }
+		qbool frameChange() { throw NOGUIexception(); return qfalse; }
+
+		void setX(int pX) { throw NOGUIexception(); }
+		void setY(int pY) { throw NOGUIexception(); }
+		void setWidth(int pWidth) { throw NOGUIexception(); }
+		void setHeight(int pHeight) { throw NOGUIexception(); }
+		void setFlags(UINT pFlags) { throw NOGUIexception(); }
+	};
+
+	// Parameter type for WNDsetWindowPosEx
+	typedef int WNDsetWindowPosStruct;
+#else
+	// Start rmmhdpi
+	// LPARAM window pos structure passed to WM_WINDOWPOSCHANGING and WM_WINDOWPOSCHANGED
+	class WNDwindowPosMessageStruct : private WINDOWPOS
+	{
+	public:
+		HWND getHwnd() { return hwnd; }
+		HWND getHwndInsertAfter() { return hwndInsertAfter; }
+		void setHwnd(HWND pHwnd) { hwnd = pHwnd; }
+		void setHwndInsertAfter(HWND pHwndInsertAfter) { hwndInsertAfter = pHwndInsertAfter; }
+
+		int getX() { return GDIconvToDesign(x, qfalse); }
+		int	getY() { return GDIconvToDesign(y, qtrue); }
+		int	getWidth() { return GDIconvToDesign(cx, qfalse); }
+		int	getHeight() { return GDIconvToDesign(cy, qtrue); }
+		UINT getFlags() { return flags; }
+
+		qbool move() { return (flags & SWP_NOMOVE) == 0; }
+		qbool size() { return (flags & SWP_NOSIZE) == 0; } 
+		qbool frameChange() { return (flags & SWP_FRAMECHANGED) != 0; }
+
+		void setX(int pX) { x = GDIconvToScreen(pX, qfalse); }
+		void setY(int pY) { y = GDIconvToScreen(pY, qtrue); }
+		void setWidth(int pWidth) { cx = GDIconvToScreen(pWidth, qfalse); }
+		void setHeight(int pHeight) { cy = GDIconvToScreen(pHeight, qtrue); }
+		void setFlags(UINT pFlags) { flags = pFlags; }
+	};
+
+	// Parameter type for WNDsetWindowPosEx
+	typedef WINDOWPOS WNDsetWindowPosStruct;
+	// End rmmhdpi
+#endif
+
+// ######################## cross platform API functions ####################
+
+#pragma SET_RETURN_REGISTER_ON
+
+HWNDAPI  void    OMNISAPI  WNDupdateLayeredChild(HWND pHwnd);  //pkcocoa_1179
+
+HWNDAPI HWND		OMNISAPI						WNDcreateWindow			( HWND pParentHwnd, void* pWind, qulong pStyle, qulong pExStyle,
+																		WNDprocClass* pObject, qrect* pRect, WNDborderStruct* pBorderSpec );
+HWNDAPI HWND		OMNISAPI						WNDcreateWindow			( HWND pParentHwnd, qulong pStyle, qulong pExStyle,									// mpm4162 removed pWind parameter
+																		WNDprocClass* pObject, qrect* pRect, WNDborderStruct* pBorderSpec );
+HWNDAPI qbool		OMNISAPI	WNDdestroyWindow		( HWND pHwnd );
+HWNDAPI qbool		OMNISAPI	WNDbringWindowToTop	( HWND pHwnd );
+HWNDAPI qbool		OMNISAPI	WNDshowWindow				( HWND pHwnd, qulong pCmdShow );
+HWNDAPI qbool		OMNISAPI	WNDmoveWindow				( HWND pHwnd, qdim pLeft, qdim pTop, qdim pWidth,
+																		qdim pHeight, qbool pRepaint );
+																		
+HWNDAPI qbool		OMNISAPI	WNDisWindowVisible	( HWND pHwnd );
+HWNDAPI void		OMNISAPI	WNDfloatChildren		( HWND pHwnd, qdim pXOffset, qdim pYOffset );
+HWNDAPI qbool		OMNISAPI	WNDsetWindowPos			( HWND pHwnd, HWND pHwndInsertAfter, qdim pLeft,
+																		qdim pTop, qdim pWidth, qdim pHeight, qulong pFlags );
+HWNDAPI qbool	 	OMNISAPI	WNDsetWindowPosEx		( WNDsetWindowPosStruct* pWPos ); // rmmhdpi
+HWNDAPI qbool		OMNISAPI	WNDgetWindowPos			( HWND pHwnd, qrect *pFrameRect );	// rmmhdpi: Get the window frame rectangle in parent coordinates (in resolution independent units)
+HWNDAPI qulong 	OMNISAPI	WNDgetFloat					( HWND pHwnd );
+HWNDAPI void	 	OMNISAPI	WNDsetFloat					( HWND pHwnd, qulong pFloat );
+HWNDAPI void	 	OMNISAPI	WNDgetBorderSpec		( HWND pHwnd, WNDborderStruct* pBorderSpec );
+HWNDAPI void	 	OMNISAPI	WNDsetBorderSpec		( HWND pHwnd, WNDborderStruct* pBorderSpec, qbool pRedraw ); //DRS4084a
+HWNDAPI void	 	OMNISAPI	WNDsetTopLevelParent( HWND pHwnd, void* pTopLevelParent );
+HWNDAPI void	 						WNDmakePoint				( LPARAM pLngValue, qpoint* pPoint ); // mpm4019 // rmm64bit2
+HWNDAPI qlong	 						WNDmakeLong					( qpoint* pPoint ); // mpm4025
+HWNDAPI void							WNDmakeRect					( qulong pLngValue, qrect* pRect ); // mpmCarbon19
+HWNDAPI qulong						WNDmakeLong					( qrect* pRect ); // mpmCarbon19
+HWNDAPI qbool	 	OMNISAPI	WNDgetWindowFromPt	( HWND* pHwnd, qword2* pHitTest, qpoint* pPoint );
+HWNDAPI void	 	OMNISAPI	WNDmapWindowPoint		( HWND pHwndFrom, HWND pHwndTo, qpoint* pPoint );
+HWNDAPI void	 	OMNISAPI	WNDmapWindowRect		( HWND pHwndFrom, HWND pHwndTo, qrect* pRect );
+HWNDAPI void	 	OMNISAPI	WNDgetWindowRect		( HWND pHwnd, qrect* pRect );
+HWNDAPI void	 	OMNISAPI	WNDgetClientRect		( HWND pHwnd, qrect* pRect );
+// rmm8909: removed this API: HWNDAPI qbool	WNDisBorderExternal	(	HWND pHwnd, qshort pBorderStyle ); // mpmCarbon19
+// MHn0188 begins
+#if defined(isunix) && defined(isGDIHWNDLIB)
+HWNDAPI void	OMNISAPI 		WNDinsetBorderRect	(	HWND pHwnd, qrect* pRect, WNDborderStruct* pBorderSpec );   // PK4063
+HWNDAPI void	OMNISAPI 		WNDinflateBorderRect(	HWND pHwnd, qrect* pRect, WNDborderStruct* pBorderSpec );	  // PK4063
+#else
+HWNDAPI void	 						WNDinsetBorderRect	(	HWND pHwnd, qrect* pRect, WNDborderStruct* pBorderSpec );   // PK4063
+HWNDAPI void	 						WNDinflateBorderRect(	HWND pHwnd, qrect* pRect, WNDborderStruct* pBorderSpec );	  // PK4063
+#endif
+// MHn0188 ends
+// Start rmmhdpi
+const qlong HWND_BORDER_FLAGS_USE_SCREEN_COORDINATES = 1;	// When used with WNDinsetBorderRectEx or WNDinflateBorderRectEx: do not scale coordinates from screen to design
+#if defined(isOMNISCORE) && defined(iswin32)
+	HWNDAPI void WNDinsetBorderRectEx(HWND pHwnd, qrect* pRect, WNDborderStruct* pBorderSpec, qlong pFlags);
+	HWNDAPI void WNDinflateBorderRectEx(HWND pHwnd, qrect* pRect, WNDborderStruct* pBorderSpec, qlong pFlags);
+#else
+	inline HWNDAPI void WNDinsetBorderRectEx(HWND pHwnd, qrect* pRect, WNDborderStruct* pBorderSpec, qlong pFlags)
+	{
+		pFlags = 0;	// Prevent warning
+		WNDinsetBorderRect(pHwnd, pRect, pBorderSpec);
+	}
+	inline HWNDAPI void WNDinflateBorderRectEx(HWND pHwnd, qrect* pRect, WNDborderStruct* pBorderSpec, qlong pFlags)
+	{
+		pFlags = 0;	// Prevent warning
+		WNDinsetBorderRect(pHwnd, pRect, pBorderSpec);
+	}
+#endif
+// End rmmhdpi
+
+HWNDAPI void	 	OMNISAPI	WNDgetMinMaxInfo		( HWND pHwnd, WNDminMaxInfo* pMinMaxInfo );
+HWNDAPI void		OMNISAPI	WNDshowFocusBorder( HWND pHwnd, qbool pShow );	// PK4857
+
+HWNDAPI HWND	 	OMNISAPI	WNDgetParent							( HWND pHwnd );
+HWNDAPI HWND	 	OMNISAPI	WNDsetParent							( HWND pHwnd, HWND pNewParent );
+HWNDAPI HWND	 	OMNISAPI	WNDaddWindowComponent			( HWND pHwnd, qulong pComponent, qulong pStyle, qulong pExStyle,
+																		WNDprocClass* pObject, qdim pSize, WNDborderStruct* pBorderSpec );
+HWNDAPI HWND	 	OMNISAPI	WNDaddWindowComponent			( HWND pHwnd, qulong pComponent, qulong pStyle, qulong pExStyle,
+																		WNDprocClass* pObject, qrect *pRect, WNDborderStruct* pBorderSpec ); // rmm1626
+HWNDAPI void	 	OMNISAPI	WNDremoveWindowComponents	( HWND pHwnd, qulong pComponents );
+HWNDAPI HWND	 						WNDgetWindowComponent			( HWND pHwnd, qulong pComponent );
+HWNDAPI HWND	 	OMNISAPI	WNDnextWindowComponent		( HWND pHwnd, HWND pComponentHwnd, qulong pComponent );
+HWNDAPI qbool	 	OMNISAPI	WNDchangeComponentId			(	HWND pHwnd, qulong pComponent ); // rmm1626
+HWNDAPI HWND	 	OMNISAPI	WNDgetMainHwnd(); //gra0866
+
+// cursor functions
+HWNDAPI void	 	OMNISAPI	WNDsetWindowCursor	( HWND pHwnd, HCURSOR pCursor );	// mt40338
+HWNDAPI HCURSOR	OMNISAPI	WNDgetWindowCursor	( HWND pHwnd );										// mt40338
+HWNDAPI void	 						WNDcheckCursor			( HWND pHwnd, qword2 pHittest );
+HWNDAPI HCURSOR	OMNISAPI	WNDsetCursor				( HCURSOR pCursor );		// mt40338  	// mt40377
+HWNDAPI HCURSOR	OMNISAPI	WNDgetCursor				();											// mt40338	  // mt40377
+HWNDAPI WNDcanSetCursorProc WNDsetCanSetCursorProc( WNDcanSetCursorProc pNewProc ); 											 // AE4762
+HWNDAPI WNDcanSetCursorProc	WNDmakeCanSetCursorProc(WNDcanSetCursorProc pTimerProc, HINSTANCE pInstance);	 // AE4762
+HWNDAPI void 								WNDdisposeCanSetCursorProc(WNDcanSetCursorProc pProc);												 // AE4762
+
+HWNDAPI void	 						WNDgetCursorPos			( qpoint* pPoint ); // mpm4022 - next three functions
+HWNDAPI void	 						WNDsetCursorPos			( qpoint* pPoint );
+HWNDAPI void	 						WNDclipCursor				( qrect* pRect );
+
+// mouse button functions // mpm4022
+HWNDAPI qbool		OMNISAPI 	WNDmouseLeftButtonDown();
+HWNDAPI qbool		OMNISAPI 	WNDmouseRightButtonDown();
+HWNDAPI qbool		OMNISAPI 	WNDmouseTrackLeftButton(); // mpmCarbon69
+
+HWNDAPI void		OMNISAPI 	WNDsetScrollRange		( HWND pHwnd, qshort pWhich, qdim pMin, qdim pMax, qdim pPage, qbool pRedraw );
+HWNDAPI void		OMNISAPI 	WNDsetScrollPos			( HWND pHwnd, qshort pWhich, qdim pPos, qbool pRedraw );
+HWNDAPI void		OMNISAPI 	WNDgetScrollRange		( HWND pHwnd, qshort pWhich, qdim* pMin, qdim* pMax, qdim* pPage ); // mpm4013
+HWNDAPI void		OMNISAPI 	WNDgetScrollPos			( HWND pHwnd, qshort pWhich, qdim* pPos );
+HWNDAPI void		OMNISAPI	WNDsetAlpha					( HWND pHwnd, qbyte pAlpha);	// rmm9199
+
+// painting, invalidating, etc.
+HWNDAPI WNDprocClass*	OMNISAPI WNDbeginPaint				( HWND pHwnd, WNDpaintStruct* pPaintStruct );
+HWNDAPI void		OMNISAPI 	WNDendPaint					( HWND pHwnd, WNDpaintStruct* pPaintStruct );
+HWNDAPI void*		OMNISAPI	WNDchildPaintBegin	( void* pChildPaintInfo, HWND pParentHwnd,  HDC pParentHdc, HWND pChildHwnd, qrect* pChildRect, qrect* pClipRect ); // mpm4732
+HWNDAPI void		OMNISAPI	WNDchildPaintEnd		( void* pChildPaintInfo ); // mpm4732
+HWNDAPI HDC			OMNISAPI 	WNDstartDraw				( HWND pHwnd );
+HWNDAPI void		OMNISAPI 	WNDendDraw					( HWND pHwnd, HDC pHdc );
+HWNDAPI void		OMNISAPI 	WNDpaintBorder			(	HWND pHwnd, HDC pHdc, qrect* pRect, WNDborderStruct* pBorderSpec );
+HWNDAPI void		OMNISAPI 	WNDupdateWindow			( HWND pHwnd );
+HWNDAPI void		OMNISAPI 	WNDupdateWindowCO		( HWND pHwnd,	qulong pComponents );
+HWNDAPI void		OMNISAPI 	WNDredrawWindow			( HWND pHwnd, qrect* pRect, qrgn* pRgn, qulong pFlags );
+HWNDAPI void		OMNISAPI 	WNDredrawWindowCO		( HWND pHwnd, qrect* pRect, qrgn* pRgn, qulong pFlags, qulong pComponents );
+HWNDAPI void		OMNISAPI 	WNDredrawChildren		( HWND pHwnd, qrgn* pRgn );
+HWNDAPI void		OMNISAPI 	WNDgetUpdateRgn			( HWND pHwnd, qrgn* pRgn ); // mpm4020
+HWNDAPI void		OMNISAPI 	WNDinvalidateRect		( HWND pHwnd, qrect *pRect );
+HWNDAPI void		OMNISAPI 	WNDinvalidateRgn		( HWND pHwnd, qrgn *pRgn );
+HWNDAPI void		OMNISAPI 	WNDinvalidateFrame	( HWND pHwnd ); //DRS4084c
+HWNDAPI void		OMNISAPI 	WNDscrollWindow			( HWND pHwnd, qdim pXOffset, qdim pYOffset);
+HWNDAPI void		OMNISAPI 	WNDfloatChildren		( HWND pHwnd, qdim pXOffset, qdim pYOffset );
+HWNDAPI void		OMNISAPI 	WNDsetRedraw				( HWND pHwnd, qbool pRedraw );
+HWNDAPI qbool		OMNISAPI 	WNDdrawThemeBackground( HWND pHwnd, HDC pHdc, qrect* pRect, qulong pBKTheme );
+HWNDAPI HWND							WNDwindowFromDC			( HDC pHdc );
+HWNDAPI qbool		OMNISAPI	WNDisPaintInProgress();	// rmm6098
+#ifndef ismobile
+	HWNDAPI	void		OMNISAPI	WNDupdateLayeredWindow(HWND pHwnd, qrect &pWindowRect, HBITMAP pBitmap);	// rmm_nc
+#endif
+
+// Theme Functions AEXP
+HWNDAPI qbool		OMNISAPI 	WNDdrawThemeControl(HWND hWnd,HDC pHdc,qulong pType,qulong pFlags,qrect* pRect);
+HWNDAPI	qbool		OMNISAPI	WNDgetThemeControlSize(HWND hWnd,HDC pHdc,qulong pType,qulong pFlags,qpoint* pSize);
+HWNDAPI qcol		OMNISAPI	WNDgetThemeColor(qulong pType, qulong pFlags, qulong pPropId);	// rmm6000
+#ifdef isCOCOA	// CR0515
+	extern HDC GDIgetTempDC();
+	extern qreal GDIgetDeviceScale( HDC pHdc );
+	HWNDAPI HBITMAP	OMNISAPI  WNDfindSkin(qlong pSkinId, qreal pScale = GDIgetDeviceScale(GDIgetTempDC()) );
+#else
+HWNDAPI HBITMAP	OMNISAPI  WNDfindSkin(qlong pSkinId);	 // AE6100
+#endif
+HWNDAPI	qbool		OMNISAPI	WNDsetSkin(HWND hWnd,HBITMAP hBitmap,HBITMAPMASK hBitmapMask,qlong pSkinId,qlong pSkinAlign);
+// pkvista
+#if defined(iswin32) && !defined(isunix)
+	#ifdef isheadless
+		inline qulong 	WNDisVistaTheme() { return qfalse; }			// rmmheadless
+	#else
+		HWNDAPI qulong 	OMNISAPI 	WNDisVistaTheme();
+	#endif
+#endif
+#ifdef isheadless
+	inline qulong 	WNDgetThemeState(HWND hWnd) { return 0; } // rmmheadless
+#else
+	HWNDAPI qulong 	OMNISAPI 	WNDgetThemeState(HWND hWnd);
+#endif
+
+// capture functions
+HWNDAPI void		OMNISAPI 	WNDsetCapture				( HWND pHwnd, qulong pFlags );
+HWNDAPI HWND		OMNISAPI 	WNDgetCapture				( qulong pFlags );
+HWNDAPI void		OMNISAPI 	WNDreleaseCapture		( qulong pFlags );
+HWNDAPI qbool		OMNISAPI 	WNDhasCapture				( HWND pHwnd, qulong pFlags );
+HWNDAPI void		OMNISAPI	WNDabortMouseCapture();	// rmm_nc: aborts mouse capture as a result of some user action elsewhere in the process e.g.  CMND+N to open a new window in the browser
+																									// rmm_nc: sends WM_CAPTUREABORT to the hwnd with the mouse capture, and then releases the mouse capture
+
+// caret functions
+HWNDAPI void		OMNISAPI 	WNDcreateCaret( HWND pHwnd, qdim pWidth, qdim pHeight );
+HWNDAPI void		OMNISAPI 	WNDdestroyCaret( HWND pWnd );
+HWNDAPI void		OMNISAPI 	WNDdestroyCaret();
+HWNDAPI void		OMNISAPI 	WNDshowCaret();
+HWNDAPI void		OMNISAPI 	WNDhideCaret();
+HWNDAPI void		OMNISAPI 	WNDgetCaretPos( qpoint* pPos );
+HWNDAPI void		OMNISAPI 	WNDsetCaretPos( qpoint* pPos );
+
+HWNDAPI WNDprocClass*	OMNISAPI	WNDgetProcInst( HWND pHwnd ); // mpm4162
+HWNDAPI void					OMNISAPI 	WNDsetProcInst( HWND pHwnd, WNDprocClass* pFld ); // mpm4162
+
+HWNDAPI LRESULT	OMNISAPI 	WNDsendMessage			( HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam );	// rmm64bit2
+HWNDAPI qlong		OMNISAPI 	WNDpostMessage			( HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam ); // MHSERVER
+// Start rmm8568
+#ifdef isCOCOA
+	HWNDAPI void OMNISAPI WNDwakeUpMainThread();
+#elif defined(iscarbon)
+	inline void WNDwakeUpMainThread() { WNDpostMessage(NULL, 0, 0, 0); }
+#endif
+// End rmm8568
+HWNDAPI qbool		OMNISAPI 	WNDenumChildWindows	( HWND pParentHwnd, WNDenumProc pEnumProc, LPARAM lParam );
+HWNDAPI FARPROC 					WNDmakeEnumWindowsProc(WNDenumProc pEnumProc, HINSTANCE pInstance);	// mt40295 mt40310
+HWNDAPI void  						WNDdisposeEnumWindowsProc(FARPROC pProc);	// mt40295
+
+HWNDAPI HWND		OMNISAPI 	WNDgetWindow				( HWND pHwnd, UINT pRelationFlag );
+
+HWNDAPI void		OMNISAPI 	WNDdelay						( qlong pMilliSecs ); // mpm4183
+HWNDAPI qbool		OMNISAPI	WNDgetGrowBoxRect		( HWND pHwnd, qrect *pGrowBoxRect );	// rmm2207 mt40180
+HWNDAPI qbool		OMNISAPI	WNDgetOS						( HWND pHwnd, qlong pSelector, qlongptr pLngValue );	// mt40188	// rmm64bit2
+
+// rmm1407: timer functions
+HWNDAPI FARPROC 					WNDmakeTimerProc(WNDtimerProc pTimerProc, HINSTANCE pInstance);
+HWNDAPI void 							WNDdisposeTimerProc(FARPROC pProc);
+
+HWNDAPI UINT_PTR	OMNISAPI	WNDsetTimer(HWND pHwnd, UINT_PTR pTimerId, qulong pMillisecondDuration, FARPROC pProc = NULL );	// mt40472	// rmm64bit2: Changed UINT to UINT_PTR
+HWNDAPI qbool			OMNISAPI	WNDkillTimer(HWND pHwnd, UINT_PTR pTimerId);																																// rmm64bit2: Changed UINT to UINT_PTR
+// Start rmm8448: timer that can be started by any thread, and which will run on the main thread
+#if defined(isOMNISCORE) || defined(isXCOMPLIB)
+	HWNDAPI UINT_PTR OMNISAPI WNDsetTimerEx(qulong pMillisecondDuration, FARPROC pProc);
+	HWNDAPI void OMNISAPI WNDkillTimerEx(UINT_PTR pTimerId);
+#endif
+// End rmm8448
+#ifndef isiphone
+	// rmm_nc: OSX timer attributes
+	const qulong HWND_TIMER_RUNS_WHEN_EVENTS_ARE_BLOCKED = 0x1;	// Attribute bit value: can be set for timers that do not do event-related processing e.g. timers which only draw
+	#ifdef ismacosx
+		HWNDAPI void		OMNISAPI	WNDsetTimerAttributesOSX(HWND pHwnd, UINT pTimerId, qulong pAttributes);
+	#else
+		inline void WNDsetTimerAttributesOSX(HWND pHwnd, UINT pTimerId, qulong pAttributes) {}
+	#endif
+#endif
+
+// mt40314
+HWNDAPI void		OMNISAPI	WNDdragAcceptFiles( HWND pHwnd, qbool pAccept );
+#if ( defined(iswin32) && !defined(isunix) ) || defined(ismacosx) //pkcocoa_1176
+	HWNDAPI void		OMNISAPI	WNDdragAcceptFileData( HWND pHwnd, qbool pAccept );	 // AE6535
+#endif
+
+#pragma SET_RETURN_REGISTER_OFF
+
+// rmm1407: timer ids.
+// HWND reserves ids <= 100 for common processing.
+// Specific HWNDs can use ids > 100 for their own purposes
+#define WND_TIMER_NULL												1
+#define WND_TIMER_TOOLTIP											2
+#define	WND_TIMER_REMOTE											3		// mpmTHINd 
+#define WND_TIMER_TIMESLICE										4		// rmm5509
+#define WND_TIMER_ANIMATE											5		// rmm6000
+#define WND_TIMER_RELOAD_ICONSETS							6		// rmm_icon6
+#define WND_TIMER_CUSTOM_SCROLL								7		// rmm8816
+#define WND_TIMER_WINDOWS_ABORT_MESSAGE_BOX		8		// rmm9680
+#define WND_TIMER_FADE												9		// rmm_rd: Used for fading variable panels
+#define WND_TIMER_REMOTE_DEBUG_RESPONSE				10	// rmm_rd: Used by remote debug client when waiting for a response from the server
+#define WND_TIMER_FIRST												101 // mpm4162 renamed 
+
+// contains inlines for some of the above functions
+#include "xhwndinl.hi"
+
+// ######################## the wndproc message encapsulation class ####################
+// any one wanting to receive messages can subclass from this class
+class WNDprocClass
+{ // mpm4062
+	
+	public:										
+		#if defined(isOMNISCORE) || defined(isXCOMPLIB)	// rmm64bit2
+			virtual	LRESULT	WndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam, LPARAM uParam ) = 0;
+		#else
+			virtual	qlong	WndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam, LPARAM uParam ) = 0;
+		#endif
+		virtual qbool isTableCell() { return qfalse; } // rmm9174
+};
+
+class GDIhighlightLayeredWNDprocClass : public WNDprocClass
+{
+public:
+	virtual	LRESULT	WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam, LPARAM uParam)
+	{
+		#ifdef isCOCOA
+			#pragma unused (uParam)
+		#else
+			GDIignore(&uParam);
+		#endif
+		return DefWindowProc(hWnd, message, wParam, lParam);
+	}
+};
+
+// ######################### old functions / to be removed ##########################
+
+inline WNDprocClass* WNDgetOmnisField( HWND pHwnd ) // mpm4162
+{
+	return WNDgetProcInst( pHwnd );
+}
+
+inline void WNDsetOmnisField( HWND pHwnd, WNDprocClass* pFld ) // mpm4162
+{
+	WNDsetProcInst( pHwnd, pFld );
+}
+
+qbool WNDprocessingSysDragDrop(); // pkcocoa_1176
+
+// ######################### support for multiple characters in an OSX key message ##
+// rmmuni_mk:
+#ifndef ismobile	// rmm_mobile: avoid packing on mobile devices as alignment issues cause crashes
+	GCC_SET_BYTE_PACKING_ON // MHMACH
+	#pragma	 SET_BYTE_PACKING_ON
+#endif
+class WNDmultiKey
+{
+private:
+	qlong		mLen;
+	qchar		*mData;
+	
+	void		init(qchar *pData, qlong pLen);
+public:
+	WNDmultiKey();
+	WNDmultiKey(qchar *pData, qlong pLen);
+	WNDmultiKey(WNDmultiKey &pMultiKey);
+	~WNDmultiKey();
+	void		set(qchar *pData, qlong pLen);
+	
+	qlong 	len() const { return mLen; }
+	qchar		*dataPtr() const { return mData; }
+};
+#ifndef ismobile	// rmm_mobile
+	GCC_SET_BYTE_PACKING_OFF // MHMACH
+	#pragma	 SET_BYTE_PACKING_OFF
+#endif
+
+#endif	// rmm_iphone9: #ifndef isiphone
+
+#ifdef isOMNISCORE
+	// Start rmm8752: class used to handle drag border state
+	typedef void(*WNDdragBorderUpdate)();
+	class WNDinDragBorder
+	{
+	public:
+		WNDinDragBorder()
+		{
+			mOldInDragBorder = smInDragBorder;
+			smInDragBorder = qtrue;
+		}
+		~WNDinDragBorder()
+		{
+			smInDragBorder = mOldInDragBorder;
+			if (!smInDragBorder)
+			{
+				if (smDragBorderUpdate)
+				{
+					smDragBorderUpdate();
+					smDragBorderUpdate = 0;
+				}
+			}
+		}
+		void callDragBorderUpdate()
+		{
+			if (smDragBorderUpdate)
+				smDragBorderUpdate();
+		}
+
+		static void setDragBorderUpdate(WNDdragBorderUpdate pDragBorderUpdate)
+		{
+			if (smInDragBorder)	// Ignore the parameter if we are not in drag border (as the caller in obrowser does not know if the resize is due to drag border)
+				smDragBorderUpdate = pDragBorderUpdate;
+		}
+		static qbool inDragBorder() { return smInDragBorder; }
+
+		enum eDragSide	// rmm_emat: Value passed in LPARAM to WM_DRAGBORDERSTARTING
+		{
+			eLeft = 0,
+			eRight = 1,
+			eTop = 2,
+			eBottom = 3
+		};
+	private:
+		qbool												mOldInDragBorder;
+
+		static WNDdragBorderUpdate	smDragBorderUpdate;	// Function called during drag border (set by SET_DRAGBORDERUPDATE WM_CONTROL message)
+		static qbool								smInDragBorder;
+	};
+	// End rmm8752
+#endif
+
+// Start rmm_emat: Scrollbar marker information
+struct WNDscrollbarMarker
+{
+	WNDscrollbarMarker(qlong pLineNumber, qbool pError, qbool pFindAndReplace)
+	{
+		mLineNumber = pLineNumber;
+		mError = pError;
+		mFindAndReplace = pFindAndReplace;
+	}
+
+	qlong			mLineNumber;			// The line number
+	qbool			mError;						// True if the line has an error marker
+	qbool			mFindAndReplace;	// True if the line has a find result marker
+
+	static const qdim smScrollbarMarkerSize = 4;
+};
+// End rmm_emat
+
+// Start rmmhdpi: 
+#ifdef iswin32anyresolution	// Define this for arbitrary scaling rather than just scaling to 192dpi (requires the core to be built with this defined too)
+	// Regarding window creation, and calls that reposition and resize windows:
+	//		For Win32 and Unix, we scale left and top when scaling is required, and we normally scale width and height.
+	//		However, while an instance of this class is constructed, any non-component windows created with WNDcreateWindow are scaled by scaling right
+	//		and bottom instead of width and height.  This allows us to handle windows such as cell HWNDs for complex grids, leaving appropriate space
+	//		for vertical grid lines.  Without this, gridlines can be overlapped by cell HWNDs (due to the way rounding affects coordinates), 
+	//		meaning they only partially draw if at all.
+	HWNDAPI qbool OMNISAPI WNDsetScalePositionRatherThanSize(qbool pScalePositionRatherThanSize);
+	class WNDscalePositionRatherThanSize
+	{
+	public:
+		WNDscalePositionRatherThanSize()
+		{
+			#ifdef iswin32
+				mOldValue = WNDsetScalePositionRatherThanSize(qtrue);
+			#endif
+		}
+		~WNDscalePositionRatherThanSize()
+		{
+			#ifdef iswin32
+				WNDsetScalePositionRatherThanSize(mOldValue);
+			#endif
+		}
+	private:
+		#ifdef iswin32
+			qbool		mOldValue;
+		#endif
+	};
+#endif
+// End rmmhdpi
+#endif
+// End of file

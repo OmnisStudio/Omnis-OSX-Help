@@ -1,0 +1,45 @@
+/*$Header: svn://svn.omnis.net/trunk/Studio/EXTCOMP/CALLBACK/COCOA/xextcinl.hi 11804 2015-05-04 07:01:20Z bmitchell $*/
+ 
+/*
+   	OMNIS 7 Version 4.0 - External component interface header
+	 	Copyright (C) Blyth Holdings Inc 1996
+*/
+
+/**************** Changes ******************
+Date			Edit				Bug					Description
+04-May-15	rmm8565									Deprecated global handle functions (these are also not available for Cocoa).
+12-Dec-14	rmm8467									Memory issues - GlobalAlloc is limited to 64k moveable handles.
+08-May-08	rmm_handle							Implemented platform independent handle classes as part of mobile device support.
+26-Feb-04	rmmuni_osx7							Mac OSX Unicode port.
+23 JUN 99 mpmMEMb									Implements handle and ptr chains
+*/
+
+inline qbyte* MEMincAddr( qbyte* pAddress, qlong pOffset ) 
+{
+	return pAddress+pOffset;
+}
+
+inline qbyte* MEMdecAddr( qbyte* pAddress, qlong pOffset )
+{
+	return pAddress-pOffset;
+}
+
+
+inline qchar* MEMincAddr( qchar* pAddress, qlong pOffset ) 
+{
+	return pAddress+pOffset;
+}
+
+inline qchar* MEMdecAddr( qchar* pAddress, qlong pOffset )
+{
+	return pAddress-pOffset;
+}
+
+// rmm8565: removed MEMglobal... functions
+
+inline qlong	HANglobalSize	( qHandle pHandle  )
+{
+	return pHandle->mLength;	// rmm_handle
+}
+
+// End of file

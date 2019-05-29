@@ -1,0 +1,1168 @@
+/* $Header: svn://svn.omnis.net/trunk/Studio/O7EXE/INDY/pri.he 18570 2017-11-30 12:05:05Z bmitchell $ */
+
+//Q4 PRI.HE
+//Print manager independent public interface
+//Copyright (C) Blyth Holdings Inc 1996
+
+/**************** Changes ******************
+Date			Edit				Bug					Description
+29-Nov-17	rmm9581			ST/RC/1266	Problems with report background pictures.
+28-Nov-17	rmm9577			ST/RC/1270	Added save to PDF button to page preview toolbar.
+25-Apr-17	rmm9347			ST/RC/1261	Added zoom capability to report class editor.
+05-Apr-17	rmm9306			ST/RC/1260	Problems with paper sizes A7-A10 - these are not supported by Windows, so I have removed them.
+09-Mar-17	rmm9283			ST/CT/032		Added A6-A10 paper sizes.
+25-Oct-16	rmm9123									Implemented $exportjson() and $importjson().
+15-Sep-16	rmm9045									"Open PDF in Preview" did not work when used with Cocoa job setup dialog.
+13-Sep-16	rmm9043			ST/RC/1234	$pages did not work when printing report to preview.
+02-Oct-15	rmm8638			ST/HE/1294	$searchreport and $zoom for screen report field.
+01-Jun-15	rmmhdpi									High DPI support for Windows.
+09-Apr-15	rmm8547			ST/HE/1277	Print top window now scales the image if it is too big for the paper.
+20-May-14	rmm8328			ST/RC/1191	Text width in report list fields did not take styled text into account.
+22-Apr-14	rmm8306									New and improved page preview.
+19-Aug-13	rmm64bitux							Linux 64 bit port.
+24-Sep-12	rmm_pdf									Omnis PDF device for all platforms - modified version of Linux print device.
+26-Apr-12	rmm64bit2								64 bit portability changes.
+31-Aug-11	mpmPOChars	ST/HI/1555	Implements PRI_OBJ_CHARS
+12-Apr-10	rmm6957			ST/PF/350		Problem redirecting report printed to window field to PDF on OSX.
+01-Feb-10	rmm6886			ST/RC/1108	More report data grid issues.
+22-Jan-10	rmm6876			ST/RC/1096	Rotated text did not draw correctly when scrolled.
+27-Jul-09	rmm6670			ST/IE/109		Problem with escape characters sent to port.
+03-Sep-08	rmm6457			ST/RC/1054	Page setup changed even when the dialog was cancelled.
+18-Aug-08	rmm6397			ST/HI/1499+1500	Added control of screen report/preview copy selection and toolbar.
+18-Feb-08	rmm_mobile							Mobile device support.
+07-Jan-08	rmm6299			ST/HI/1485	Problems with page setup on OSX due to Leopard - omnispde.bundle is now only used on Tiger.
+02-Jun-06	rmm5802			ST/RC/995		Problem with lines extending further than they should.
+28-Sep-05 MHMACH                  Mach-o changes
+20-Jun-05	rmm5400			ST/RC/930		Problems with fit on page and line drawing.
+09-May-05 MHn0435     ST/RC/922   Added support for storing the printer name in the pagesetup data on OSX.
+28-Apr-05	AE6566			ST/RC/921 	Added $keepaspectratio for report picture field
+04-Jan-05	AE6553			ST/RC/902: 	Bin ids greater than 256 were getting lost
+20-Oct-04	rmm5118			ST/RC/884		Lots of problems with section background fill/border.
+09-Jul-04	rmm5015									Fixed crash when printing, caused by uninitialised variables in PRIobjectStruct.
+02-Jul-04 MHCW9										CW9 changes.
+18-Jun-04 MHn0377			ST/PC/384		Network ports can now be specified on windows when using set port name.
+02-Mar-04 MHn0321			ST/WO/1635	Fixed crash in graphs component on OSX.
+12-Feb-04	gra0200									OmODBC MacOSX port
+12-Feb-04 MHn0311			ST/HE/675		Added paper sizes for STAR TSP600 receipt printer.
+08-Jan-04	rmmuni_fnt4							Now that we use ATSUI to render fonts, drawing to page preview and copy selection from preview
+																	to clipboard can no longer use OpenCPicture on OSX.
+16-Sep-03 MHPRT										OSX Printing Enhancements
+06-Aug-03 MHn0268			ST/RC/811		Fixed Select Printer problem on OSX.
+19-Jun-03	rmm4561			ST/RC/771		Sliding field problem.
+05 JUN 03 MHn0235			ST/HE/513		Implemented select printer for OSX.
+02 SEP 02 mpmBackPic							Implements $backpicture for reports
+03 JUL 02 mpmFitonpage						Implements kFitonpage section positioning mode
+18-Jul-01	AE5259									Reports $XXXmargins had accuracy problems
+05-Jan-01	rmm3998			ST/RC/695		Problem printing label reports.
+18 JUL 00 mpm4714									Implements ability to replace internal devices with custom devices
+05 MAY 00 mpm4619									Convert pictures to 24bit shared when seving to disk or memory
+20 APR 00 mpm4616			st/rc/641		Fixes problems with multiple multi line objects crossing page boundaries when printed to html
+10 APR 00 mpm4600			st/rc/601		Fixes calc problems with large objects and co-ordinates
+19-Jan-00	rmm3601			ST/RC/608		Reports sent to file did not generate correct number of lines per page.
+25 NOV 99 MHPORT									Added mRtimeout member to PRIdestparmstruct
+01 NOV 99 mpmCarbon2							Carbon port
+04 FEB 99 MHn0034			ST/HE/040		Added constants for imagewriter paper types. 
+04 JAN 99 mpm4545			st/rc/538		New Page Count object type 
+26 NOV 98 mpm4532			st/rc/488fc	Introduced min and max scaling values
+16 SEP 98 MHn0001									Added mProfile to PRIdestParmStruct for Port Profile Support.
+11 MAY 98 mpm4494									Fixes crashes with passing qreal on stack accross code fragments
+13 Feb 98 mpm4451									Non-fatal custom errors were treated as fatal
+04-Feb-98	mpm4436									fixes PriProc virtual callbacks
+28-Jan-98	mpm4426									implements getEOL as a message
+26-Jan-98	mt40428									now have SET_CORE_PACKING && SET_BYTE_PACKING directives
+15 DEC 97 mpmPRIw									Implements custom device errors
+15 DEC 97 mpmPRIw									Print manager needs more information about multiline curline
+03 DEC 97 mpm4401									Multiline text object fixes
+02 DEC 97 mpm4398									Implements PM_OUT_BROWSE message
+28 NOV 97 mpm4397									Fixed user screen report
+21-Nov-97	rmm2797			ST/RC/302		Text was sometimes truncated when printing on Windows.
+21 NOV 97 mpm4338			st/rc/295		Zero empty property for text objects was missed
+19 NOV 97 mpmPRIs									External interface implementation
+20-Nov-97	AE4649									Win16: Compiler fault with inlines which used many registers
+11 NOV 97 mpm4332			st/ie/032		Export file dialog was showing incorrect title ansd masks
+11 NOV 97 mpmPRIo									Renamed ePosMargin and mMarginBounds
+05 NOV 97	mpmPRIk									New report class properties
+04 NOV 97 mpmPRIj									More device notation
+30 OCT 97 mpmPRIh									$devices implementation
+28 OCT 97 mpmPRIf									New report pos notation
+22 OCT 97 mpmPRIe									Fixed section custom notation
+21 OCT 97 mpmPRIa									Implemented PRIbuildPrinterList
+18 JUN 97	mpmPRI									New file
+
+********************************************/
+
+#ifndef	_PRI_HE_
+#define _PRI_HE_
+
+#ifndef _basics_
+#	include "basics.h"
+#endif
+
+#ifndef _GDI_HE_
+#	include "gdi.he"
+#endif
+
+#ifndef _HWND_HE_
+#	include "hwnd.he"
+#endif
+
+#ifndef _EXTCRB_HE_
+#	include "extcrb.he"
+#endif
+
+#ifndef _STRCLASS_HE_
+#	include "strclass.he"
+#endif
+
+// ######################## typedefs required before including XPRI.HE ####################
+
+class PRIprocClass;
+class tqappfile;
+class handle;
+
+typedef void*				PRIjob;		// pointer to internal job record
+typedef void*				PRIout;		// pointer to internal output class
+typedef qlong 			qpridim;	// the print manager unit 1/1000th of a milli meter
+typedef qulong			qprierr;	// print manager error type
+typedef tqappfile*	qapp;			// pointer to OMNIS application
+
+enum ePRIpos { ePosGlobal = 0, ePosPaper = 1, ePosPrintable = 2, ePosLocal = 3, // mpmPRIo
+								ePosHeader = 4, ePosFooter = 5, ePosSection = 6,
+								eBndsGlobal = 7, eBndsPaper = 8, eBndsPrintable = 9,  // conversion only // mpmPRIf
+								eBndsLocal = 10, eBndsHeader = 11, eBndsFooter = 12 };  // conversion only // mpmPRIo
+
+const ePRIpos ePosFst = ePosGlobal,
+							ePosLst = ePosSection;
+
+typedef qprierr (OMNISPRIPROC *PRIprocClassFunc)( PRIprocClass* pProc, PRIjob pJob, UINT pMessage, WPARAM wParam, LPARAM lParam ); // mpm4436
+typedef qprierr (OMNISPRIPROC *PRIcustomFunc)( PRIjob pJob, void* pOutput, qulongptr pData, UINT pMessage, LPARAM lParam1, LPARAM lParam2, LPARAM lParam3 ); // rmm64bitux
+
+FARPROC 		PRImakeCustomProc( PRIcustomFunc pPRIcustomFunc, HINSTANCE pInstance );
+void				PRIdisposeCustomProc( FARPROC pProc );
+
+#ifndef _XPRI_HE_
+#	include "xpri.he"
+#endif
+
+#ifndef ismobile	// rmm_mobile
+	GCC_SET_CORE_PACKING_ON // MHMACH
+	#pragma	 SET_CORE_PACKING_ON
+#endif
+
+// ######################## initialization ####################
+// internal use only
+void		PRI_init();
+void		PRI_term();
+
+
+// ######################## defines ####################
+
+// print manager version numbers // mpmPOChars moved here from pri.hi
+#define PRI_VERSION 0x00020001						// current print manager version   - MHn0001: Increment to 2.0 
+#define PRI_VERSION_OBJ_CHARS 0x00020001	// version that support PRI_OBJ_CHARS objects // mpmPOChars
+
+// MAX PAGES
+#define PRI_MAX_PAGES 					7000
+#define PRI_MAX_HORZ_PAGES			8
+
+// JOB MEMORY OR DISK SIGNATURE
+#define PRI_SIGNATURE1	0x50524931	// 'PRI1'
+#define PRI_SIGNATURE2	0x50524932	// 'PRI2' // mpm4619
+
+// DRIVER INFO SIGNITURES
+#define PRI_DRV_MAC			0x4d414320	// 'MAC '
+#define PRI_DRV_MACE		0x4d414345	// 'MACE'
+#define PRI_DRV_CARBON	0x43415242	// 'CARB'
+#define PRI_DRV_COCOA   0x434F4341	// 'COCA'
+#define	PRI_DRV_WIN16		0x57493136	// 'WI16'
+#define	PRI_DRV_WIN32		0x57493332	// 'WI32'
+
+#define PRI_DRV_BEST		0x42455354	// 'BEST'
+
+// PRINT DESTINATIONS
+#define PRI_DEST_PRINTER		1
+#define PRI_DEST_PREVIEW		2
+#define PRI_DEST_SCREEN			3
+#define PRI_DEST_DISK				4
+#define PRI_DEST_MEM				5
+#define PRI_DEST_CLIPBOARD	6
+#define PRI_DEST_PORT				7
+#define PRI_DEST_FILE				8
+#define PRI_DEST_DDE_PUB		9
+#define PRI_DEST_PREVIEWOLD	10	// rmm8306
+
+#define PRI_DEST_STD_FST		PRI_DEST_PRINTER
+#define PRI_DEST_STD_LST		PRI_DEST_DDE_PUB	// rmm8306: To include old preview, set PRI_DEST_STD_LST to PRI_DEST_PREVIEWOLD
+
+#define PRI_DEST_CUSTOM_FST	11
+#define PRI_DEST_CUSTOM_LST	32
+
+#define PRI_DEST_FST				PRI_DEST_STD_FST
+#define PRI_DEST_LST				PRI_DEST_CUSTOM_LST
+
+
+// CUSTOM OUTPUT BASE TYPES // mpmPRIs allow to derive from all build in outputs
+#define	PRI_DEST_EXTBASE		100					// custom dvice does NOT inherit any functionality
+#define	PRI_DEST_EXTHDC			101					// custom device inherits DC based formating and drawing functionality
+#define	PRI_DEST_EXTTEXT		102					// custom device inherits text based formating functionality
+#define PRI_DEST_EXTPRINTER		103		// inherits printer functionality
+#define PRI_DEST_EXTPREVIEW		104		// inherits preview functionality
+#define PRI_DEST_EXTSCREEN		105		// inherits screen report functionality
+#define PRI_DEST_EXTDISK			106		// inherits save to disk functionality
+#define PRI_DEST_EXTMEM				107		// inherits save to memory functionality
+#define PRI_DEST_EXTCLIPBOARD	108		// inherits clipboard functionality
+#define PRI_DEST_EXTPORT			109		// inherits port functionality
+#define PRI_DEST_EXTFILE			110		// inherits file functionality
+#define PRI_DEST_EXTDDE_PUB		111		// inherits DDE or Publisher functionality
+
+
+// ERROR CODES
+#define PRI_ERR_NONE								0		// no error
+#define PRI_ERR_INVALID_JOB					1		// non fatal errors
+#define PRI_ERR_INVALID_DEST				2
+#define PRI_ERR_INVALID_FILE				3
+#define PRI_ERR_INVALID_PAGESETUP		4
+#define PRI_ERR_INVALID_PROCINST		5
+#define PRI_ERR_INVALID_REPDATA			6
+#define PRI_ERR_INVALID_PARM				7
+#define PRI_ERR_INVALID_DRVINFO			8
+#define PRI_ERR_INSUFFICIENT_BUFFER	9
+#define PRI_ERR_INVALID_POS					10
+#define PRI_ERR_INVALID_SECTION			11
+#define PRI_ERR_DUP_SECTION					12
+#define PRI_ERR_SECTION_NOT_FOUND		13
+#define PRI_ERR_INVALID_PAGE_SPEC		14 // rmm9043: Invalid pages to print specification
+#define PRI_ERR_PAGE_INIT						15
+#define PRI_ERR_ALREADY_OPEN_CLOSED	16
+#define PRI_ERR_TOMANY_OUTPUTS			17
+#define PRI_ERR_PAGE_CLOSED					18
+#define PRI_ERR_INVALID_PRINTER			19 // MHn0268
+
+#define PRI_ERR_MANAGER_CLOSED			21	// fatal errors
+#define PRI_ERR_MEMORY							22
+#define	PRI_ERR_ABORT								23
+#define PRI_ERR_BUFFER_READ					24
+#define PRI_ERR_BUFFER_WRITE				25
+
+#define PRI_ERR_IGNORE							1001	// non reportable errors/messages // mpmPRIs
+
+#define PRI_ERR_SYSERROR						0x80000000
+#define PRI_ERR_OMSERROR						0x40000000
+#define PRI_ERR_CUSTOM							0x20000000  // mpmPRIw
+#define PRI_ERR_CUSTOM_FATAL				0x10000000  // mpmPRIw
+#define PRI_FATAL_START							21
+#define PRI_FATAL_END								25  // mpm4451
+
+#define PRI_ERR_NEGATIVE						0x01000000
+#define	PRI_ERR_SYSMASK							0x00FFFFFF
+
+#define PRI_ERR_CUSTOM_MASK					0x0000FFFF  // mpmPRIw
+#define PRI_ERR_CUSTOM_IDMASK				0x00FF0000  // mpmPRIw
+
+
+// OBJECT TYPES
+#define PRI_OBJ_LINE					1
+#define PRI_OBJ_RECT					2
+#define PRI_OBJ_ROUNDRECT			3
+#define PRI_OBJ_OVAL					4
+#define PRI_OBJ_BORDER				5
+
+#define PRI_OBJ_BITMAP				51
+#define PRI_OBJ_PICTURE				52
+#define PRI_OBJ_PIXMAP				53
+#define PRI_OBJ_WINDOWBITMAP	54	// rmm8547
+
+#define PRI_OBJ_TEXT					101
+#define PRI_OBJ_PGCNT					102		// Page count object 'Page #P of #C' // mpm4545
+#define PRI_OBJ_CHARS					103		// Chars with char width mappping for cross platform accurate text renedering // mpmPOChars
+#define PRI_OBJ_EXTERNAL			201
+#define PRI_OBJ_COMMENT				301
+
+// PAGE COUNT OBJECT (PRI_OBJ_PGCNT) PLACE HOLDERS // mpm4545
+#define PRI_OBJ_PGCNT_CNT		1		// will be replaced with page count
+#define PRI_OBJ_PGCNT_PAGE	2		// will be replaced with current page number
+
+// MEASUREMENTS
+#define PRI_MM			1000
+#define PRI_CM			10000
+
+#define PRI_1_8INCH		3175
+#define PRI_1_4INCH		6350
+#define PRI_1_2INCH		12700
+#define PRI_INCH			25400
+#define PRI_POINT			352.77
+
+#define PRI_MM_PER_INCH 	25.400
+#define PRI_INCH_PER_MM		0.03937
+
+// FLAGS PAGE SETUP mFields
+#define PRI_PS_ORIENT		0x0001
+#define PRI_PS_PAPER		0x0002
+#define PRI_PS_PAPERL		0x0004
+#define PRI_PS_PAPERW		0x0008
+#define PRI_PS_HSCALE		0x0010
+#define PRI_PS_VSCALE		0x0020
+#define PRI_PS_COPIES		0x0040
+#define PRI_PS_DESTTYPE 0x0080 // MHPRT
+#define PRI_PS_DESTNAME 0x00A0 // MHPRT
+#define PRI_PS_PRINTNAME 0x0100 // MHn0435
+
+#define PRI_PS_PAPERLW				0x000C
+#define PRI_PS_NOT_PAPERLW		0xFFF3
+#define PRI_PS_EFFECT_PAPER		0x003F
+#define PRI_PS_ALL						0xFFFF
+
+// ORIENTATION CONSTANTS
+#define PRI_OR_PORTRAIT						1
+#define PRI_OR_LANDSCAPE					2
+#define PRI_OR_ROTATED_PORTRAIT		3
+#define PRI_OR_ROTATED_LANDSCAPE	4
+
+// OSX Destination type constants
+// MHPRT begins
+#define PRI_DT_PRINTER    1
+#define PRI_DT_PDF        2
+#define PRI_DT_POSTSCRIPT 3
+// MHPRT ends
+
+// PAPER SIZES
+// rmm9306: Note that these must have the same values as the DMPAPER_ values defined for MS Windows
+#define PRI_PA_LETTER						 1 // Letter, 8 1/2 by 11 inches
+#define PRI_PA_LETTERSMALL			 2 // Letter small, 8 1/2 by 11 inches
+#define PRI_PA_TABLOID					 3 // Tabloid, 11 by 17 inches
+#define PRI_PA_LEDGER						 4 // Ledger, 17 by 11 inches
+#define PRI_PA_LEGAL						 5 // Legal, 8 1/2 by 14 inches
+#define PRI_PA_STATEMENT				 6 // Statement, 5 1/2 by 8 1/2 inches
+#define PRI_PA_EXECUTIVE				 7 // Executive 7 1/4 by 10 1/2 inches
+#define PRI_PA_A3								 8 // A3 sheet, 297 by 420 mm
+#define PRI_PA_A4								 9 // A4 Sheet 210 by 297 mm
+#define PRI_PA_A4SMALL					10 // A4 small sheet, 210 by 297 mm
+#define PRI_PA_A5								11 // A5 sheet, 148 by 210 mm
+#define PRI_PA_B4								12 // B4 sheet, 250 by 354 mm
+#define PRI_PA_B5								13 // B5 sheet, 182 by 257 mm
+#define PRI_PA_FOLIO						14 // Folio, 8 1/2 by 13 inches
+#define PRI_PA_QUARTO						15 // Quarto, 215 by 275 mm
+#define PRI_PA_10X14						16 // 10 by 14 inch sheet
+#define PRI_PA_11X17						17 // 11 by 17 inch sheet
+#define PRI_PA_NOTE							18 // Note, 8 1/2 by 11 inches
+#define PRI_PA_ENV_9						19 // #9 Envelope, 3 7/8 by 8 7/8 inches
+#define PRI_PA_ENV_10						20 // #10 Envelope, 4 1/8 by 9 1/2 inches
+#define PRI_PA_ENV_11						21 // #11 Envelope, 4 1/2 by 10 3/8 inches
+#define PRI_PA_ENV_12						22 // #12 Envelope, 4 3/4 by 11 inches
+#define PRI_PA_ENV_14						23 // #14 Envelope, 5 by 11 1/2 inches
+#define PRI_PA_CSHEET						24 // C Sheet, 17 by 22 inches
+#define PRI_PA_DSHEET						25 // D Sheet, 22 by 34 inches
+#define PRI_PA_ESHEET						26 // E Sheet, 34 by 44 inches
+#define PRI_PA_ENV_DL						27 // DL Envelope, 110 by 220 mm
+#define PRI_PA_ENV_C5						28 // C5 Envelope, 162 by 229 mm
+#define PRI_PA_ENV_C3						29 // C3 Envelope, 324 by 458 mm
+#define PRI_PA_ENV_C4						30 // C4 Envelope, 229 by 324 mm
+#define PRI_PA_ENV_C6						31 // C6 Envelope, 114 by 162 mm
+#define PRI_PA_ENV_C65					32 // C65 Envelope, 114 by 229 mm
+#define PRI_PA_ENV_B4						33 // B4 Envelope, 250 by 353 mm
+#define PRI_PA_ENV_B5						34 // B5 Envelope, 176 by 250 mm
+#define PRI_PA_ENV_B6						35 // B6 Envelope, 176 by 125 mm
+#define PRI_PA_ENV_ITALY				36 // Italy Envelope, 110 by 230 mm
+#define PRI_PA_ENV_MONARCH			37 // Monarch Envelope, 3 7/8 by 7 1/2 inches
+#define PRI_PA_ENV_PERSONAL			38 // 6 3/4 Envelope, 3 5/8 by 6 1/2 inches
+#define PRI_PA_FANFOLD_US				39 // US Std Fanfold, 14 7/8 by 11 inches
+#define PRI_PA_FANFOLD_STD_GER	40 // German Std Fanfold, 8 1/2 by 12 inches
+#define PRI_PA_FANFOLD_LGL_GER	41 // German Legal Fanfold, 8 1/2 by 13 inches
+
+#define PRI_PA_ISO_B4							42 // B4 (ISO) 250 x 353 mm
+#define PRI_PA_JAPANESE_POSTCARD	43 // Japanese Postcard 100 x 148 mm
+#define PRI_PA_9x11								44 // 9 x 11 inches
+#define PRI_PA_10x11							45 // 10 x 11 inches
+#define PRI_PA_15x11							46 // 15 x 11 inches
+#define PRI_PA_ENV_INVITE					47 // Envelope Invite 220 x 220 mm
+#define PRI_PA_RESERVED_48				48
+#define PRI_PA_RESERVED_49				49
+#define PRI_PA_LETTER_EXTRA				50 // Letter extra 9 \275 x 12 inches
+#define PRI_PA_LEGAL_EXTRA				51 // Legal Extra 9 \275 x 15 inches
+#define PRI_PA_TABLOID_EXTRA			52 // Tabloid Extra 11.69 x 18 inches
+#define PRI_PA_A4_EXTRA						53 // A4 Extra 9.27 x 12.69 inches
+#define PRI_PA_LETTER_TRANSVERSE	54 // Letter Transverse 8 \275 x 11 inches
+#define PRI_PA_A4_TRANSVERSE			55 // A4 Transverse 210 x 297 mm
+#define PRI_PA_LETTER_EXTRA_TRANSVERSE	56 // Letter Extra Transverse 9 \275 x 12 inches
+#define PRI_PA_A_PLUS							57 // SuperA/A4 227 x 356 mm
+#define PRI_PA_B_PLUS							58 // SuperB/A3 305 x 487 mm
+#define PRI_PA_LETTER_PLUS				59 // 8.5 x 12.69 inches
+#define PRI_PA_A4_PLUS						60 // A4 Plus 210 x 330 mm
+#define PRI_PA_A5_TRANSVERSE			61 // A5 Transverse 148 x 210 mm
+#define PRI_PA_B5_TRANSVERSE			62 // B5 (JIS) Transverse 182 x 257 mm
+#define PRI_PA_A3_EXTRA						63 // A3 Extra 322 x 445 mm
+#define PRI_PA_A5_EXTRA						64 // A5 Extra 174 x 235 mm
+#define PRI_PA_B5_EXTRA						65 // B5 (ISO) Extra 201 x 276 mm
+#define PRI_PA_A2									66 // A2 420 x 594 mm
+#define PRI_PA_A3_TRANSVERSE			67 // A3 Transverse 297 x 420 mm
+#define PRI_PA_A3_EXTRA_TRANSVERSE	68 // A3 Extra Transverse 322 x 445 mm
+#define PRI_PA_A6									70 // A6 105 x 148 mm mm // rmm9306
+#define PRI_PA_ST_RECEIPT					252  // STAR Receipt 200 x 104 mm MHn0311
+#define PRI_PA_ST_LONGRECEIPT			253  // STAR Receipt 1000 x 104 mm MHn0311
+#define PRI_PA_IW_COMPUTER				254  // ImageWriter Computer Paper 356 x 279 mm MHn0034
+#define PRI_PA_IW_INTER_FANFOLD		255  // ImageWriter International Fanfold 210 x 305 mm MHn0034
+
+#define PRI_PA_FIRST		PRI_PA_LETTER
+//#define PRI_PA_LAST			PRI_PA_A3_EXTRA_TRANSVERSE
+#define PRI_PA_LAST			PRI_PA_IW_INTER_FANFOLD // MHn0034
+
+#define PRI_PA_CUSTOM			0x4000		// AE6553 Was 256
+#define PRI_PA_PAPERMASK  0x3fff		// AE6553
+
+#define PRI_MIN_SCALE			25		// mpm4532
+#define PRI_MAX_SCALE			400		// mpm4532
+
+// CUSTOM DIALOG RETURNS
+#define PRI_DLG_NONE			0
+#define PRI_DLG_CUSTOM		-1
+#define PRI_DLG_INHERIT		1
+
+// mpmPOChars begins
+// PRI_OBJ_CHARS data columns of qcrb in PRIobjectStruct.mData
+#define PRI_CHR_XN_TYPE					1		// see PRI_CHR_TYPE_ below
+#define PRI_CHR_XN_BASELINE			2		// baseline co-ordinate, subtract top of qprirect to calculate intended ascent height
+#define PRI_CHR_XN_CHARS				3		// array of unicode characters
+#define PRI_CHR_XN_WIDTHS				4		// 16 bit integer array of character widths at one-thousand points (1000/72)
+
+// PRI_OBJ_CHARS type constants
+#define PRI_CHR_TYPE_ONE_TO_ONE  0x0001	// one 'widths' array entry for each 'chars' array entry
+// mpmPOChars ends
+
+
+// ######################## messages ####################
+
+// messages for PRIprocClass::PriProc
+#define PM_INIT_PAGE						0x0001	// ( wParam = generate pages flag ; lParam = PRIpageStruct* )
+#define PM_ADD_HEADER_OBJECTS		0x0011
+#define PM_ADD_FOOTER_OBJECTS		0x0012
+#define PM_PAINT_OBJECT					0x0021
+
+#define PM_CLOSE								0x0041
+
+// messages for PRIcustomFunc // mpmPRIs
+#define PM_OUT_CONSTRUCT				0x8001	// an instance of the output class has been constructed ( lParam1 = qulong* for setting any custom data as a long value )
+#define PM_OUT_DESTRUCT					0x8002	// an instance of the output class is being destructed ( lParam1 = qulong* the long value set on construction )
+#define PM_OUT_OPEN							0x8003	// open the device for a job if it isn't already open ( lParam1 = PRIdestParmStruct* )
+#define PM_OUT_CLOSE						0x8004	// close the device for a job if the job opened the device ( no parameters )
+#define PM_OUT_OPENDEVICE				0x8005	// open the device without job, pJob will be NULL ( lParam1 = PRIdestParmStruct* )
+#define PM_OUT_CLOSEDEVICE			0x8006	// close the device without job, flush if neccessary ( no parameters )
+#define PM_OUT_SENDTEXT					0x8007	// send raw text to device ( lParam1 = qchar*, lParam2 = textLen , HIWORD(lParam3) = newLine, LOWORD(lParam3) = formFeed )
+#define PM_OUT_SENDDATA					0x8008	// send data to device ( lParam1 = qbyte*, lParam2 = textLen )
+#define PM_OUT_FLUSHDEVICE			0x8009	// flush the device ( no parameters )
+#define PM_OUT_ISDEVICEOPEN			0x800a	// if device is open set lParam1 to qtrue ( lParam1 = qbool* )
+#define PM_OUT_GETPARM					0x800b	// get custom parameter ( lParam1 = id, lParm2 = qfldval, lParam3 = optional list data for drop lists etc ) // mpmPRIs
+#define PM_OUT_SETPARM					0x800c	// set custom parameter ( lParam1 = id, lParm2 = qfldval ) // mpmPRIs
+#define PM_OUT_VALIDATEPARMS		0x800d	// validate the destination parameters ( lParam1 = PRIdestParmStruct* )
+#define PM_OUT_LOADPARMS				0x800e	// load the parms from a data collection ( lParam1 = qcrb ) // mpmPRIs
+#define PM_OUT_SAVEPARMS				0x800f	// save the parms into a data collection ( lParam1 = qcrb ) // mpmPRIs
+#define PM_OUT_ADDPAGE					0x8010	// eject page to destination ( lParam1 = qpripage* )
+#define PM_OUT_DRAWPAGE					0x8011	// draw all objects to page ( lParam1 = qpripage* )
+#define PM_OUT_DRAWOBJECT				0x8012	// draw object to page ( lParam1 = PRIobjectStruct* , lParam2 = qprirect* pClipRect )
+#define PM_OUT_ADJPOS						0x8013	// adjust coords prior to drawing ( lParam1 = PRIpageStruct* , lParam2 = qpripos* , lParam3 = qprirect* pClipRect )
+#define PM_OUT_SENDPAGE					0x8014	// generated by the text output class when a page of raw text data is ready to be send ( lParam1 = PRIpageStruct* , lParam2 = crbval containg raw text )
+#define PM_OUT_GETPARMDLG				0x8015	// send when the dialog resource for the parameters pane is required ( lParam1 = qfldval )
+#define PM_OUT_GETPAGEDLG				0x8016	// send when the dialog resource for the page size pane is required ( lParam1 = qfldval )
+#define PM_OUT_GETDLGIDS				0x8017	// send when the dialog resource id is required ( lParam1 = rstrno*, lParam2 = rstrno* ) return one of the PRI_DLG_xxx defines
+#define PM_OUT_BROWSE						0x8018	// send to custom devices when the PRIbrowseOutput is called ( lParam1 = PRIdestParmStruct* , lParam2 = strxxx* title, lParam3 = strxxx* mask ) // mpm4398
+#define PM_OUT_AFTER						0x8019	// send to custom devices when leaving a field on custom parameters ( lParam1 = id , lParm2 = qfldval ) // mpmPRIv2
+#define PM_OUT_CLICK						0x801a	// send to custom devices for clicks on custom parameters ( lParam1 = id , lParm2 = qfldval ) // mpmPRIv2
+#define PM_OUT_DCLICK						0x801b	// send to custom devices for clicks on custom parameters // mpmPRIv2
+#define PM_OUT_SETDATA					0x801c	// can be send to PRIdefOutputProc to set control's data on destination dialog ( lParam1 = controls id, lParam2 = qfldval )
+#define PM_OUT_GETERRTEXT				0x801d	// send to custom device to get custom error text ( lParam1 = err code , lParam2 = str255* ) // mpmPRIw
+#define PM_OUT_GETEOL						0x801e	// send to custom device to get custom end of line characters ( lParam1 = strxxx* ) // mpm4426
+#define PM_OUT_JOBSETUP					0x801f	// send to custom overloaded printer device when PRIopenJobSetupDialog is called ( lParam1 = PRIjob, lParam2 = PRIpageSetup*, lParam3 = qbool* ) // mpm4714
+
+#define PM_OUT_SET_HDC					0x8021	// must be send to PRIdefOutputProc prior to drawing to set the dc of the HDC output class ( lParam1 = HDC )
+#define PM_OUT_WAITPDF					0x8022	// rmm_pdf: internal message
+#define PM_OUT_DELETEPDFINFO		0x8023	// rmm_pdf: internal message
+
+// messages for PRIprocClass::PriProc
+#define PM_OUT_PRINTER					0x8031	// user has clicked the printer button on preview/screen toolbar
+#define PM_OUT_DISK							0x8032	// user has clicked the save button on preview/screen toolbar
+#define PM_OUT_PAGE							0x8033	// user has clicked the print page button on preview/screen toolbar
+#define	PM_OUT_PREVIEW					0x8034	// user has clicked the open preview button on screen toolbar
+#define PM_OUT_KILL							0x8035	// special message to close a specified output can be send to PRIdefOutputProc // mpm4397
+#define PM_OUT_ZOOM							0x8036	// special message to zoom a preview output ( lParam1 = zoom on ) can be send to PRIdefOutputProc // mpm4397
+#define PM_OUT_SEARCH						0x8037	// rmm8638: special message to search a preview output (lParam1 = (fldval *) search text, lParam2 = bNext)
+#define PM_OUT_PDF							0x8038	// rmm9577: user has clicked the save PDF button on preview toolbar
+
+#define PM_OUT_BUTTFST					0x8031
+#define PM_OUT_BUTTLST					0x8038	 // mpm4397	// rmm8638 // rmm9577
+
+// Parallel Port indexes for Port List (PRIdestParmStruct.mPortParms.mPort) // MHn0001
+#define PRI_PARPORT_START				4 // MHn0001
+#define PRI_PARPORT_END					7 // MHn0001
+#define PRI_PARPORT_NET					13	// MHn0377
+
+// ######################## structs ####################
+
+extern void PRIclearMem( void* pAdd, qlong pLen );
+
+struct qprirect
+{
+	qpridim	left;
+	qpridim	top;
+	qpridim	right;
+	qpridim	bottom;
+	
+	qprirect() :left(0), top(0), right(0), bottom(0) {} // rmm5118: safer to clear memory
+	qprirect( qpridim pLeft, qpridim pTop, qpridim pRight, qpridim pBottom )
+						:left(pLeft), top(pTop), right(pRight), bottom(pBottom) {}
+	qprirect( const qprirect &pRect )
+						:left(pRect.left), top(pRect.top), right(pRect.right), bottom(pRect.bottom) {}
+	
+	qpridim width() { return right - left + 1; }
+	qpridim height() { return bottom - top + 1; }
+	
+	void width( qpridim pWidth ) { right = left + pWidth - 1; }
+	void height( qpridim pHeight ) { bottom = top + pHeight - 1; }
+	
+	void setEmpty() { left = top = 0; right = bottom = -1; }
+	qbool isEmpty() { return qbool(right < left || bottom < top); }
+	
+#ifdef iswin16 // AE4649
+	void	inset( qpridim pHorz, qpridim pVert );
+	void	inflate( qpridim pHorz, qpridim pVert );
+	void	offset( qpridim pHorz, qpridim pVert );
+#else
+	void	inset( qpridim pHorz, qpridim pVert ) { left+=pHorz; right-=pHorz; top+=pVert; bottom-=pVert; }
+	void	inflate( qpridim pHorz, qpridim pVert ) { left-=pHorz; right+=pHorz; top-=pVert; bottom+=pVert; }
+	void	offset( qpridim pHorz, qpridim pVert ) { left+=pHorz; right+=pHorz; top+=pVert; bottom+=pVert; }
+#endif
+	qbool	intersect( qprirect* pSrcRect1, qprirect* pSrcRect2 );
+	qbool	unionRect( qprirect* pSrcRect1, qprirect* pSrcRect2 );
+
+};
+
+
+struct qpripage
+{
+	qshort	mHorz;
+	qshort	mVert;
+	
+	qpripage() :mHorz(0), mVert(0) {} // rmm5118: safer to clear memory
+	qpripage( qshort pHorz, qshort pVert )
+						:mHorz(pHorz), mVert(pVert) {}
+	qpripage( const qpripage &pPage )
+						:mHorz(pPage.mHorz), mVert(pPage.mVert) {}
+
+};
+
+
+struct qpripos: public qprirect, qpripage
+{
+	qlong			mSectID;
+	ePRIpos		mMode;
+	
+	// constructors for ePosGlobal
+	qpripos()
+					:qprirect(0,0,-1,-1), mMode(ePosGlobal), mSectID(0) {} // rmm5118: clear mSectID
+
+	qpripos( qpridim pLeft, qpridim pTop, qpridim pRight, qpridim pBottom )
+						:qprirect(pLeft,pTop,pRight,pBottom), mMode(ePosGlobal) {}
+	
+	// constructors for ePosPaper, ePosPrintable, ePosMargins, ePosHeader, ePosFooter
+	qpripos( ePRIpos pMode, qshort pHorzPage, qshort pVertPage )
+					:qprirect(0,0,-1,-1), qpripage(pHorzPage,pVertPage), mMode(pMode) {}
+	
+	qpripos( ePRIpos pMode, qshort pHorzPage, qshort pVertPage, const qprirect &pRect )
+					:qprirect(pRect), qpripage(pHorzPage,pVertPage), mMode(pMode) {}
+
+	qpripos( ePRIpos pMode, qshort pHorzPage, qshort pVertPage, qpridim pLeft, qpridim pTop, qpridim pRight, qpridim pBottom )
+					:qprirect(pLeft,pTop,pRight,pBottom), qpripage(pHorzPage,pVertPage), mMode(pMode) {}
+
+	qpripos( ePRIpos pMode, const qpripage &pPage )
+					:qprirect(0,0,-1,-1), qpripage(pPage), mMode(pMode) {}
+	
+	qpripos( ePRIpos pMode, const qpripage &pPage, const qprirect &pRect )
+					:qprirect(pRect), qpripage(pPage), mMode(pMode) {}
+
+	qpripos( ePRIpos pMode, const qpripage &pPage, qpridim pLeft, qpridim pTop, qpridim pRight, qpridim pBottom )
+					:qprirect(pLeft,pTop,pRight,pBottom), qpripage(pPage), mMode(pMode) {}
+
+	// constructors for ePosSection
+	qpripos( qlong pSecID )
+						:qprirect(0,0,-1,-1), mSectID(pSecID), mMode(ePosSection) {}
+
+	qpripos( qlong pSecID, const qprirect &pRect )
+						:qprirect(pRect), mSectID(pSecID), mMode(ePosSection) {}
+
+	qpripos( qlong pSecID, qpridim pLeft, qpridim pTop, qpridim pRight, qpridim pBottom )
+						:qprirect(pLeft,pTop,pRight,pBottom), mSectID(pSecID), mMode(ePosSection) {}
+
+	void operator=( const qpripage& pPage ) { mHorz = pPage.mHorz; mVert = pPage.mVert; }
+	qbool	operator==( const qpripage& pPage ) { return qbool( mHorz == pPage.mHorz && mVert == pPage.mVert ); }
+	qbool	operator!=( const qpripage& pPage ) { return !(operator==(pPage)); }
+
+	void operator=( const qprirect& pRect ) { left = pRect.left; top = pRect.top; right = pRect.right; bottom = pRect.bottom; }
+	qbool	operator==( const qprirect& pRect ) { return qbool( left == pRect.left && top == pRect.top && right == pRect.right && bottom == pRect.bottom ); }
+	qbool	operator!=( const qprirect& pRect ) { return !(operator==(pRect)); }
+
+	void operator=( const qpripos& pPos );
+	qbool operator==( const qpripos& pPos );
+	qbool operator!=( const qpripos& pPos ) { return !(operator==(pPos)); }
+};
+
+
+struct PRIobjectStruct
+{
+	// general properties
+	qlong				mIdent;		// user identifier
+	qlong				mType;		// the objects type (PRI_OBJ_xxx)
+	qlong				mUnique;	// unique identfier generated by print manager when object is added // mpm4616
+	qpripos			mPos;			// location of object
+	qfldval			mData;		// specifies objects data (fldval*)
+
+	// image properties
+	qdim			mHorzDPI;		// dots per inch in image (required for when mHorzExtend or mVertExtend are true)
+	qdim			mVertDPI;
+	
+	// fill properties
+	qpat			mFillPat;				// fill pattern
+	qcol			mBackFillColor;	// background fill color
+	qcol			mForeFillColor;	// foreground fill color
+	
+	// border and line properties
+	WNDborderStruct	mBorder;	// border style
+
+	qshort			mReserved2;		// reserved
+	qshort			mReserved3;		// reserved
+
+	// text properties
+	qshort		mStyleIndex;				// index into OMNIS style table
+	qshort		mFontIndex;					// index into OMNIS font table
+	GDItextSpecStruct	mTextSpec;	// text specifications
+
+	// other
+	qbool			mHorzSlide:1;		// horizontal sliding
+	qbool			mHorzExtend:1;	// grows horizontally to fit text
+	qbool			mVertExtend:1;	// grows vertically to fit text
+	qbool			mFloatRight:1;	// right edge can float when section grows
+	qbool			mFloatBottom:1;	// bottom edge can float when section grows
+	qbool			mMultiLine:1;		// paint as multi line text
+	qbool			mAddEllipsis:1;	// if true and mMultiLine and mHorzExtend are false, text is displayed with ellipsis if it doesn't fit
+	qbool			mScreenUnits:1;	// scale object to screen units
+
+	qbool			mFitVertPage:1;	// if true objects are moved onto next page if bottom doesn't fit on current and pos mode is ePosGlobal
+	qbool			mGrowSection:1;	// if true object will grow section if it extends vertically and/or horizontally
+	qbool			mZeroEmpty:1;		// if true zero number values are drawn as empty // mpm4338
+	qbool			mJstText:1;			// if true text may contain escape characters for GDIdrawTextJst // mpm4401
+	qbool			mIsMultiLine:1;	// if true the single row of text originated from a multi line text object // mpm4401
+	qbool			mIsLastMultiLine:1;	// if true the single row of text is the last row of a multi line text object // mpm4401
+	qbool			mLineHadCR:1;		// if true the row of multiline text was terminated by a carriage return character // mpmPRIw
+	qbool			mLineHadLF:1;		// if true the row of multiline text had a line feed character // mpmPRIw
+
+	qbool			mLineWasWrap:1;	// if true the row of multiline text was word wrapped // mpmPRIw
+	qbool			mTile:1;				// if true objects of type picture are tiled within the destination rect // mpmBackPic
+	qbool			mKeepAspectRatio:1;		// AE6566
+	qbool			mTreatAsInSection:1;	// rmm5802: used when a section is shifted down when spanning a page, to force the print manager to accept this object
+	qbool			mDisableDrawTextJst:1;// rmm6670: If true, do not use GDIdrawTextJst to draw text (data contains escapes for a printer, rather than our own escapes)
+	qbool			mDoNotClip:1;			// rmm6876: always draw the entire object - used for rotated text, where the text draws outside the object bounds 
+	qbool			mPrintOnTop:1;		// rmm6886: If true, the object is drawn after objects for which mPrintOnTop is false. For example,this allows a long gridline object which spans many pages to be drawn on top of filled rectangles on pages after the starting page for the line
+	qbool			mAddedDuringPageInit:1;		// rmm5118: do not set this: reserved for print manager
+	
+	PRIobjectStruct() { PRIclearMem( this, sizeof(PRIobjectStruct) ); } // rmm5015: always need to clear the whole structure
+	PRIobjectStruct( qniltype qnil ) { GDIignore(&qnil); PRIclearMem( this, sizeof(PRIobjectStruct) ); } // mpm_cw
+	~PRIobjectStruct() {}
+};
+
+// mpmCarbon2 / moved PRIdrvInfo to XPRI.HE
+
+struct PRIpageSetup
+{
+	qshort	mFields;				// contains flags specifying which properties are set
+	qshort	mOrientation;		// paper orientation
+	qshort	mPaperSize;			// paper size (i.e. PRI_PAPER_A4)
+	qpridim	mPaperLength;		// paper length in qpridims for custom paper
+	qpridim	mPaperWidth;		// paper width in qpridims for custom paper
+	qshort	mHorzScale;			// scale in percent
+	qshort	mVertScale;			// scale in percent
+	qshort	mCopies;				// number of copies to print
+	qshort	mFlags;					// rmm9045: was mReserved1
+	qshort	mReserved2;			// reserved
+	PRIdrvInfo	mDriverInfo;		// printer driver info
+	qshort mOSXDestType;        // OSX Print Destintation (Printer, PDF, Postscript) MHPRT
+	str255 mOSXDestName;    // OSX Print Destination filename MHPRT
+	str255 mOSXPrintName; // OSX Printer Name MHn0435
+	
+	PRIpageSetup() { init(); } // rmm5118
+	//PRIpageSetup( qniltype qnil ) { PRIclearMem( this, sizeof(PRIpageSetup) ); }
+	// MHPRT begins
+	PRIpageSetup( qniltype qnil ) { GDIignore(&qnil); init(); }	// rmm5118 // mpm_cw
+	// MHPRT ends
+	~PRIpageSetup() {}
+private:
+	void init() // rmm5118: made this a method (was qnil constructor)
+	{ 
+		mFields = 0;
+		mOrientation = 0;
+		mPaperSize = 0;
+		mPaperLength = 0;
+		mPaperWidth = 0;
+		mHorzScale = 0;
+		mVertScale = 0;
+		mCopies = 0;
+		mFlags = 0; // rmm9045
+		mReserved2 = 0;
+		PRIclearMem( &mDriverInfo, sizeof(mDriverInfo) );
+		mOSXDestType = 0;
+		mOSXDestName = qnil;
+		mOSXPrintName = qnil; // MHn0435
+	}
+};
+
+// Start rmm9045: flag masks for PRIpageSetup mFlags
+const qshort cPRIpsFlagOSXOpenPDFInPreview = 1;
+// End rmm9045
+
+
+struct PRIpageStruct
+{
+	qlong			mIdent;						// unique identfier of page starts at one for each job
+	qpripage	mPage;						// the vertical and horizontal page numbers.
+	qprirect	mGlobalBounds;		// global rect (mLocalBounds) in global coordinates
+	qprirect	mPaperBounds;			// paper rect local to paper
+	qprirect	mPrintBounds;			// printable rect local to paper
+	qprirect	mLocalBounds;			// global rect local to paper // mpmPRIo
+	qprirect	mHeaderBounds;		// page header bounderies local to paper
+	qprirect	mFooterBounds;		// page footer bounderies local to paper
+	
+	PRIpageStruct() { mIdent = 0; } // rmm5118
+	PRIpageStruct( qniltype qnil ) { GDIignore(&qnil); mIdent = 0; } // rmm5118: qpripage and qprirect now have default constructors that do something // mpm_cw
+	~PRIpageStruct() {}
+};
+
+
+struct PRIdestParmStruct
+{
+	qlong								mDest;			// the destination, one of the PRI_DEST_xxx defines
+	qlong								mReserved1;	// reserved
+	PRIpageSetup* 			mPageSetup;	// the page setup for the print job
+	HWND								mHwnd;			// hwnd for PRI_DEST_SCREEN and _PREVIEW (can be null)
+	qrect								mWRect;			// size of window for PRI_DEST_SCREEN and _PREVIEW if mHwnd is NULL (can be empty rect)
+	str255							mRepFile;		// file name for PRI_DEST_DISK
+	str255							mTextFile;	// file name for PRI_DEST_FILE
+	str255							mEdFile;		// edition file name for PRI_DEST_DDE_PUB (Mac only)
+	str255							mPages;			// pages to be printed for PRI_DEST_PRINTER
+	qfldval							mRepData;		// destination for report data for PRI_DEST_MEM (fldval*)
+	qpridim							mCharWidth;	// character width for PRI_DEST_FILE, PRI_DEST_PORT, PRI_DEST_CLIPBOARD
+	qpridim							mLineHeight;// line height for PRI_DEST_FILE, PRI_DEST_PORT, PRI_DEST_CLIPBOARD
+	qfldval							mExtParms;	// custom output parameters (contains a list of property values)
+	PRIportParmStruct		mPortParms;	// platform dependent port parameters PRI_DEST_PORT
+	
+	qshort							mLinesPerPage;	// the following are used when printing to a raw text output (port or textfile)
+	qshort							mCharsPerLine;
+	qshort							mRtimeout;			// MHPORT: timeout in seconds.
+	qshort							mReserved3;			// reserved
+	qbool								mGeneratePages:1;
+	qbool								mSendFormFeed:1;
+	qbool								mRestrictPageWidth:1;
+	qbool								mAppendFile:1;	// if true any data send to file is appended (PRI_DEST_FILE only)
+	qbool								mIsText:1;			// if true, only raw text data is printed
+	qbool								mStack:1;				// if true window will be opened in stack position for PRI_DEST_SCREEN and _PREVIEW
+	qbool								mCenter:1;			// if true window will be opened centrally on screen for PRI_DEST_SCREEN and _PREVIEW
+	qbool								mShowBounds:1;	// show page bounderies (screen reports)
+	qbool								mOpenModal:1;		// the screen or preview report is opened modally (method execution is halted)
+	qbool								mHide:1;				// if true window is hidden until job is completed
+	qbool								mDoNotGetPageSetup:1;	// rmmuni_fnt4: if true, do not load printer page setup when opening printer (use existing page setup in this structure)
+	qbool								mPrintingPage:1;// rmm6299: tells job setup dialog we are printing a single page (flag is currently used on OSX only)
+	qbool								mDisableCopy:1;	// rmm6397: copy selection is disabled for screen report and page preview windows
+	qbool								mReserved7:1;		// reserved
+	qbool								mReserved8:1;		// reserved
+	qbool								mReserved9:1;		// reserved
+	PRIdestParmStruct() {}
+	PRIdestParmStruct( qniltype qnil );
+	~PRIdestParmStruct() {}
+	
+	// rmmuni_fnt4: page preview must remain hidden until report has been generated, on OSX (when using ATSUI)
+	#ifdef ismacosx
+		qbool								isHidden() { return mHide || (gUseATSUI && PRI_DEST_PREVIEWOLD == mDest); }  // rmm8306
+	#else
+		qbool								isHidden() { return mHide; }
+	#endif
+};
+
+
+struct PRIparmStruct
+{
+	qulong							mVersion;					// The version of the print manager
+	qlongptr						mReserved1;				// reserved // rmm64bit2
+	PRIjob							mJob;							// the print job (returned by PRIstartJob)
+	qapp								mApp;							// the application to use for retrieving font or style information
+	PRIdestParmStruct*	mDestParms;				// the destination info (can be null)
+	str255* 						mDocName;					// document name
+	PRIprocClass* 			mProc;						// pointer to message proc instance
+	qshort							mReserved2;				// reserved
+	qshort							mReserved3;				// reserved
+	qbool								mHorzPages:1;			// generate horizontal pages
+	qbool								mHorzHeaders:1;		// generate individual headers for each horizontal page
+	qbool								mHorzFooters:1;		// generate individual footers for each horizontal page
+	qbool								mAutoEject:1;			// automaticcaly sends pages to device
+	qbool								mUserReport:1;		// rmm6397: qtrue for user (non-IDE) reports
+	qbool								mReserved5:1;			// reserved
+	qbool								mReserved6:1;			// reserved
+	qbool								mReserved7:1;			// reserved
+	
+	PRIparmStruct() { PRIclearMem( this, sizeof(PRIparmStruct) ); } // rmm5118
+	PRIparmStruct( qniltype qnil ) { GDIignore(&qnil); PRIclearMem( this, sizeof(PRIparmStruct) ); } // mpm_cw
+	~PRIparmStruct() {}
+};
+
+
+struct PRIsectionStruct
+{
+	qlong			mIdent;					// user identifier
+	qlong			mReserved1;			// reserved
+	qpripos		mPos;						// sections location local to print job
+	qshort		mReserved2;			// reserved
+	qshort		mReserved3;			// reserved
+	qbool			mFloatRight:1;	// right edge floating
+	qbool			mFloatBottom:1;	// bottom edge floating
+	qbool			mFitOnPage:1;		// fit section on new page if it crosses pages // mpmFitonpage
+	qbool			mReserved5:1;		// reserved
+	qbool			mReserved6:1;		// reserved
+	qbool			mReserved7:1;		// reserved
+	qbool			mReserved8:1;		// reserved
+	qbool			mReserved9:1;		// reserved
+	
+	PRIsectionStruct() { PRIclearMem( this, sizeof(PRIsectionStruct) ); } // rmm5118
+	PRIsectionStruct( qniltype qnil ) { GDIignore(&qnil); PRIclearMem( this, sizeof(PRIsectionStruct) ); } // mpm_cw
+	~PRIsectionStruct() {}
+};
+
+
+struct PRIdeviceInfoStruct // mpmPRIs
+{
+	// read only properties
+	qlong		mID;							// the destination ID (One of the PRI_DEST_xxx defines) If non-zero, the specified standard device is replaced by custom device // mpm4714
+	HBITMAP	mBitmap;					// bitmap displayed in dialog / used by custom devices
+	void*		mExtInfo;					// info provided by external components registering custom destinations
+	qlong		mExtCtrlID;				// info provided by external components registering custom destinations
+	qlong		mReserved1;				// reserved
+	qshort	mReserved2;				// reserved
+	qshort	mReserved3;				// reserved
+	qbool		mIsOpen:1;				// device is open
+	qbool		mIsText:1;				// its a text based device
+	qbool		mCanOpenDirect:1;	// device can be opened via PRIopenDevice
+	qbool		mCanKeepOpen:1;		// if true device can be kept open for long periods of time (i.e. file or port)
+	qbool		mCanSendText:1;		// if true raw text can be send to device via PRIsendTextToDevice
+	qbool		mCanSendData:1;		// if true raw text can be send to device via PRIsendDataToDevice
+	qbool		mCanPage:1;				// if true the text output can be paged
+	qbool		mKeepPages:1;			// if true the pages of data are held by the formating manager until the job is closed
+	// read/write properties
+	str31		mName;						// if non/zero // mpmPRIj
+	qlong		mIconID;					// alternative icon to be displayed // mpmPRIo
+	qlong		mReserved13;			// reserved
+	qbool		mShowInDialog:1;	// device will appear in destination dialog
+	qbool		mReserved6:1;			// reserved
+	qbool		mReserved7:1;			// reserved
+	qbool		mReserved8:1;			// reserved
+	qbool		mReserved9:1;			// reserved
+	qbool		mReserved10:1;		// reserved
+	qbool		mReserved11:1;		// reserved
+	qbool		mReserved12:1;		// reserved
+
+	PRIdeviceInfoStruct() {}
+	PRIdeviceInfoStruct( qniltype qnil );
+	~PRIdeviceInfoStruct() {}
+};
+
+
+
+// ######################## classes ####################
+
+class PRIprocClass
+{
+	public:
+		virtual qprierr PriProc( PRIjob pJob, UINT pMessage, WPARAM wParam, LPARAM lParam )=0;
+};
+
+
+
+// ######################## functions ####################
+
+#pragma SET_RETURN_REGISTER_ON
+
+// CONVERSION
+qpridim 					PRIconvFromCM( qlong pCms, qlong pFraction );
+qpridim OMNISAPI	PRIconvFromDC( HDC pHdc, qdim pUnits, qbool pVert );
+qpridim 					PRIconvFromIN( qlong pInches, qlong pFraction );
+qpridim OMNISAPI	PRIconvFromScreen( qdim pUnits, qbool pVert );
+qpridim OMNISAPI	PRIconvFromResolution(qdim pUnits, qdim pResolution);	// rmmhdpi
+void		OMNISAPI	PRIconvFromCMorINCH( const qreal& pReal, qpridim& pPridim ); // mpm4494
+void							PRIconvFromCMorINCHEx(const qreal& pReal, qpridim& pPridim, qbool pCmsFlag); // rmm9123
+
+qlong 						PRIconvToCM( qpridim pUnits, qlong pRetFraction );
+qdim		OMNISAPI	PRIconvToDC( HDC pHdc, qpridim pUnits, qbool pVert );
+qlong 						PRIconvToIN( qpridim pUnits, qlong pRetFraction );
+qdim		OMNISAPI	PRIconvToScreen( qpridim pUnits, qbool pVert );
+qdim							PRIconvToScreenEx(qpridim pUnits, qbool pVert, qdim pDPI);	// rmm9347
+qdim		OMNISAPI	PRIconvToResolution(qpridim pUnits, qdim pResolution);	// rmmhdpi
+void		OMNISAPI	PRIconvToCMorINCH( qpridim pPridim, qreal& pReal );
+
+void 		OMNISAPI	PRIconvRectFromDC( HDC pHdc, qrect* pDeviceRect, qprirect* pPriRect );
+void 		OMNISAPI	PRIconvRectFromScreen( qrect* pScreenRect, qprirect* pPriRect );
+
+void		OMNISAPI	PRIconvRectToDC( HDC pHdc, qprirect* pPriRect, qrect* pDeviceRect );
+void		OMNISAPI	PRIconvRectToScreen( qprirect* pPriRect, qrect* pScreenRect );
+void							PRIconvRectToScreenEx(qprirect* pPriRect, qrect* pScreenRect, qdim pDPI);	// rmm9347
+
+void							PRIconvDimensionsToDPI(qrect &pRect, qdim pHdpi, qdim pVdpi, qdim pScreenDPI = 0); // rmm9581
+
+qprierr OMNISAPI	PRInormPos( PRIjob pJob, qpripos* pPos ); // converts section coordinates to real coordinates
+qprierr OMNISAPI	PRIconvPos( PRIjob pJob, qpripos* pPos, ePRIpos pTo ); // converts positions to given position mode
+
+// KEY FUNCTIONS
+qbool							PRIextended();		// returns true if extended printing is available (MAC: LaserWriter 8.4.1 or later, WIN always true)
+qprierr OMNISAPI	PRIopen();				// opens the print manager
+qprierr OMNISAPI	PRIclose();				// closes the print manager
+
+qprierr OMNISAPI	PRIstartJob( PRIparmStruct* pParms );	// starts a new print job
+qprierr OMNISAPI	PRIendJob( PRIjob pJob );							// destroys the given print job
+qprierr OMNISAPI	PRIkillJob( PRIjob pJob );
+qprierr OMNISAPI	PRIredirectJob( PRIjob pJob, PRIdestParmStruct* pDestParms );
+qprierr OMNISAPI	PRIloadJob( PRIparmStruct* pParms, const strxxx* pFileName );
+qprierr OMNISAPI	PRIloadJob( PRIparmStruct* pParms, const handle& pRepData );
+qbool		OMNISAPI	PRIisUserReport(PRIjob pJob);	// rmm6397
+PRIprocClass* OMNISAPI	PRIselectProc( PRIjob pJob, PRIprocClass* pNewProc ); // changes the message proc of the job and returns the previous
+PRIprocClass* OMNISAPI	PRIgetProc( PRIjob pJob ); // returns the message proc instance of the job
+
+qpridim OMNISAPI PRItextWidth( PRIjob pJob, qchar* pAdd, qlong pLen, GDItextSpecStruct* pTextSpec );		// rmm2797: returns the width of the supplied text
+qpridim OMNISAPI PRItextWidthEx(PRIjob pJob, qchar* pAdd, qlong pLen, GDItextSpecStruct* pTextSpec, qbool pJstText);	// rmm8328: Like PRItextWidth, but also caters for styled text
+qpridim OMNISAPI PRItextHeight(PRIjob pJob, qfnt* pFnt);																							// rmm2797: returns the height of the supplied text
+
+qprierr OMNISAPI	PRIendSlide(PRIjob pJob);	// rmm4561
+
+// PAGES
+qprierr OMNISAPI	PRIstartPage( PRIjob pJob );							// starts a new page
+qprierr OMNISAPI	PRIendPage( PRIjob pJob );								// ends the current page
+qprierr OMNISAPI	PRIejectPage( PRIjob pJob, qlong pPage );	// ejects pages up to and including pPage
+qprierr OMNISAPI	PRIgetPageInfo( PRIjob pJob, PRIpageStruct* pPageInfo );	// retrieves page info for specified page
+qprierr OMNISAPI	PRIsetPageInfo( PRIjob pJob, PRIpageStruct* pPageInfo );  // sets the info for the specified page (can only be called for current page)
+qprierr OMNISAPI	PRIfitSectionOnPage(PRIjob pJob, qlong pSectionID); // rmm5400: moves section to next page if necessary; call this once, for sections with the fit on page property, typically just before deleting the section
+
+
+// OBJECTS
+qprierr OMNISAPI	PRIaddObject( PRIjob pJob, PRIobjectStruct* pObject );	// adds an object
+
+
+// SECTIONS
+qprierr OMNISAPI	PRIcreateSection( PRIjob pJob, PRIsectionStruct* pSectionStruct );		// creates a section in the print job
+qprierr OMNISAPI	PRIdeleteSection( PRIjob pJob, qlong pSectionID );										// deletes the section from the print job
+qprierr OMNISAPI	PRIgetSectionInfo( PRIjob pJob, PRIsectionStruct* pSectionStruct );		// finds the section and returns its info
+qprierr OMNISAPI	PRIsetSectionInfo( PRIjob pJob, PRIsectionStruct* pSectionStruct );		// finds the section and alters its info // mpmPRIe
+qprierr OMNISAPI	PRIgrowSection( PRIjob pJob, qlong pSectionID, qpridim pHorz, qpridim pVert ); // grows or shrinks the section by specified ammount
+
+// ERROR HANDLING
+qprierr	OMNISAPI	PRIgetError( PRIjob pJob );			// checks for error conditions in job or globally and returns the error
+qlong		OMNISAPI	PRIgetSysError( qprierr err );	// returns the system error code if error is greater then PRI_ERR_SYSTEM
+void 		OMNISAPI	PRIshowError( qprierr pErr );		// opens an error message box ( causes stack reset for fatal errors )
+qret		OMNISAPI	PRIgetErrorText( qprierr pErr, str255* pText ); // returns the error text and omnis error code of the error
+
+void		OMNISAPI	PRIsetError( PRIjob pJob, qprierr pErr );		// sets job error condition (can be used to abort print job)
+
+
+// STANDARD DIALOGS
+qlong							PRIbuildPrinterList( qfldval pList, qbool pShowPort );	// builds a list of installed printers, returns the row number of the current printer // mpmPRIa
+qbool							PRIopenChangePrinterDialog();										// opens the change printer dialog
+qprierr 					PRIopenJobSetupDialog( PRIjob pJob, qbool* pOk );  // opens the print dialog
+qprierr 					PRIopenPageSetupDialog( PRIpageSetup* pPageSetup, qbool* pChanged );	// opens the page setup dialog
+qprierr	OMNISAPI	PRIopenDestinationDialog( PRIdestParmStruct* pDestParms, qbool pShowParms, qbool* pChanged );
+qbool							PRIopenGetFileDialog( str255* pName );
+qbool							PRIbrowseOutput( PRIdestParmStruct* pDestParms, strxxx* pTitle = NULL, strxxx* pMask = NULL ); // opens file selection dialog for destination ( FILE, TEXTFILE or PUBLISH ) // mpm4332
+
+// DESTINATION FUNCTIONS
+void 		OMNISAPI	PRIinitDestinationParms( PRIdestParmStruct* pDestParms ); // mpmPRIs
+qprierr	OMNISAPI	PRIvalidateDest( PRIdestParmStruct* pDestParms );
+
+// OUTPUT DEVICE FUNCTIONS
+qprierr OMNISAPI	PRIopenDevice( PRIdestParmStruct* pDestParms );
+qprierr OMNISAPI	PRIcloseDevice( qlong pDest );
+qprierr OMNISAPI	PRIsendTextToDevice( qlong pDest, qchar* pText, qlong pTextLen, qbool pNewLine, qbool pFormFeed );
+qprierr OMNISAPI	PRIsendDataToDevice( qlong pDest, qbyte* pData, qlong pDataLen );
+qprierr OMNISAPI	PRIsendCharactersToDevice( qlong pDest, qchar* pData, qlong pCharLen );
+qprierr OMNISAPI	PRIflushDevice( qlong pDest );
+qbool		OMNISAPI	PRIisDeviceOpen( qlong pDest );
+
+qprierr	OMNISAPI	PRIgetDeviceName( qlong pDest, str255* pName ); // mpmPRIh
+qprierr	OMNISAPI	PRIgetDeviceInfo( qlong pDest, PRIdeviceInfoStruct* pInfo );
+qprierr	OMNISAPI	PRIsetDeviceInfo( qlong pDest, PRIdeviceInfoStruct* pInfo );
+qprierr OMNISAPI	PRIgetDeviceEOLchars( qlong pDest, str15* pEOL );
+
+qbool PRIisCustomDevice( qlong pDest ); // mpm4714
+
+// PAGE SETUP RELATED FUNCTIONS
+qprierr OMNISAPI	PRIgetPageSetup( PRIjob pJob, PRIpageSetup*& pPageSetup );						// creates a new page setup and returns a pointer to it
+qprierr OMNISAPI	PRIsetPageSetup( PRIpageSetup* pPageSetup );													// sets the global page setup
+qprierr OMNISAPI	PRIcopyPageSetup( PRIpageSetup* pSrcPageSetup, PRIpageSetup*& pDestPageSetup );	// makes a copy of a page setup it returns its pointer
+qprierr	OMNISAPI	PRIdestroyPageSetup( PRIpageSetup* pPageSetup );											// destroys the given page setup
+qprierr OMNISAPI	PRIchangeJobPageSetup( PRIjob pJob, PRIpageSetup* pPageSetup, PRIpageStruct* pPageInfo );
+
+qprierr	OMNISAPI	PRIpageSetupFromCRB( qcrb pCrb, PRIpageSetup*& pPageSetup );					// retrieves the page setup for this platform from a CRB 
+qprierr	OMNISAPI	PRIpageSetupToCRB( qcrb pCrb, PRIpageSetup* pPageSetup );							// stores the page setup for this platform in a CRB
+
+qbool 	OMNISAPI	PRIsetPageSetupItem( PRIpageSetup *pPageSetup, qlong pItem, qlong pLngValue );			// sets specified item in flattened pagesetup // mpmPRIk
+qlong 	OMNISAPI	PRIgetPageSetupItem( PRIpageSetup *pPageSetup, qlong pItem );										// gets specified item from flattened pagesetup // mpmPRIk
+qbool 	OMNISAPI	PRIsetPageSetupItem( qcrb pCrb, qlong pItem, qlong pLngValue );					// sets specified item in flattened pagesetup // mpmPRIk
+qlong 	OMNISAPI	PRIgetPageSetupItem( qcrb pCrb, qlong pItem );												// gets specified item from flattened pagesetup // mpmPRIk
+// Start rmm64bit2
+qbool 		OMNISAPI	PRIsetPageSetupPtrItem( PRIpageSetup *pPageSetup, qlong pItem, qlongptr pLngValue );// sets specified pointer item in flattened pagesetup 
+qlongptr	OMNISAPI	PRIgetPageSetupPtrItem( PRIpageSetup *pPageSetup, qlong pItem );										// gets specified pointer item from flattened pagesetup
+qbool 		OMNISAPI	PRIsetPageSetupPtrItem( qcrb pCrb, qlong pItem, qlongptr pLngValue );		// sets specified pointer item in flattened pagesetup
+qlongptr	OMNISAPI	PRIgetPageSetupPtrItem( qcrb pCrb, qlong pItem );												// gets specified pointer item from flattened pagesetup
+// End rmm64bit2
+PRIparmStruct* OMNISAPI PRIgetParmStruct( PRIjob pJob );	// ae6647 
+
+qprierr						PRIgetPaperDimensions( PRIjob pJob, const qpripage* pPage, qprirect* pPaperBounds, qprirect* pPrintBounds );		// fetches the paper bounderies
+qprierr						PRIgetPaperDimensions( PRIpageSetup* pPageSetup, qprirect* pPaperBounds, qprirect* pPrintBounds );		// fetches the printable area bounderies
+
+qprierr	OMNISAPI	PRIsetJobRedirectFlag(PRIjob pJob, qbool pFlag); // rmm6957
+
+// DRIVER INFO FUNCTIONS
+qprierr 					PRIgetDriverSigniture( PRIpageSetup* pPageSetup, qlong* pSigniture );	// returns the driver signiture
+qprierr 					PRIgetFlattDriverInfoSize( PRIpageSetup* pPageSetup, qlong* pSize );	// returns the size of the driver info for storage on disk
+qprierr						PRIflattenDriverInfo( PRIpageSetup* pPageSetup, qfldval pData );	// copies the driver info to buffer in a flat format suitable for disk storage // mpmCarbon2
+qprierr 					PRIunflattenDriverInfo( PRIpageSetup* pPageSetup, qfldval pData );	// creates a new driver info from flat format // mpmCarbon2
+
+
+// CUSTOM OUTPUT REGISTRATION // mpmPRIs
+qprierr OMNISAPI	PRIregisterOutput( PRIdeviceInfoStruct* pInfo, qlong pSuperClass, FARPROC pProc );
+qprierr OMNISAPI	PRIunregisterOutput( qlong pID );
+
+qprierr OMNISAPI	PRIdefOutputProc( PRIjob pJob, void* pOut, UINT pMessage, LPARAM lParam1, LPARAM lParam2, LPARAM lParam3 );
+
+qbool OMNISAPI PRIsendPDF(qprierr &pError, UINT pMessage, LPARAM lParam1, LPARAM lParam2, LPARAM lParam3);	// rmm_pdf
+
+// INLINES ################################################
+inline qpridim PRIconvFromCM( qlong pCms, qlong pFraction )
+{
+	return pCms ? (qpridim( qreal(pCms) * PRI_CM / qreal(pFraction)+0.5 )) : 0; // mpm4600 // rmm2797 // rmm3601: special case for zero // rmm3998 //AE5259
+}
+
+
+inline qpridim PRIconvFromIN( qlong pInches, qlong pFraction )
+{
+	return pInches ? (qpridim( qreal(pInches) * PRI_INCH / qreal(pFraction)+0.5 )) : 0; // mpm4600 // rmm2797 // rmm3601: special case for zero // rmm3998 AE5259
+}
+
+
+inline qlong PRIconvToCM( qpridim pUnits, qlong pRetFraction )
+{
+	return qlong( qreal(pUnits) * qreal(pRetFraction) / PRI_CM ); // mpm4600
+}
+
+
+inline qlong PRIconvToIN( qpridim pUnits, qlong pRetFraction )
+{
+	return qlong( qreal(pUnits) * qreal(pRetFraction) / PRI_INCH ); // mpm4600
+}
+
+
+qbool		OMNISAPI	xPRIextended();
+#ifdef ismacosx
+	void xPRIsetPageSetupDefaults(); // MHn0235
+#endif
+qprierr OMNISAPI	xPRIopenPageSetupDialog( PRIpageSetup* pPageSetup, qbool* pChanged );
+qprierr OMNISAPI	xPRIopenJobSetupDialog( PRIjob pJob, qbool* pOk );
+qlong		OMNISAPI	xPRIbuildPrinterList( qfldval pList, qbool pShowPort ); // mpmPRIa
+qbool		OMNISAPI	xPRIopenChangePrinterDialog();
+qbool		OMNISAPI	xPRIopenGetFileDialog( str255* pName );
+qbool		OMNISAPI	xPRIbrowseOutput( PRIdestParmStruct* pDestParms, strxxx* pTitle, strxxx* pMask ); // mpm4332
+qprierr OMNISAPI	xPRIgetPaperDimensions( PRIjob pJob, const qpripage* pPage, qprirect* pPaperBounds, qprirect* pPrintBounds );
+qprierr OMNISAPI	xPRIgetPaperDimensions( PRIpageSetup* pPageSetup, qprirect* pPaperBounds, qprirect* pPrintBounds );
+qprierr OMNISAPI	xPRIgetDriverSigniture( PRIpageSetup* pPageSetup, qlong* pSigniture );
+qprierr OMNISAPI	xPRIgetFlattDriverInfoSize( PRIpageSetup* pPageSetup, qlong* pSize );	
+qprierr	OMNISAPI	xPRIflattenDriverInfo( PRIpageSetup* pPageSetup, qfldval pData ); // mpmCarbon2
+qprierr OMNISAPI	xPRIunflattenDriverInfo( PRIpageSetup* pPageSetup, qfldval pData ); // mpmCarbon2
+
+
+inline qbool PRIextended()
+{
+	return xPRIextended();
+}
+
+inline qprierr PRIopenPageSetupDialog( PRIpageSetup* pPageSetup, qbool* pChanged )
+{
+	if (pChanged) *pChanged = qfalse;	// rmm6457
+	return xPRIopenPageSetupDialog( pPageSetup, pChanged );
+}
+
+inline qprierr PRIopenJobSetupDialog( PRIjob pJob, qbool* pOk )
+{
+	if (pOk) *pOk = qfalse;	// rmm6457
+	return xPRIopenJobSetupDialog( pJob, pOk );
+}
+
+inline qlong PRIbuildPrinterList( qfldval pList, qbool pShowPort ) // mpmPRIa
+{
+	return xPRIbuildPrinterList( pList, pShowPort );
+}
+
+inline qbool PRIopenChangePrinterDialog()
+{
+	return xPRIopenChangePrinterDialog();
+}
+
+inline qbool PRIopenGetFileDialog( str255* pName )
+{
+	return xPRIopenGetFileDialog( pName );
+}
+
+inline qbool PRIbrowseOutput( PRIdestParmStruct* pDestParms, strxxx* pTitle, strxxx* pMask ) // mpm4332
+{
+	return xPRIbrowseOutput( pDestParms, pTitle, pMask );
+}
+
+inline qprierr PRIgetPaperDimensions( PRIjob pJob, const qpripage* pPage, qprirect* pPaperBounds, qprirect* pPrintBounds )
+{
+	return xPRIgetPaperDimensions( pJob, pPage, pPaperBounds, pPrintBounds );
+}
+
+inline qprierr PRIgetPaperDimensions( PRIpageSetup* pPageSetup, qprirect* pPaperBounds, qprirect* pPrintBounds )
+{
+	return xPRIgetPaperDimensions( pPageSetup, pPaperBounds, pPrintBounds );
+}
+
+inline qprierr PRIgetDriverSigniture( PRIpageSetup* pPageSetup, qlong* pSigniture )
+{
+	return xPRIgetDriverSigniture( pPageSetup, pSigniture );
+}
+
+inline qprierr PRIgetFlattDriverInfoSize( PRIpageSetup* pPageSetup, qlong* pSize )
+{
+	return xPRIgetFlattDriverInfoSize( pPageSetup, pSize );
+}
+
+inline qprierr PRIflattenDriverInfo( PRIpageSetup* pPageSetup, qfldval pData ) // mpmCarbon2
+{
+	return xPRIflattenDriverInfo( pPageSetup, pData ); // mpmCarbon2
+}
+
+inline qprierr PRIunflattenDriverInfo( PRIpageSetup* pPageSetup, qfldval pData ) // mpmCarbon2
+{
+	return xPRIunflattenDriverInfo( pPageSetup, pData ); // mpmCarbon2
+}
+
+// MHCW9: CW9 does not like blank pragmas..
+// MHn0321 begins
+// Note: If the following pragmas are removed, the OSX graphs component will crash!
+//#ifdef ismac
+//	#if (__MWERKS__ < 0x3200)
+//		#pragma SET_RETURN_REGISTER_OFF
+//		#pragma	SET_CORE_PACKING_OFF
+//	#else
+//		#pragma	SET_CORE_PACKING_OFF	
+//	#endif
+//#else
+	#pragma SET_RETURN_REGISTER_OFF
+#ifndef ismobile	// rmm_mobile
+	#pragma	SET_CORE_PACKING_OFF
+	GCC_SET_CORE_PACKING_OFF // MHMACH
+#endif
+//#endif
+// MHn0321 ends
+
+#endif
+
+
+/* eof */

@@ -1,0 +1,262 @@
+/*  $Header: svn://svn.omnis.net/trunk/Studio/EXTCOMP/CALLBACK/anums.he 20555 2018-08-01 09:16:08Z bwoolnough $ */
+
+
+// Q4 ANUMS.HE
+// external ANUMS.HE
+// Copyright (C) Blyth Holdings Inc 1996
+
+/**************** Changes ******************
+Date			Edit				Bug					Description
+01-Aug-18	bjw0059									Accessibility - Added $arialabel, $arialabelledby & $ariadescribedby properties.
+29-Dec-15	rmm8700			ST/JS/464		JS client drag and drop.
+15-Jun-15	jmg0260									Added $pagesize property (currently only for some JS client comps).
+29-Jul-11	rmm7197									Added $autoscroll for JS client.
+21-Jul-11	mpmBordRad3							Implements rounded borders
+25-May-11	rmm7138									Mobile device wrapper apps.
+05-May-11	rmm7114									Disable system focus property for JavaScript client controls.
+08-Apr-11	rmm7101									JS tab strip component.
+15-Mar-11	rmm7095									JavaScript client - data grid design component.
+02-Feb-11	rmm7082									JavaScript client - more HTML generation issues.
+19-Feb-10	rmm6905									Added ability to vertically align labels.
+13-Aug-09	rmm6734									Improvements to iPhone paged pane support.
+04-Jun-09	rmm_iphone29						iPhone animation support.
+09-Mar-09	rmm_iphone13						Text field controls.
+23-Feb-09	rmm_iphone9							Sorted out standard properties e.g. colours, effect etc.
+16-Jan-09	rmm6576			ST/WO/2124	Implemented $allowcopy for entry fields.
+12-Jan-09	rmm6557			ST/WT/1401	Assigning $bordercolor failed on Web Client.
+02-Jul-08	rmm_rfmenu							Context menus for remote forms.
+18-Feb-08	rmm_mobile							Mobile device support.
+28-Mar-07	rmm6000									Windows Vista changes.
+10-Aug-06	rmm5880									More data grid and headed list column improvements.
+19-Jun-06	rmm5818			ST/WT/1130	Added $disablescrollonredraw property.
+07-Mar-06	AE6664			ST/WT/1014: Background skins for webclient
+09-Dec-05	AE6623			ST/WT/929 	Webclient tooltips
+28-Nov-05	AE6621			ST/WT/1013 	Webclient Drag & Drop
+12-May-05	rmm5369			ST/WT/931		Implemented masked edit field for web client.
+07-Dec-04	rmm5190			ST/NT/497		Added $clib.$prefs.$reportcalculationerrors, to report errors in calculations, such as divide by zero.
+05-Sep-03	rmm4689			ST/HE/597		$userinfo now also applies to objects in menu, toolbar, window and remote form instances.
+17 MAY 02 mpm5118a		st/nt/418		Missing runtime notation for key objects and always active object
+08 AUG 01 mpmSubform2							Implements multiple subforms
+25 JUL 01 mpmSubform							Implements remote subforms
+20-Apr-01 MHn0143									Added $backgroundtheme
+12-Apr-00	rmm3704									Page pane methods ($allpanes and $panenumber) implemented.
+06-Dec-99	rmm3551									Added $picturealign and $keepaspectratio picture field properties.
+13-Oct-99	AE4973									Thin-client cursors
+18-Aug-99	DRS5100									Client method execution
+20 NOV 98 mpmTHINh								Paged Pane
+********************************************/
+
+#ifndef _ANUMS_HE_
+#define _ANUMS_HE_
+
+#include"basics.h"
+
+const attnumber 				 //attribute numbers
+
+				anumName=-1,								//simple name of item
+				anumDesc=-2,								//description for item
+				anumFullname=-3,						//full notation for item
+				anumType=-4,								//type of value for item (fftXxxx)
+				anumIdent=-25,							//unique numeric identifier for an item within its group //DRS5100
+				anumColumnEditorColumnCount=-38,	// rmm5880
+
+				anumAttcount=-14,					//number of attributes
+
+				anumIsinherited=-31,				//true if an attribute is inherited //DRS4100
+
+				anumToolTip=-262, // ae6623
+				anumHiliteline = -278,			// rmm8700
+
+				anumTop=-401,
+				anumLeft=-402,
+				anumHeight=-403,
+				anumWidth=-404,
+
+				anumIconID=-250,
+				anumCanresizecolumns=-267,	// rmm7095
+				anumColumnNames=-366,				// rmm7095
+
+				anumBackcolor=-416,
+				anumBackpattern=-417,
+
+				anumListName=-435, 		
+				anumListCalc=-436, 
+				anumStyledtext=-437, 
+																	//attributes for a window format object
+
+				anumDragborder=-438,
+				anumPixheight=-439,
+				anumOrder=-440,
+
+				anumObjtype=-441,
+				anumBackground=-442,
+
+				anumFieldname=-443,
+				anumText=-444,
+				anumPicture=-445,
+				anumVisible=-446,
+				anumDisplay=-447,
+				anumCalculated=-448,
+
+				anumHasborder=-449,
+				anumLocal=-450,
+				anumUnqindex=-451,
+				anumAutofind=-452,
+				anumUppercase=-453,
+				anumNegallowed=-454,
+				anumZeroempty=-455,
+				anumActedata=-456,
+				anumActnoproc=-457,
+				anumInactnorec=-458,
+				anumNoflash=-459,
+				anumButtonmode=-460,
+				anumNogray=-461,
+				anumNoscale=-462,
+				anumShowselected=-463,
+				anumForecolor=-464,
+
+				anumEnterable=-474,		// rmm7095
+				anumExtendable=-475,	// rmm7095
+
+				anumTextColor=-721,
+
+				anumFont=-465,
+				anumFontsize=-466,
+				anumFontstyle=-467,
+				anumAlign=-468,
+
+				anumLinestyle=-469,
+				anumEdgefloat=-470,
+				anumShownulls=-471,
+				anumTabsection=-472,
+
+				anumTabrheight=-517,	// rmm7095
+
+				anumFldStyle=-887,
+
+				anumEffect=-494,
+
+			  anumHScroll=-498,
+				anumVScroll=-499,
+
+				anumHorzscroll=-409,
+				anumVertscroll=-410,
+
+				anumFirstsel=-501,	// pksaratoga2
+				anumLastsel=-502,		// pksaratoga2
+
+				anumHasfocus=-505,
+				anumEnabled=-506,
+				anumSelected=-507,
+				anumDragmode=-508,
+				anumDragrange=-548,
+				anumDragiconID=-549,
+				anumDropmode=-509,
+				anumDropped=-510,		
+				anumListheight=-511,	
+
+				anumActive=-514,								// active field
+				anumTabhheight=-515,						// rmm7095
+ 				anumAutoTabLen=-519,   					// for automatic tabbing
+			
+				anumNobackground=-536,  // mpmSubform
+				anumClassname=-539,			// mpmSubform
+				anumParameters=-579,		// mpmSubform
+																			//attributes of a report format header
+				anumLineno=-550,
+				anumLineoffset=-551,
+				anumFloating=-565,
+				anumHorzslide=-566,  
+				anumHorzextend=-567,	
+				anumRightmargin=-568,
+				anumApplyselected=-569,
+				
+				anumColumnWidths=-657,		// rmm7095
+				anumFontname = -690,			// rmm7082
+				anumGridHCell = -717,			// rmm7095
+				anumGridVCell = -718,			// rmm7095
+				anumBorderColor = -720,		// rmm6557
+				
+				anumFormatString = -724,	// Start rmm5369
+				anumInputMask = -725,		
+				anumFormatMode = -726,		// End rmm5369
+				anumPasswordchar=-727,
+				anumDesignCols = -758,		// rmm7095
+				anumContextmenu = -760,		// rmm_rfmenu
+				anumPagecount=-797,				// rmm6734
+
+				anumTabCount = -840,			// rmm7101
+				anumTabToolTip = -849,		// rmm7101
+				anumCurrentTab = -864,		// rmm7101
+				anumCurrentPage=-865,		// mpmTHINh
+				anumCursor=-880,	 // AE4973
+				anumDragCursor=-881,								// AE6621
+				anumDropCursor=-882,								// AE6621
+				anumWndMenuList=-899,								// rmm_rfmenu
+				anumAllowempty=-927,  // rmm5369
+				anumCachenativepicture = -930,
+				
+				anumStatecolumn = -933,	// rmm_mobile
+
+				anumAllPanes = -936,		// rmm3704
+				anumPaneNumber = -937,	// rmm3704
+				anumEvents=-956,	 // rmm7082
+				anumWebKey = -980, // mpm5118a
+				anumWebCKey = -985, // mpm5118a
+
+				anumPictureAlign=-986,		// rmm3551
+				anumKeepAspectRatio=-987,	// rmm3551
+				
+				anumUserdefined = -997,			// rmm7095
+				anumColumnjst=-998,					// rmm7095
+				anumColumntype=-999,				// rmm7095
+				anumColumnpicklist=-1000,		// rmm7095
+				anumColumnenabled=-1001,		// rmm7095
+				anumColumnforecolor=-1002,	// rmm7095
+				anumColumntextcolor=-1003,	// rmm7095
+				anumColumnwidth=-1004,			// rmm7095
+				anumCurrentcolumn=-1005,		// rmm7095
+				anumColumndata=-1006,				// rmm7095
+				
+				anumTile=-1014, // mpm4711
+				anumRightToLeft=-1016,		 // mlr0026
+				anumBackgroundTheme=-1019, // MHn0143
+				anumMultipleclasses=-1042,	// mpmSubform2
+
+				anumAlwaysEnabled=-1045, // mpm5118a
+
+				anumBackgroundSkin = -1054,   // AE6664
+				anumBackgroundSkinAlign = -1055,
+
+				anumLineHtExtra = -1085,		// rmm_mobile
+				anumComponentValid = -1090, // AE6167
+				anumUserinfo = -1091,				// rmm4689
+				anumDisableDefaultContextMenu = -1117,// rmm_rfmenu
+				anumDisableSystemFocus=-1130,					// rmm7114
+				anumReportCalculationErrors = -1139,	// rmm5190
+				anumDisableScrollOnRedraw = -1177,		// rmm5818
+				anumColumnName=-1179,									// rmm7095
+				anumMoveColumn=-1180,									// rmm7095
+				anumHorizontal = -1183,								// rmm6000
+				anumContentTip = -1188,								// rmm_iphone13
+				anumAlpha = -1200,										// rmm_iphone9
+				anumCanDragDisplayOrder = -1216,			// rmm7095
+				anumAllowCopy = -1226,								// rmm6576
+				anumBackgroundAlpha = -1227,					// rmm_iphone9
+				anumOpaque = -1228,										// rmm_iphone9
+				anumBeginAnimations = -1232,					// rmm_iphone29
+				anumCommitAnimations = -1233,					// rmm_iphone29
+				anumScrollToChangePage = -1235,				// rmm6734
+				anumObjLink = -1239,									// rmm7082
+				anumTextVertCentre = -1243,						// rmm6905
+				anumJSHtml = -1246,										// pk_jsc_1
+				anumScreenSizeFloat = -1249,					// rmm7138
+				anumBorderRadius = -1252,							// mpmBordRad3
+				anumJSAutoScroll = -1253,							// rmm7197
+				anumPageSize = -1307,							// jmg0260 - list pager
+				anumAriaLabel = -1361,						// bjw0059
+				anumAriaLabelledby = -1362,				// bjw0059
+				anumAriaDescribedby = -1363;			// bjw0059
+
+#endif
+// End of file

@@ -1,0 +1,241 @@
+/* $Header: svn://svn.omnis.net/trunk/Studio/O7EXE/COCOA/xhwndinl.hi 16934 2017-03-20 13:00:16Z crichardson $ */
+
+//Q4 XHWNDINL.HI
+//Mac HWND interface inline functions
+//Copyright (C) Blyth Holdings Inc 1996
+
+/**************** Changes ******************
+Date			Edit				Bug					Description
+20-Feb-17	CR0424			ST/EC/1447	Need callback for WNDwindowFromDC on Cocoa.
+26-May-16	CR0355									Review and remove COCOA q q q marks. ( Removed legacy routine descriptor calls ).
+06-May-16	rmm8909			ST/HE/1376	Issues with ctrl shadow borders.
+11-Dec-15	CR0291			ST/BE/1060	Implement drop library onto Studio app icon for Cocoa.
+											ST/BE/1072	Implement drop library into Studio Browser for Cocoa.
+											ST/HE/1347	Drag and drop destination highlighting for Cocoa.
+24-Feb-04	gra0200									Casts added for CW9 compile
+28 NOV 02 mpm_qdim		st/wo/1447		Changed qdim on OSX from short to long
+04 JUL 01 mpm5006			st/he/341		Fixes PopupMenuSelect crash
+02 JAN 01 mpmCarbon19							Implements new way of dealing with OSX shadows
+20 OCT 00 mpmCarbon								OSX Changes NOT MARKED
+24-May-00 PK6033		ST/EC/347			Problems with 68K enums and cursor functions calling CFM->core & CFM<-core
+18 OCT 99 mpmCarbon								Carbon port
+16-Jun-99 PKMACCLIENT							Mac client updates
+10-Mar-99 PK4900									Problems with timer procs on 68K
+22-Aug-98 PK added isOMNISCORE and other thin client changes
+15-Jun-98	AE4762									Additional Cursor functions
+27-Apr-98	mt40472									WNDsetTimer can now take a FARPROC
+07-Oct-97	mt40338									HCURSOR Support
+13-Jun-97	mt40295									fixed WNDenumChildWindows && GDIsetOptionClick thru exteral component interface
+04-Nov-96	mt40046									68k Code fragment
+11 JUN 96 mpm4029									Added custom borders
+01 MAY 96	mpm4020									Table/Grid field implementation
+22 APR 96 mpm4019									Added WNDmakePoint inline
+
+********************************************/
+
+// this file is included at the bottom of xhwnd.he
+inline void WNDignore(const void* a1) 	// used to avoid 'unused parameter' warnings
+{
+	#pragma unused (a1)
+}
+
+#ifdef isCOCOA
+extern HWND	doCreateWindow(	HWND pParentHwnd, qulong pStyle, qulong pExStyle, WNDprocClass* pObject, qrect* pRect, WNDborderStruct* pBorderSpec );
+#else
+extern HWND	doCreateWindow(	HWND pParentHwnd, WindowPtr pMacWindowPort, // mpmCarbon
+														qulong pStyle, qulong pExStyle,
+														WNDprocClass* pObject, qrect* pRect, WNDborderStruct* pBorderSpec );
+#endif
+extern void doInsetBorderRect( HWND pHwnd, qrect* pRect, WNDborderStruct* pBorderSpec, qbool pInflate ); // mpm_qdim
+extern void	doCheckCursor( HWND pHwnd, qword2 pHittest );
+extern HCURSOR	doSetCursor( HCURSOR pCursor );	// mt40338
+extern HCURSOR	doGetCursor();									// mt40338
+extern void doSetMenuRect( qbool pMenuDown, Rect* pRect );
+qbool		doCanSetCursor		();											// CR0006	// CR0291
+
+#pragma SET_RETURN_REGISTER_ON
+
+#if defined(isOMNISCORE)
+#ifdef isCOCOA
+HWND WNDcreateWindow( HWND pParentHwnd, void* pWind, qulong pStyle, qulong pExStyle,
+														 WNDprocClass* pObject, qrect* pRect, WNDborderStruct* pBorderSpec );
+#else
+inline HWND WNDcreateWindow( HWND pParentHwnd, void* pWind, qulong pStyle, qulong pExStyle,
+														 WNDprocClass* pObject, qrect* pRect, WNDborderStruct* pBorderSpec )
+{
+	return doCreateWindow( pParentHwnd, (WindowPtr) pWind, pStyle, pExStyle & ~WND_WC_MASK | WND_WC_FRAME, pObject, pRect, pBorderSpec ); // mpmCarbon
+}
+#endif
+#else
+HWND WNDcreateWindow( HWND pParentHwnd, void* pWind, qulong pStyle, qulong pExStyle,
+														 WNDprocClass* pObject, qrect* pRect, WNDborderStruct* pBorderSpec );
+
+#endif
+
+inline void WNDmakePoint ( LPARAM pLngValue, qpoint* pPoint ) // mpm4019
+{ // mpm_qdim
+	short data[2]; *((qlong*)data) = (qlong)pLngValue;   
+	pPoint->v = (qdim)data[0];  	pPoint->h = (qdim)data[1];  
+}
+
+
+inline qlong WNDmakeLong( qpoint* pPoint ) // mpm4025
+{ // mpm_qdim
+	short data[2]; 
+	data[0] = (short)pPoint->v; 
+	data[1] = (short)pPoint->h;
+	return *((qlong*)data);       //CR64BIT : replaced long with qlong
+}
+
+
+inline void WNDmakeRect( qulong pLngValue, qrect* pRect )
+{
+	char data[4]; *((qulong*)data) = pLngValue;
+	pRect->left = data[0];
+	pRect->top = data[1];
+	pRect->right = data[2];
+	pRect->bottom = data[3];
+}
+
+
+inline qulong WNDmakeLong( qrect* pRect )
+{
+	char data[4];
+	data[0] = (char)pRect->left;
+	data[1] = (char)pRect->top;
+	data[2] = (char)pRect->right;
+	data[3] = (char)pRect->bottom;
+	return *((qulong*)data);
+}
+
+#ifdef isOMNISCORE	// CR0424
+inline HWND WNDwindowFromDC( HDC pHdc ) 
+{
+  //pkcocoa_1021
+  extern HWND sWNDwindowFromDC( HDC pHdc );
+  return sWNDwindowFromDC(pHdc);
+}
+#endif
+
+// PKMACCLIENT #ifndef isXCOMPLIB
+#ifdef isOMNISCORE
+inline void WNDinsetBorderRect(	HWND pHwnd, qrect* pRect, WNDborderStruct* pBorderSpec ) // mpm4029
+{
+	doInsetBorderRect( pHwnd, pRect, pBorderSpec, qfalse ); // mpm_qdim
+}
+
+
+inline void WNDinflateBorderRect(	HWND pHwnd, qrect* pRect, WNDborderStruct* pBorderSpec ) // mpm4029
+{
+	doInsetBorderRect( pHwnd, pRect, pBorderSpec, qtrue ); // mpm_qdim
+}
+#endif
+
+inline HWND WNDgetWindowComponent( HWND pHwnd, qulong pComponent )
+{
+	return WNDnextWindowComponent( pHwnd, NULL, pComponent );
+}
+
+
+// PKMACCLIENT #ifndef isXCOMPLIB
+#ifdef isOMNISCORE
+inline void WNDcheckCursor( HWND pHwnd, qword2 pHittest )
+{
+	doCheckCursor( pHwnd, pHittest );
+}
+
+
+inline HCURSOR WNDsetCursor( HCURSOR pCursor )	// mt40338
+{
+	return doSetCursor( pCursor );
+}
+
+
+inline HCURSOR WNDgetCursor()			// mt40338
+{
+	return doGetCursor();
+}
+#endif
+
+inline void WNDsetWindowOrg( HDC pHdc, qdim xOrg, qdim yOrg )
+{
+	#ifdef isCOCOA
+    // DEPRECATED API
+		WNDignore(&pHdc);
+		WNDignore(&xOrg);
+		WNDignore(&yOrg);
+	#else
+		#ifdef iscarbon // mpmCarbon
+			Rect r; GetPortBounds( pHdc->mPort, &r );
+			OffsetRect( &r, xOrg, yOrg );
+			SetPortBounds( pHdc->mPort, &r );
+		#else
+			OffsetRect( &((CGrafPtr)pHdc)->portRect, xOrg, yOrg );
+		#endif
+	#endif
+}
+
+inline void WNDsetMenuRect( qbool pMenuDown, Rect* pRect )
+{
+	doSetMenuRect( pMenuDown, pRect );
+}
+
+// mt40295
+inline FARPROC 	WNDmakeEnumWindowsProc(WNDenumProc pEnumProc, HINSTANCE pInstance)	
+{ 
+	#pragma unused (pInstance)
+	return (FARPROC)pEnumProc;	// CR0355
+}
+
+inline void 			WNDdisposeEnumWindowsProc(FARPROC pProc)	
+{
+	#pragma unused (pProc)
+}
+
+// mt40472
+inline FARPROC 	WNDmakeTimerProc(WNDtimerProc pTimerProc, HINSTANCE pInstance)
+{ 
+	#pragma unused (pInstance)
+	return (FARPROC)pTimerProc;	// CR0355
+}
+
+inline void 			WNDdisposeTimerProc(FARPROC pProc)	
+{
+	#pragma unused (pProc)
+}
+
+// AE4762
+inline WNDcanSetCursorProc 	WNDmakeCanSetCursorProc(WNDcanSetCursorProc pProc, HINSTANCE pInstance)	
+{ 
+	#pragma unused (pInstance)
+	return pProc;
+}
+inline void 			WNDdisposeCanSetCursorProc(WNDcanSetCursorProc pProc)	
+{
+	#pragma unused (pProc)
+}
+
+#ifdef isCOCOA
+	extern qlong gBlockCarbonEvents;
+	#define BLOCK_CARBON_EVENTS gBlockCarbonEvents++
+	#define UNBLOCK_CARBON_EVENTS gBlockCarbonEvents--
+	#define CARBON_EVENTS_ARE_BLOCKED (gBlockCarbonEvents!=0)
+#else
+#if defined(iscarbon) && !defined(isGDIHWNDLIB) && !defined(isGDIPICTLIB) // mpm5006 begins
+	extern qlong gBlockCarbonEvents;
+	#define USE_CARBON_EVENTS
+	#define BLOCK_CARBON_EVENTS gBlockCarbonEvents++
+	#define UNBLOCK_CARBON_EVENTS gBlockCarbonEvents--
+	#define CARBON_EVENTS_ARE_BLOCKED (gBlockCarbonEvents!=0)
+#else
+	#define BLOCK_CARBON_EVENTS
+	#define UNBLOCK_CARBON_EVENTS
+	#define CARBON_EVENTS_ARE_BLOCKED
+#endif // mpm5006 ends
+#endif
+
+#pragma SET_RETURN_REGISTER_OFF
+
+
+
+

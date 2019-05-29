@@ -1,0 +1,78 @@
+/* $Header: */
+
+/* Changes
+Date			Edit				Fault					Description
+04-Mar-19	CR0580										Initial Omnis implementation ( tidy up not marked ).
+*/
+
+#ifndef _OSXHELP_HE_
+#define _OSXHELP_HE_
+
+#define RES_LIB_NAME				1000			// Resource id of the library name
+#define RES_CONST_PREFIX			19999			// Resource id of the constant prefix
+#define RES_CONST_START				20000			// Resource id of the start of the constants
+#define RES_CONST_END				20052			// Resource id of the end of the constants
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// OBJECTS
+const	int	cObject_Count					=    1,	 // number of objects
+			cObject_OSXHelp					=    1;	 // ID of the object
+
+
+// object method ids - the number of object methods and a unique ID for each method
+const	int	cIMethod_Count					=   20,
+			cIMethodId_LoadHandler			= 2000,
+			cIMethodId_UnloadHandler		= 2001,
+			cIMethodId_Help					= 2002,
+			cIMethodId_AddHelpItem			= 2003,
+			cIMethodId_DeleteHelpItem		= 2004,
+			cIMethodId_EnableHelpItem		= 2005,
+			cIMethodId_DisableHelpItem		= 2006,
+			cIMethodId_SetHelpItem			= 2007,
+			cIMethodId_GetHelpItem			= 2008,
+			cIMethodId_CountHelpItems		= 2009,
+			cIMethodId_ClearHelpMenu		= 2010,
+			cIMethodId_RegisterHelpBook		= 2011,
+			cIMethodId_UnRegisterHelpBook	= 2012,
+			cIMethodId_OpenHelp				= 2013,
+			cIMethodId_GotoPage				= 2014,
+			cIMethodId_GotoAnchor			= 2015,
+			cIMethodId_Search				= 2016,
+			cIMethodId_EnablePreferences	= 2017,
+			cIMethodId_DisablePreferences	= 2018,
+			cIMethodId_AboutBox				= 2019;
+
+class tqfObj;
+
+class tqfContainer
+{
+	public:
+		tqfObj*			mObject;
+		qobjinst		mObjPtr;
+
+	public:
+		tqfContainer(qobjinst pObjPtr);
+		tqfContainer(qobjinst pObjPtr,tqfContainer* pObjectContainer);
+		~tqfContainer();
+		void setObject(qobjinst pObjPtr,tqfContainer* pSource);
+};
+
+////////////////////////////////////////////////////////////////////////////////
+// STATIC METHODS
+
+// Static methods Ids - the number of static methods and a unique ID for each method
+const int		cStaticMethodCount						= 0;
+
+
+// static method class - define public static methods
+class tqfStaticObj
+{
+	public:
+		static 	qbool 	staticMethod(EXTCompInfo *pEci);
+};
+
+
+#endif
+/* EOF */

@@ -1,0 +1,917 @@
+ /* $Header: svn://svn.omnis.net/trunk/Studio/O7EXE/COCOA/xgdi.he 21818 2018-12-28 08:17:34Z bmitchell $ */
+
+//Q4 xgdi.he
+//Dependent Omnis GDI interface
+//Copyright (C) Blyth Holdings Inc 1996
+
+/**************** Changes ******************
+Date			Edit				Bug					Description
+28-Dec-18	rmm9879			ST/RC/1291	Cross-platform issue with report binaries.
+11-Apr-17	rmm9320			ST/NT/717		Added line-through font style.
+17-Feb-17	rmm9263			ST/RC/1257	Problem with $noscale set to kFalse when printing pictures.
+03-Feb-17	CR0415			ST/PI/058		Fix scaling issues with JPG and GIF xcomps.
+04-Mar-16	rmm8778									Improved performance of text drawing.
+01-Dec-15	CR0290									Allow rawBitmap format to be altered directly in XCOMP.
+21-Oct-15	rmm8668			ST/HE/1333	Hairlines now draw as a single physical pixel on retina displays.
+02-Sep-15	CR0272			ST/HI/1764	Implemented gradient pattern fill.
+11-Aug-15	CR0263			ST/CE/107		GDIlineTo now draws a transparent background and pattern drawing tidy up.
+01-Jun-15	rmmhdpi									High DPI support for Windows.
+12-May-15	CR0224									Cocoa wash effect implementation.
+23-Apr-15	rmm8557									Improved drag and drop bitmaps for Cocoa.
+03-Mar-15	CR0180			ST/HI/1741	Pattern masks were not cleared correctly.
+09-Dec-10	rmm7023									JavaScript client fonts and styles.
+15-Apr-10	rmm_oe									Omnis Eclipse changes.
+15-Jun-09	rmm_nc									New controls and supporting APIs.
+02-Mar-09	rmm_iphone10						Sorted out field styles and font-related properties.
+14-Aug-08	pkiphone								iphone pass 1
+08-Aug-08	rjc0016									Leopard - Added GDIcgFillRoundedSelectionRect.
+25-Jul-08	rjc0013									Leopard - Added GDICheckCGContext
+25-Jan-08	rmm6316									Support for "blob" password character on OSX.
+01-Aug-07	rmm6200									Changes to make Omnis run on OSX Leopard.
+05-May-06	rmm5745			ST/WT/1098	Drag and drop did not work in OSX Web Client - exported drag start/move/end APIs, and GDIdrawDragSelectRect.
+26-Dec-05 MHMACHPT                Mach-o qpoint fix.
+09-Dec-05 MHMACH4                 Mach-o changes
+28-Sep-05 MHMACH                  Mach-o changes
+13-Dec-04	gra0233			ST/DF/131		Make ODBC driver compliant with ODB
+03-Sep-04	rmm5081									Use theme fonts for all internal fonts, to get better Unicode character coverage.
+10-Jun-04 MHn0376			ST/RC/859		Fixed printing of alpha images on OSX.
+19-Mar-04 MHn0328			ST/TB/239		Fixed default push buttons for OSX.
+14-Jan-04	rmmuni_fnt6							Some more problems with text metrics.
+08-Jan-04	rmmuni_fnt4							Now that we use ATSUI to render fonts, drawing to page preview and copy selection from preview
+																	to clipboard can no longer use OpenCPicture on OSX.
+06-Jan-04	rmmuni_fnt3							Mac OSX Unicode Port: more changes to support Unicode fonts and ATSUI.
+17-Dec-03	rmmuni_fnt2							Mac OSX Unicode Port: more changes to support Unicode fonts and ATSUI.
+11-Dec-03	rmmuni_fnt							Mac OSX Unicode Port: changes to support Unicode fonts and ATSUI.
+29 MAY 03 MHTEXT			ST/RC/391		Implemented Rotated Text for OSX.
+07 MAR 03 mpmToolbars4						Implements toolbar menu
+13 FEB 02 mpmToolbars							Re-write of large part of toolbar code for new large icon and variable width modes
+21 JAN 03 MHNET8									CW8 compatibility changes.
+28 NOV 02 mpm_qdim		st/wo/1447		Changed qdim on OSX from short to long
+15 Feb 02 PK6270									GDIdrawTextJst callback for icon drawing.
+29 OCT 01 MHn0163									Implenented debugMsg for OSX debugging
+24 OCT 01 mpmOSX_DS								Implements OSX drag selecteion painting
+26 SEP 01 mpmOSX_DD								Implements new drag drop for OSX
+15 JUN 01 mpm4732a								Complex grid painting/performance changes
+14 MAY 01 mpmCarbon52							Moved CGContext function pointers to xgdi.cpp
+09 APR 01 mpmCarbon40							Implements CGContext
+08 DEC 00 mpmCarbon16							Fixes height problem with theme fonts
+20 OCT 00 mpmCarbon								OSX Changes NOT MARKED
+22-Aug-98 PK added isOMNISCORE and other thin client changes
+07-Oct-97	mt40338									Cursor Support
+09-Jul-97 PK4625									MacOS8
+04-Jul-97	mt40308									Made qfnts extern globals.
+13-Jun-97	mt40295									fixed WNDenumChildWindows && GDIsetOptionClick thru exteral component interface
+24 MAR 97 mt40240									GDI debugging (check not deleting stock brushes).
+18 MAR 97 mpm4200									added fntMenubar for MAC.
+11-Mar-97	mt40225									added accessor functions
+05-Mar-97	rmm2325			PR/HI/597FC	Fixed GPF on Win16 due to compiler bug.
+14 FEB 97 mpm4168									Problems with large font sizes when printing to high res printer 
+17 JAN 97 mpm4138									Made default button font bold
+22-Nov-96	mt40075									GDI debugging stubs
+04-Nov-96	mt40046									68k Code fragment
+30 MAY 96	rmm1407a								Added fntStatusBar and styStatusBar
+18 APR 96	mpm4018									Performance changes
+
+********************************************/
+
+#ifndef	_XGDI_HE_
+#define _XGDI_HE_
+
+#import <Cocoa/Cocoa.h>
+#import <QuartzCore/CoreAnimation.h>
+
+#ifndef _basics_
+#	include "basics.h"
+#endif
+
+extern void merror();
+
+const qchar   fixspace=202; // non breaking space character
+
+// rmmuni_fnt4:	
+#if defined(isGDIHWNDLIB)
+	GCC_EXPORT_ON // MHMACH4
+	#pragma export on
+#endif
+extern qbool gUseATSUI;	// rmmuni_fnt2
+// rmmuni_fnt4:	
+#if defined(isGDIHWNDLIB)
+	GCC_EXPORT_OFF // MHMACH4
+	#pragma export off
+#endif
+
+// ############################# quickdraw stuff ####################################
+
+// #define _GDI_DEBUG_
+
+#define HPEN_VALID		'HPEN'
+#define HFONT_VALID		'HFNT'
+#define HBRUSH_VALID	'HBSH'
+
+#ifdef _GDI_DEBUG_
+	#define _GDI_OBJECT_VALID_(pTest, pValue)  if ( pTest != pValue ) Debugger();
+#else
+	#define _GDI_OBJECT_VALID_(pTest, pValue)
+#endif
+
+// Start rmm8778: Moved to here from below
+struct QZRGBColor
+{
+	float red;
+	float green;
+	float blue;
+	float alpha;
+};
+
+typedef struct QZRGBColor QZRGBColor;
+
+// Simply typedef the HDC so this can be included in CPP files
+typedef struct HDCscreenStruct* HDCPTR;
+typedef struct HDCscreenStruct* HDC;
+
+// The omnis co-ordinate type
+typedef qlong qdim;
+typedef short qosdim;
+// End rmm8778
+
+struct HFONTstruct
+{
+	qlong						txValid;	// should contain 'HFNT' as a long value
+	qshort					txFont;
+	qshort					txSize;
+#if defined(isiphone)	// pkiphone
+#else
+
+	qsty						txFace;
+	eThemeTextMode	txThemeMode; // mpmCarbon3
+	qlong           txAngle;     // MHTEXT
+	qsty						mSty;				 // rmm9320
+#ifdef isCOCOA
+  CTFontRef       mCTFont;     // the core text font reference
+  CFDictionaryRef	getAttributes(HDCscreenStruct *pHdc);	// rmm8778
+#else
+#ifdef ismacosx
+	ATSUStyle				mStyle;			// rmmuni_fnt2: when using ATSUI, the style record for the font
+	ATSUTextLayout	mTextLayout;// rmmuni_fnt2: when using ATSUI, the text layout record for the font
+	FontInfo				*mFontInfo;	// rmmuni_fnt2: when using ATSUI, the font information for the font
+	qbool						mDeleteStyleAndFontInfo; 	// rmmuni_fnt2: when using ATSUI, if this is true, delete the style and font info in addition to the text layout
+	qbool						mUseTransientFontMatching;// rmm5081: if true, the font uses transient font matching to handle Unicode characters not present in the font
+#endif
+#endif
+#endif
+	// rmmuni_fnt2: always required, even if _GDI_DEBUG_ is not defined
+	HFONTstruct() { txValid=HFONT_VALID; }
+	~HFONTstruct() { if( mCTFont ) CFRelease( mCTFont ); if (mAttributes) CFRelease(mAttributes); if (mAttributesForTextWidth) CFRelease(mAttributesForTextWidth); } // rmm8778
+// Start rmm8778
+private:
+	CFDictionaryRef	mAttributes;
+	CFDictionaryRef	mAttributesForTextWidth;
+	QZRGBColor			mTextColorForAttributes;
+  qbyte						mTextColorAlphaForAttributes;
+	qbool						mUnderlineForAttributes;
+	
+	friend GDIAPI qdim OMNISAPI xFONToscharTextWidth(HDC pHdc, qoschar *pText, qshort pTextLen);
+// End rmm8778
+};
+
+//Start CRcoregraphics
+struct QZPattern {
+	qbyte pat[8];
+};
+
+typedef struct QZPattern QZPattern;
+
+struct QZMaskPattern {
+  CGImageRef backMask;
+	CGImageRef foreMask;
+	QZRGBColor backColor;
+	QZRGBColor foreColor;
+	QZPattern  qzPattern;     // 8 byte pattern reference     //Start CR_merge7513	// CR0180 : no longer a pointer
+  qbyte*     qzPatternData; // scaled pattern data
+  CGFloat    scale;
+	qbool			 ignoreBack;		// CR0263 : do not draw the pattern background ( GDIlineTo )
+
+  QZMaskPattern();
+  ~QZMaskPattern();                                         //End CR_merge7513
+};
+
+typedef struct QZMaskPattern QZMaskPattern;
+
+struct HPENstruct
+{
+#if defined(isiphone)	// pkiphone
+#else
+	qlong					pnValid;	// should contain 'HPEN' as a long value
+	float					pnSize;		//CRcoregraphics // rmm8668: float
+	short					patType;
+	QZPattern			pat1Data;	//CRcoregraphics
+	QZRGBColor			rgbFgColor;
+	qpat					mPat;			//rmm_nc
+#endif
+
+#ifdef 	_GDI_DEBUG_
+	HPENstruct() { pnValid=HPEN_VALID;}
+	~HPENstruct();	// mt40240
+#endif	
+
+};
+
+struct HBRUSHstruct
+{
+#if defined(isiphone)	// pkiphone
+#else
+	qlong					patValid;	// should contain 'HBSH' as a long value
+	short					patType;
+	QZPattern               pat1Data;	//CRcoregraphics
+	// Start rmm_nc
+	qpat					mPat;
+	// End rmm_nc
+#endif
+
+#ifdef 	_GDI_DEBUG_
+	HBRUSHstruct() { patValid=HBRUSH_VALID;}
+	~HBRUSHstruct();	// mt40240
+#endif	
+
+};
+
+class rawBitmapContainer;
+
+struct HWNDstruct;					// CR0415
+typedef HWNDstruct* HWND;		// CR0415
+
+typedef HFONTstruct* HFONT;
+typedef HPENstruct* HPEN;
+typedef HBRUSHstruct* HBRUSH;
+
+// Start CR0272
+#define SOLID_PAT(x) (patFill == x || patEmpty == x || patStd15 == x)
+#define GRAD_PAT(x) (patGrad1 == x || patGrad2 == x || patGrad3 == x || patGrad4 == x)
+// End CR0272
+
+
+#ifdef isCOCOA
+typedef	rawBitmapContainer*		HBITMAP;	//  device dependant bitmap  //CR_ARC : this is contained in a class to reduce parameter passing issues
+#define	HBITMAPMASK						HBITMAP		//  a black and white bitmap mask
+#define	HPIXMAP								HBITMAP		//  device independant bitmap
+#define	HRESERVED	int
+#define	HPALETTE	int
+#define	HCURSOR		int
+#else
+
+#if defined(isiphone)	// pkiphone
+#define HBITMAP		int
+#define HBITMAPMASK	int
+#define HPIXMAP 	int
+#define HRESERVED	int
+#define HPALETTE	int
+#define HCURSOR		int
+#else
+#define HBITMAP PixMapHandle
+#define HBITMAPMASK	BitMapHandle
+
+#define HPIXMAP 	PixMapHandle
+#define HRESERVED  qlong
+#define HPALETTE		CTabHandle
+#define HCURSOR		CCrsrHandle		// mt40338
+#endif
+#endif
+
+#ifndef	_XBITMAP_HE_
+#include "xbitmap.he"	// CR0290
+#endif
+
+enum eThemeFont  {
+                  eThemeNoFont = -1,
+									eThemeSystemFont = 0,
+									eThemeSmallSystemFont = 1,
+									eThemeSmallEmphasizedSystemFont = 2,
+									eThemeViewsFont = 3,
+									eThemeEmphasizedSystemFont = 4,
+									eThemeApplicationFont = 5,
+									eThemeLabelFont = 6,
+									eThemeMenuTitleFont = 100,
+									eThemeMenuItemFont = 101,
+									eThemeMenuItemMarkFont = 102,
+									eThemeMenuItemCmdKeyFont = 103,
+									eThemeWindowTitleFont = 104,
+									eThemePushButtonFont = 105,
+									eThemeUtilityWindowTitleFont = 106,
+									eThemeAlertHeaderFont = 107,
+									eThemeFixedWidth = 200	// rmm5081
+								};
+
+#define	BLACK_BRUSH			0
+#define	DKGRAY_BRUSH		1
+#define	GRAY_BRUSH			2
+#define	LTGRAY_BRUSH		3
+#define	WHITE_BRUSH			4
+
+#define	BLACK_PEN				0
+#define	WHITE_PEN				1
+
+// ############################# color stuff ####################################
+
+/*** the omnis color type ***/
+//typedef uint32_t qcol; //CR64BIT
+
+/*** some predefined colors ***/
+const qcol  colDefault =		0xffffffff;
+const qcol  colNone =				colDefault;  //value used as default, must represent no legal colour
+const qcol  colBlack =			0x00000000;
+const qcol  colWhite =			0x00ffffff;
+const qcol  colRed =				0x000000ff;
+const qcol  colLightShade =	0x00c0c0c0;
+const qcol  colMedShade =		0x00808080;
+const qcol  colDarkShade =	0x00404040;
+
+// PK4625
+const qcol  colFaceCol1 =		0x00DDDDDD;
+const qcol  colDarkShade1 =	0x00AAAAAA;
+const qcol  colDarkShade2 =	0x00999999;
+const qcol  colDarkShade3 =	0x00555555;
+
+// ############################# coordinates stuff ####################################
+
+const qdim    qdimnone=-32767;  // value used as qdim when no valid value is to be represented
+const qdim    maxqdim=32766;    // maximum qdim value
+
+/*** the omnis point (identical to Macintosh Point) ***/
+struct qpoint;
+struct qrect;
+struct MacRect;
+
+#ifdef isCOCOA
+	#ifdef isOMNISCORE
+		GDIAPI qrect* OMNISAPI GDIconv( MacRect* r1, qrect* r2 ); // mpm_qdim
+	#endif
+//CRcoregraphics Start
+GDIAPI CGRect* OMNISAPI GDIconv(qrect* pInRect, CGRect* pOutRect);
+GDIAPI qrect* OMNISAPI GDIconv(CGRect* pOutRect, qrect* pInRect);
+GDIAPI CGPoint* OMNISAPI GDIconv( qpoint* p1, CGPoint* p2 );
+GDIAPI qpoint* OMNISAPI GDIconv( CGPoint* p1, qpoint* p2 );
+
+// CR0224 Start : made these public
+void GDIconv(qcol a, QZRGBColor* b);
+void GDIconv(QZRGBColor* a, qcol* b);
+// CR0224 End
+
+//CRcoregraphics End
+#else
+GDIAPI Rect* OMNISAPI GDIconv( qrect* r1, Rect* r2 ); // mpm_qdim
+GDIAPI qrect* OMNISAPI GDIconv( Rect* r1, qrect* r2 ); // mpm_qdim
+GDIAPI Point* OMNISAPI GDIconv( qpoint* p1, Point* p2 ); // mpm_qdim
+GDIAPI qpoint* OMNISAPI GDIconv( Point* p1, qpoint* p2 ); // mpm_qdim
+#endif
+
+// Start rmmhdpi: No scaling is required for the Mac
+inline int GDIconvToScreen(int pDesign, qbool pVert)
+{
+	#pragma unused (pVert)
+	return pDesign;
+}
+inline int GDIconvToDesign(int pScreen, qbool pVert)
+{
+	#pragma unused (pVert)
+	return pScreen;
+}
+inline void GDIconvToScreen(qrect *pRect) 
+{
+	#pragma unused (pRect)
+}
+inline void GDIconvToDesign(qrect *pRect) 
+{
+	#pragma unused (pRect)
+}
+
+void GDIconvToDesign(qrect *pRect, HWND pHwnd);	// CR0415
+
+inline void GDIconvToScreen(qpoint *pPoint)
+{
+	#pragma unused (pPoint)
+}
+inline void GDIconvToDesign(qpoint *pPoint)
+{
+	#pragma unused (pPoint)
+}
+inline qbool GDIisScaled() { return qfalse; }
+// End rmmhdpi
+
+struct qpoint
+{
+	qdim v;
+	qdim h;
+	
+	qpoint(): h(0), v(0) {}
+	qpoint( qdim h1, qdim v1 ): h(h1), v(v1) {}
+	qpoint( CGPoint pt ): h(pt.x), v(pt.y) {}
+	
+	void operator =( CGPoint &pt ) { GDIconv(&pt,this); } // mpm_qdim
+};
+
+/*** the omnis rect (identical to Macintosh, except bottom and right are always one less) ***/
+struct qrect
+{
+	qdim top;
+	qdim left;
+	qdim bottom;
+	qdim right;
+	
+	qrect() {}
+	qrect( qdim left1, qdim top1, qdim right1, qdim bottom1 )
+						: left(left1), top(top1), right(right1), bottom(bottom1) {}
+						
+	// mpmToolbars added const to functions
+	qdim width() const { return right - left + 1; }
+	qdim height() const { return bottom - top + 1; }
+	qpoint topLeftPt() const { return qpoint( left, top ); }
+	qpoint botRightPt() const { return qpoint( right, bottom ); }
+};
+
+/*** the omnis region type ***/
+#if defined(isiphone)	// pkiphone
+#else
+#include "xgdi_rgn.he"
+#endif
+
+// Start CRcoregraphics
+void beginContextFromHDC(HDC dc);
+void endContextFromHDC(HDC dc);
+void resetContext(HDC dc);
+// End CRcoregraphics
+// ############################# font/text stuff ####################################
+
+/*** font stuff basic types ***/
+
+// mpm4168 begins - many changes
+
+#ifdef isiphone
+	// rmm_iphone10: qfnt for iPhone
+	#ifndef _STRCLASS_HE_
+		#include "strclass.he"
+	#endif
+	struct qfnt
+	{
+		qshort		mSize;
+		str80			mFontName;
+	};
+#else
+	// mpmCarbon3 begins
+	struct qfnt
+	{ // mpm4168 re-arranged qfnt, size needs to be a short for large sizes when printing to printer
+		qshort	mSize;  
+		qshort	mFont;
+		qshort	mExtra;
+		qbool		mTheme:1;
+		qbool		mForAlphaDC:1;	// rmm_nc
+		qbool		mForiOSorJavaScriptDesign:1;	// rmm7023 // rmm_ewad
+	
+		qfnt() { mSize = mFont = mExtra = 0; mTheme = mForAlphaDC = mForiOSorJavaScriptDesign = qfalse; } // rmm_nc // rmm7023 // rmm_ewad
+		qfnt( qshort pSize, qulong pFont, qshort pExtra, qbool pFontIsOsFontNumber ); // rmmuni_fnt2: now implemented in xgdifont.cpp	// rmm6200: pFont is now a qulong
+		qfnt( eThemeFont pThemeFontID ) { mSize = 0; mFont = (qshort)pThemeFontID; mTheme = qtrue; mExtra = 0; mForiOSorJavaScriptDesign = qfalse; } // mpmCarbon16 // rmmuni_fnt2 // rmm_nc // rmm7023 // rmm_ewad
+		~qfnt() {};
+	
+		qshort extra() { return mExtra; }
+		void  extra( qshort pExtra ) { mExtra = pExtra; }
+	
+		qshort size() { return mSize; }
+		void size( qshort pSize ) { mSize = pSize; }
+    
+		// Start rmm_nc
+		qbool forAlphaDC() { return mForAlphaDC; }
+		void forAlphaDC(qbool pForAlphaDC) { mForAlphaDC = (qbool) (pForAlphaDC != 0); }
+		// End rmm_nc
+		
+		// Start rmm7023
+		// rmm_ewad: renamed, as now also applies to iOS
+		qbool foriOSorJavaScriptDesign() { return mForiOSorJavaScriptDesign; }
+		void foriOSorJavaScriptDesign(qbool pForiOSorJavaScriptDesign) { mForiOSorJavaScriptDesign = (qbool) (pForiOSorJavaScriptDesign != 0); }
+		// End rmm7023
+
+		qbool operator !=(const qfnt& pFnt ) { return pFnt.mSize!=mSize || pFnt.mFont!=mFont || pFnt.mExtra!=mExtra || pFnt.mTheme!=mTheme || pFnt.mForiOSorJavaScriptDesign!=mForiOSorJavaScriptDesign; }	// rmmuni_fnt6: added theme test // rmm_nc // rmm7023 // rmm_ewad
+		qbool operator ==(const qfnt& pFnt ) { return pFnt.mSize==mSize && pFnt.mFont==mFont && pFnt.mExtra==mExtra && pFnt.mTheme==mTheme && pFnt.mForiOSorJavaScriptDesign==mForiOSorJavaScriptDesign; }	// rmmuni_fnt6: added theme test // rmm_nc // rmm7023 // rmm_ewad
+		qbool sameFontAndSize(qfnt &pFnt)	// rmm9879: Compare fonts using their most basic attributes (used when printing text)
+		{
+			return mFont == pFnt.mFont && size() == pFnt.size() && extra() == pFnt.extra() && mTheme == pFnt.mTheme;
+		}
+	};
+#endif
+
+
+// mpmCarbon3 ends
+
+struct GDItextSpecStruct
+{
+	qfnt mFnt;
+	qsty mSty;
+	qjst mJst;
+	qcol mTextColor;
+	
+	GDItextSpecStruct(){}
+	
+	GDItextSpecStruct( qfnt &pFnt, qsty pSty=styPlain, qcol pTextColor=colDefault, qjst pJst=jstLeft ) // rmm2325: pass a reference to the qfnt
+	{
+		mFnt = pFnt; mSty = pSty; mTextColor = pTextColor; mJst = pJst; 
+	}
+	
+#ifdef isCOCOA
+#else
+	#ifndef isiphone // rmm_iphone10
+		GDItextSpecStruct( short pFontNum, short pTextSize, qsty pSty=styPlain, qcol pTextColor=colDefault, qjst pJst=jstLeft )
+		{
+			mFnt.mFont = pFontNum;
+			mFnt.mSize = pTextSize;
+			mSty = pSty; mTextColor = pTextColor; mJst = pJst;
+		} 
+	#endif
+	#endif
+};
+
+#if defined(isiphone)	// pkiphone // rmm_iphone10: moved to here - GDItextSpecStruct is now defined for iPhone
+#else
+// Start rmm6316: support for drawing a max of 256 identical special characters
+const qchar	GDIspecialCharCheckMark = 0x10,
+						GDIspecialCharPassword = 0x11;
+#ifdef isOMNISCORE
+	extern qchar gSpecialChar;
+
+	class GDIdrawSpecialChar
+	{
+		private:
+			qbool		mSet;
+			qchar		mPrevSpecial;
+		public:
+			GDIdrawSpecialChar(qchar pSpecialChar) { mSet = qfalse; if (pSpecialChar) { mPrevSpecial = gSpecialChar; gSpecialChar = pSpecialChar; mSet = qtrue; } }
+			~GDIdrawSpecialChar() { if (mSet) gSpecialChar = mPrevSpecial; }
+	};
+#endif
+// End rmm6316
+
+/*** some predefined fonts ***/
+// mt40308
+#if defined(ismacosx) && !defined(isXCOMPLIB)
+	// rmmuni_fnt2: now stored in a structure, so that they are initialised correctly
+	struct xFONTstandardFonts
+	{
+		qfnt 	mfntNone, 					// must represent no legal font
+					mfntChicago,				// used when standard font is required
+	      	mfntGen,						// used as general purpose font    
+	      	mfntList,						// geneva 10, is default list field font   
+	      	mfntSlist,					// geneva 9, is list field font when smaller font is required  
+	      	mfntFix,						// monaco 9, used when fixed point font is required
+	      	mfntAdhoc,					// used for adhoc reports //NNNc
+					mfntButt,						// default button font is bold geneva 10
+					mfntCheck,					// default checkbox and radio button font
+					mfntEdit,						// default edit font is Chicago?
+					mfntLabel,					// default for labels on edit fields is Chicago?
+					mfntPromptRS,				// prompt for report/search window controls
+					mfntFindRep,				// Find and replace window controls   Chicago?
+					mfntFmtList,				// Formats small list. PC needs fntFmtList=fntList
+					mfntSmallFnt,				// small font // mpmCarbon13
+
+					mfnt6Gen,						// tiny font.
+	      	mfnt6Mon,						// tiny font.
+					mfntPalette,				// font for 'A' on palette window is bold NY 14
+
+					mfntSystem,					// systems default font
+	      	mfntMenubar,				// menubar font // mpm4200
+					mfntStatusBar,			// rmm1407a
+
+					mfntPush,						// default push button font is bold geneva 10
+					mfntAutoPush,	
+					mfntAutoWin,	
+					mfntAutoRep,	
+					mfntAutoRepHead,	
+					mfntToolbar,				// mpmToolbars
+					mfntToolbarHilite;	// mpmToolbars
+	};
+	// rmmuni_fnt3:	
+	#if defined(isGDIHWNDLIB)
+		GCC_EXPORT_ON // MHMACH4
+		#pragma export on
+	#endif
+	extern xFONTstandardFonts *gStandardFonts;
+	// rmmuni_fnt3:	
+	#if defined(isGDIHWNDLIB)
+		GCC_EXPORT_OFF // MHMACH4
+		#pragma export off
+	#endif
+	
+	#define fntNone						(gStandardFonts->mfntNone)
+	#define fntChicago				(gStandardFonts->mfntChicago)
+	#define fntSystem 				(gStandardFonts->mfntSystem)
+	#define fntGen						(gStandardFonts->mfntGen)  
+	#define fntList 					(gStandardFonts->mfntList)
+	#define fntSlist 					(gStandardFonts->mfntSlist)  
+	#define fntFix 						(gStandardFonts->mfntFix)
+	#define fntAdhoc 					(gStandardFonts->mfntAdhoc)          
+	#define fntButt 					(gStandardFonts->mfntButt)
+	#define fntCheck 					(gStandardFonts->mfntCheck)
+	#define fntEdit 					(gStandardFonts->mfntEdit)
+	#define fntLabel 					(gStandardFonts->mfntLabel)
+	#define fntPromptRS 			(gStandardFonts->mfntPromptRS)
+	#define fntFindRep 				(gStandardFonts->mfntFindRep)
+	#define fntFmtList 				(gStandardFonts->mfntFmtList)
+	#define fntSmallFnt				(gStandardFonts->mfntSmallFnt)
+	#define fnt6Gen						(gStandardFonts->mfnt6Gen)
+	#define fnt6Mon						(gStandardFonts->mfnt6Mon)
+	#define fntMenubar				(gStandardFonts->mfntMenubar)
+	#define fntStatusBar			(gStandardFonts->mfntStatusBar)
+	#define fntPush						(gStandardFonts->mfntPush)
+	#define fntPalette 				(gStandardFonts->mfntPalette)
+	#define fntAutoPush				(gStandardFonts->mfntAutoPush)
+	#define fntAutoWin				(gStandardFonts->mfntAutoWin)
+	#define fntAutoRep				(gStandardFonts->mfntAutoRep)
+	#define fntAutoRepHead		(gStandardFonts->mfntAutoRepHead)
+	#define fntToolbar				(gStandardFonts->mfntToolbar)
+	#define fntToolbarHilite	(gStandardFonts->mfntToolbarHilite)
+
+#else
+	// rmmuni_fnt6: export these from ORFCGUI, rather than declaring them in xstat.cpp
+	#if defined(isGDIHWNDLIB)
+		GCC_EXPORT_ON // MHMACH4
+		#pragma export on
+	#endif
+	extern qfnt	fntNone, 				// must represent no legal font
+
+	  					fntChicago, 		// chicago 12, used when standard font is required
+	  					fntSystem, 			// systems default font
+	            fntGen,					// geneva 9, used as general purpose font    
+	            fntList, 				// geneva 10, is default list field font   
+	            fntSlist, 			// geneva 9, is list field font when smaller font is required  
+	            fntFix, 				// monaco 9, used when fixed point font is required
+	            fntAdhoc, 			// geneva 10, used for adhoc reports //NNNc
+	            
+							fntButt, 				// default button font is bold geneva 10
+							fntCheck, 			// default checkbox and radio button font
+							fntEdit, 				// default edit font is Chicago?
+							fntLabel, 			// default for labels on edit fields is Chicago?
+							fntPromptRS, 		// prompt for report/search window controls
+							fntFindRep, 		// Find and replace window controls   Chicago?
+							fntFmtList, 		// Formats small list. PC needs fntFmtList=fntList
+							fntSmallFnt,		// small font
+
+							fnt6Gen,				// tiny font.
+	            fnt6Mon,				// tiny font.
+	            fntMenubar,			// menubar font // mpm4200
+							fntStatusBar,		// rmm1407a
+
+							fntPush,				//default push button font is bold geneva 10
+							fntPalette, 		//font for 'A' on palette window is bold NY 14
+							fntAutoPush,
+							fntAutoWin,
+							fntAutoRep,
+							fntAutoRepHead,
+							fntToolbar,				// default font used in toolbars // mpmToolbars
+							fntToolbarHilite; // default font used in toolbars when pressed // mpmToolbars
+	// rmmuni_fnt6:
+	#if defined(isGDIHWNDLIB)
+		GCC_EXPORT_OFF // MHMACH4
+		#pragma export off
+	#endif
+#endif
+
+/*** predefined special font styles ***/					
+#define			styButt 			(gUseATSUI ? styPlain : styBold)		// mpm4138 styPlain -> styBold // rmmuni_fnt2
+const qsty	styList =			styPlain,
+						stySlist =		styPlain,
+						styAdhoc =		styPlain,
+						styEdit =			styPlain,
+						styLabel =		styPlain,
+						styPromptRS =	styPlain,
+						styFindRep =	styPlain,
+						styStatusBar = styPlain;	// rmm1407a
+
+
+/*** predefined indexes into font table ***/
+const qshort  fntGenIndex =				3, // geneva
+              fntSysIndex =				0, // system
+              fntMonSmallIndex =	0, // monaco
+              fntGenSmallIndex =	3; // geneva
+
+/*** predefined font/style combinations ***/
+
+const qsty	styPush =					styBold;
+const qsty	styPalette =			styBold;
+const qsty	styAutoPush =			styPlain;
+const qsty	styAutoWin =			styPlain;
+const qsty	styAutoRep =			styPlain;
+const qsty	styAutoRepHead =	styBold | styUnderline;
+
+// mpm4168 ends
+
+// ############################# drawing mode ####################################
+
+#ifdef isCOCOA
+enum qdmd {
+						dmdCopy = kCGBlendModeCopy,
+						dmdOr = kCGBlendModeNormal,
+						//dmdXor = kCGBlendModeXOR        
+            dmdXor = kCGBlendModeDifference  // this seems to work as intended (used for invert region)     
+          };
+#else
+enum qdmd {
+						dmdCopy = patCopy,
+						dmdOr = patOr,
+						dmdXor = patXor
+					};
+#endif						
+
+// ############################# initialization stuff ####################################
+
+GDIAPI void		OMNISAPI  GDI_init( qshort pOmnisResFile,FARPROC pBmpCallback=NULL );	// PK6270
+GDIAPI void		OMNISAPI GDI_term();
+
+GDIAPI WindowPtr OMNISAPI GDInewWindow( const Rect *boundsRect, ConstStr255Param title, Boolean visible,short procID, WindowPtr behind, Boolean goAwayFlag, long refCon ) ;
+GDIAPI void OMNISAPI GDIdestroyWindow( WindowPtr wp );
+
+#ifdef ismacosx
+	qlong GDIdrawRotatedText( HDC pHdc, qoschar* pText, qshort pTextLen ); // MHTEXT 
+#endif
+qlong GDIthemeText( HDC pHdc, qoschar* pText, qshort pTextLen, eThemeTextMode pMode ); // mpm_uni
+qlong GDIthemeText( GDItextSpecStruct* pTextSpec, qoschar* pText, qshort pTextLen, eThemeTextMode pMode ); // mpm_uni
+
+
+// ############################# conversion stuff ####################################
+
+#pragma SET_RETURN_REGISTER_ON
+
+//void GDIconv( qcol pColor, RGBColor* rgb );
+//void GDIconv( RGBColor* rgb, qcol& pColor );
+
+// mt40225
+void OMNISAPI doCreatePolyRgn( qrgn* pRgn, qpoint* pPoints, qshort pNumPoints );	
+void OMNISAPI doCreateRoundRectRgn( qrgn* pRgn, qdim pLeft, qdim pTop, qdim pRight, qdim pBottom, qdim pWidthEllipse, qdim pHeightEllipse );
+
+GDIAPI CTabHandle OMNISAPI GDIgetMacColorTable( qshort pDepth );
+
+#pragma SET_RETURN_REGISTER_OFF
+
+
+// mt40295
+enum
+{
+	GDIoptionClickFunc_ProcInfo = kThinkCStackBased
+		 | RESULT_SIZE(SIZE_CODE(sizeof(qbool)))	
+		 | STACK_ROUTINE_PARAMETER(1, SIZE_CODE(sizeof(HDC)))
+		 | STACK_ROUTINE_PARAMETER(2, SIZE_CODE(sizeof(qdim)))
+		 | STACK_ROUTINE_PARAMETER(3, SIZE_CODE(sizeof(qdim)))
+		 | STACK_ROUTINE_PARAMETER(4, SIZE_CODE(sizeof(qchar*)))
+		 | STACK_ROUTINE_PARAMETER(5, SIZE_CODE(sizeof(qshort)))
+
+};
+
+extern QZPattern	GDIpatArr[];	//CRcoregraphics
+
+
+struct qGDIprivate
+{
+	qlong 			mLastMaskSeedId;
+	CTabHandle	mMaskColorTable;
+	qcol				mMaskTransColor;
+	qlong 			mLastChiselSeedId;
+	CTabHandle	mChiselColorTable;
+	qcol				mChiselTransColor;
+	CTabHandle	mSaveCTab;
+	qbool 			mHas32BitQD;
+	qGDIprivate();
+};
+
+#pragma SET_RETURN_REGISTER_ON
+
+GDIAPI qGDIprivate* OMNISAPI GDIgetPrivate();
+
+#ifdef isCOCOA
+  #define GDI_OVERLAY_WINDOW_KIND 1001
+	#define GDI_LAYERED_WINDOW_KIND 1002	// rmm_nc
+	extern GDIAPI void		OMNISAPI GDIdrawDragSelectRect( qrect* pRect, qrect* pClipRect, qbool pFinish ); // mpmOSX_DS
+  extern GDIAPI qulongptr	OMNISAPI GDIdragStart( HBITMAP pBitmap, HBITMAPMASK pBitmapMask, qrect* pBitmapBounds, qpoint* pStartPt, qpoint* pDrawOffsetPt, qbool pDraggingText, qshort pDragAlpha); // rmm8557
+	extern GDIAPI qulongptr	OMNISAPI GDIdragStart( qrgn* pRgn, qpoint* pStartPt, qpoint* pDrawOffsetPt );
+	extern GDIAPI void		OMNISAPI GDIdragEnd( qulongptr pDragInfo, qbool pCouldDrop );
+	extern GDIAPI void		OMNISAPI GDIdragMove( qulongptr pDragInfo, qpoint* pNewPt );
+	extern GDIAPI void OMNISAPI GDIcgFillRoundedSelectionRect(HDC pHdc, CGColorRef pColor, qrect &pRect, qdim pOvalWidth, qbool pDragging);	// rjc0016
+#elif defined(ismacosx) // mpmCarbon52  //CRCOCOA
+	GDIAPI void OMNISAPI GDIinitBundle(void* pBundleRef);
+	// mpmOSX_DD begins
+	// internal use only
+	#define GDI_OVERLAY_WINDOW_KIND 1001
+	#define GDI_LAYERED_WINDOW_KIND 1002	// rmm_nc
+	extern GDIAPI void		OMNISAPI GDIdrawDragSelectRect( qrect* pRect, qrect* pClipRect, qbool pFinish ); // mpmOSX_DS
+	extern GDIAPI qulong	OMNISAPI GDIdragStart( HBITMAP pBitmap, HBITMAPMASK pBitmapMask, qrect* pBitmapBounds, qpoint* pStartPt, qpoint* pDrawOffsetPt, qbool pDraggingText, qshort pDragAlpha); // rmm8557
+	extern GDIAPI qulong	OMNISAPI GDIdragStart( qrgn* pRgn, qpoint* pStartPt, qpoint* pDrawOffsetPt );
+	extern GDIAPI void		OMNISAPI GDIdragEnd( qulong pDragInfo, qbool pCouldDrop );
+	extern GDIAPI void		OMNISAPI GDIdragMove( qulong pDragInfo, qpoint* pNewPt );
+	// mpmOSX_DD ends
+	
+	extern GDIAPI void OMNISAPI GDIconv( HDC pHdc, qrect* pInRect, CGRect* pOutRect ); // mpmToolbars
+	extern GDIAPI void OMNISAPI GDIconv( HDC pHdc, CGRect* pInRect, qrect* pOutRect  ); // MHn0328 
+    
+    extern void CGContextDrawToolbarArrows( CGContextRef ctx, float x, float y, qulong pFlags ); // mpmToolbars4
+	extern void GDICheckCGContext( HDC pHdc);	// rjc0013
+	extern GDIAPI void OMNISAPI GDIcgFillRoundedSelectionRect(HDC pHdc, CGColorRef pColor, qrect &pRect, qdim pOvalWidth, qbool pDragging);	// rjc0016
+#endif
+extern void GDIDrawToolbarArrows( HDC pHdc, qrect* pRect, qulong pFlags = 0 ); // mpmToolbars4
+
+GDIAPI void OMNISAPI debugMsg(const char *pMessage, ...); //MHn0163
+
+// Start rmmuni_fnt: Mac font API - isolates Mac platform dependent code from whether ATSUI or QuickDraw is being used.
+GDIAPI qshort OMNISAPI xFONTgetFontNumber(qchar *pPascalFontName);									 // pPascalFontName is a qchar Pascal string
+																																										 // Returns zero if font is invalid
+GDIAPI void		OMNISAPI xFONTgetFontName(qshort pFontNumber, qchar *pPascalFontName); // Get font name of font with specified font number
+																																										 // Returns empty string if font does not exist
+GDIAPI qbool	OMNISAPI xFONTrealFont(qfnt *pFnt);																// Determine if font is available in specified size
+GDIAPI qbool 	OMNISAPI xFONTrealFont(HDC pHdc);																	// Determine if font is available in specified size
+GDIAPI qbool 	OMNISAPI xFONTisTrueType(qfnt *pFnt);	// Return qtrue if font is TrueType
+GDIAPI qbool 	OMNISAPI xFONTisTrueType(HDC pHdc);							// Return qtrue if font selected into HDC is TrueType
+GDIAPI void 	OMNISAPI xFONTgetFontInfo(HDC pHdc, qfnt *pFnt, qsty pSty, FontInfo *pInfo);	// Get information about font
+GDIAPI void 	OMNISAPI xFONTgetFontInfo(HDC pHdc, FontInfo *pInfo);							// Get information about font selected into HDC
+GDIAPI HFONT 	OMNISAPI xFONTcreateInitialHFONT(HDC pHdc);												// Creates initial HFONT for HDC
+GDIAPI void 	OMNISAPI xFONTdeleteInitialHFONT(HFONT pHFont);										// Deletes initial HFONT when HDC is deleted
+GDIAPI qdim   OMNISAPI xFONTgetFontMetric(CTFontRef pFont, eGDIfontPart pPart); // Get the font metric for pFont
+GDIAPI HFONT 	OMNISAPI xFONTcreateFont(qfnt *pFnt, qsty pSty, HDC pHdc = 0);		// Create HFONT for the specified qfnt and qsty
+GDIAPI void 	OMNISAPI xFONTdeleteObject(HFONT pObject);												// Delete an HFONT
+GDIAPI qdim 	OMNISAPI xFONTcharWidth(HDC pHdc, qchar pChar);										// Return the width of a character: font must already be selected into HDC
+GDIAPI qdim 	OMNISAPI xFONTcharWidth(HDC pHdc, GDItextSpecStruct *pTextSpec, qchar pChar);	// Return the width of a character
+GDIAPI qdim 	OMNISAPI xFONTtextWidth(HDC pHdc, qchar *pText, qshort pTextLen);	// Return the width of some text: font must already be selected into HDC
+GDIAPI qdim 	OMNISAPI xFONTtextWidth(HDC pHdc, GDItextSpecStruct *pTextSpec, qchar *pText, qshort pTextLen);	// Return the width of some text
+GDIAPI qdim 	OMNISAPI xFONToscharTextWidth(HDC pHdc, qoschar *pText, qshort pTextLen);												// Return the width of text, in oschars, HDC already completely set up
+GDIAPI void 	OMNISAPI xFONToscharDrawText(HDC pHdc, qoschar *pText, qshort pTextLen);												// Draw some text in oschars, HDC already completely set up
+GDIAPI void 	OMNISAPI xFONToscharDrawOrGetTextWidth(HDC pHdc, qoschar *pText, qshort pTextLen, qdim* pTextWidth = NULL);												// Draw or get width of some text in oschars, HDC already completely set up
+GDIAPI void 	OMNISAPI xFONTinitialize();																				// rmmuni_fnt2: Initialize the API at startup
+GDIAPI void 	OMNISAPI xFONTterminate();																				// rmmuni_fnt2: Terminate the API at shutdown
+// End rmmuni_fnt
+
+// Start rmm_nc
+GDIAPI qbool	OMNISAPI GDIclearClipAlpha(HDC pHdc);
+// End rmm_nc
+// Start CR0290
+eBitmapFormat GDIgetBitmapFormatOSX(HBITMAP bitmap);
+void GDIsetBitmapFormatOSX(HBITMAP bitmap, eBitmapFormat format);
+// End CR0290
+
+GDIAPI void *OMNISAPI GDIgetNativeGraphicsObjectForDC(HDC pHdc); // rmm8849: Returns CGContextRef from HDC // rmm9263: Moved to xgdi.he from gdi.he
+
+// Start rmm9263: Class to temporarily set high interpolation quality for CGContextRef associated with HDC
+class COCOAhighInterpolationQuality
+{
+public:
+	COCOAhighInterpolationQuality(HDC pHdc)
+	{
+		mContext = (CGContextRef) GDIgetNativeGraphicsObjectForDC(pHdc);
+		if (mContext)
+		{
+			mOldQuality = CGContextGetInterpolationQuality(mContext);
+			CGContextSetInterpolationQuality(mContext, kCGInterpolationHigh);
+		}
+	}
+	~COCOAhighInterpolationQuality()
+	{
+		if (mContext)
+			CGContextSetInterpolationQuality(mContext, mOldQuality);
+	}
+private:
+	CGContextRef						mContext;
+	CGInterpolationQuality	mOldQuality;
+};
+// End rmm9263
+
+// Start rmmuni_fnt4: made these available, so that formpri can use them
+#ifdef ismacosx
+	// MHMACH begins
+	#ifdef ismach_o // mpm_cw 
+		#define xCGRectOffset(_a,_b,_c) CGRectOffset((_a),(_b),(_c))
+		#define xCGContextScaleCTM(_a,_b,_c) CGContextScaleCTM((_a),(_b),(_c)) 
+		#define xCGContextDrawPDFDocument(_a,_b,_c,_d) CGContextDrawPDFDocument((_a),(_b),(_c),(_d))
+		#define xCGPDFDocumentCreateWithURL(_a) CGPDFDocumentCreateWithURL((_a))
+	#else
+	  typedef CGRect(*XCGContext_CGRectOffset)(CGRect rect, float dx, float dy);
+	  typedef void(*XCGContext_CGContextScaleCTM)(CGContextRef ctx, float sx, float sy); 
+	  typedef void(*XCGContext_CGContextDrawPDFDocument)(CGContextRef context, CGRect rect, CGPDFDocumentRef document, int page);
+	  typedef CGPDFDocumentRef(*XCGContext_CGPDFDocumentCreateWithURL)(CFURLRef url);
+	#endif
+	// MHMACH ends
+
+	#if defined(isGDIHWNDLIB)
+		GCC_EXPORT_ON // MHMACH4
+		#pragma export on
+	#endif
+	#ifndef ismach_o // mpm_cw 
+	extern XCGContext_CGRectOffset xCGRectOffset; 
+	extern XCGContext_CGContextScaleCTM xCGContextScaleCTM; 
+	extern XCGContext_CGContextDrawPDFDocument xCGContextDrawPDFDocument;
+	extern XCGContext_CGPDFDocumentCreateWithURL xCGPDFDocumentCreateWithURL;
+	#endif // MHMACH
+	#if defined(isGDIHWNDLIB)
+		GCC_EXPORT_OFF // MHMACH4
+		#pragma export off
+	#endif
+#endif
+// End rmmuni_fnt4
+
+#pragma SET_RETURN_REGISTER_OFF
+#endif
+
+
+#endif
+
+/* eof */

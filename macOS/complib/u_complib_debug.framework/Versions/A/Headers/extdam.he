@@ -1,0 +1,277 @@
+/* $Header: svn://svn.omnis.net/trunk/Studio/O7EXE/INDY/extdam.he 19024 2018-02-06 13:51:34Z gashford $ */
+
+//Q4 EXTDAM.HE
+// external non-visual DAM callbacks
+//Copyright (C) OMNIS Technology Corporation 1999
+
+/**************** Changes ******************
+Date			Edit		Bug					Description
+27-Nov-17	gra1130							finfotype modified to store flags info
+04-Sep-17	rmm9474							Removed csettype and hptrlock (many changes, not marked).
+07-Mar-16	CR0333	ST/BE/1236	Cocoa performance when loading large library is slow.
+29-May-15 gra1041 ST/*A/110		Added $debugsize
+05-Aug-14 gra0990 ST/*P/051		Added $bytesreceived & $bytessent
+17-Dec-13	gra0947	ST/*L/010		Implemented $commitretries & $commitdelay
+16-May-13	gra0884	ST/*A/092		Added $fetch64bitints
+11-Jul-12	gra0858							Added DAMgetThreadLocalStorage callback
+05-Jan-12	gra0838							Added DAMreleasePoolRef callback
+26-Aug-11	CR0055							Added cQuotedIdentifier
+09-Feb-11	gra0778	ST/*A/082		Added DAMgetSeparators callback
+06-Oct-09	gra0670	ST/*A/075		Added $codepage
+22-May-09	gra0612	ST/*A/071		Added $unicode
+30-Oct-08	gra0580	ST/*O/111		Restore batchsize each time statement is executed
+15-May-08	gra0530	ST/*A/065		Implemented debugging
+05-Dec-07	gra0491							Unicode Character conversino changes
+27-Jan-06	MHMACHTB						Removed tabinst.h from complib headers.
+27-Sep-05	MHMACH							Mach-o changes
+20-May-04	gra0210	ST/*A/038		Implement $fetchtofile
+19-Apr-04	gra0204							Batch fetching
+04-Mar-03	rmmdocgen						Studio documentation generator.
+18-Aug-00	cr1135	ST/*A/008		Replace correct #pragma settings
+02-Aug-00	ijt063	DM/*O/006		Added putBindVariableValues
+07-Apr-00	cr1059							Fix Mac callback getDateString to use pointers not references
+03-Apr-00	rmm3693							RPCs.
+31-Mar-00	rmm3690							$createnames for table instances did not work with new DAMs.
+13-Mar-00	rmm3679							$sessions
+13-Mar-00	cr1031							Date to character string mapping
+09-Mar-00	cr1030							Character mapping
+28-Jan-99	cr1006							Make DAMbindVariables constructor & destructor public
+15-Dec-99	rmm3568							Added meta-data methods to new ODBC DAM.
+30-Nov-99	rmm3542							Non-visual DAM callbacks for processing SQL statements.
+********************************************/
+
+#ifndef _EXTDAM_HE_
+#define _EXTDAM_HE_
+
+#ifndef _basics_
+#	include "basics.h"
+#endif
+
+// Start rmmdocgen: moved standard method and property ids to here
+// DAMobj object method ids
+const	qlong cDAMMethodId_Logon							= 6000,
+						cDAMMethodId_Logoff							= 6001,
+						cDAMMethodId_NewStatement				= 6002,
+						cDAMMethodId_ColText						= 6003,	//ijt005
+						cDAMMethodId_SelectNames				=	6004,	//ijt005
+						cDAMMethodId_InsertNames				=	6005,	//ijt005
+						cDAMMethodId_UpdateNames				=	6006,	//ijt005
+						cDAMMethodId_WhereNames					=	6007,	//ijt005
+						cDAMMethodId_CreateNames				=	6008,	//ijt005
+						cDAMMethodId_Commit							= 6009,	//cr1001
+						cDAMMethodId_Rollback						= 6010,	//cr1001
+						cDAMMethodId_NextNativeError		= 6011,	//cr1012
+						cDAMMethodId_RpcDefine					= 6012,	//rmm3693
+						cDAMMethodId_Clear							=	6013,	//cr1092
+						cDAMMethodId_Begin							= 6014,	//cr1126 
+						cDAMMethodId_NewStatementRef		= 6015,	//rmmv4obj
+
+						cDAMMethodId_FirstStandard			= 6000,
+						cDAMMethodId_LastStandard				= 6015;	// rmmdocgen: IF YOU ADD A NEW STANDARD METHOD, CHANGE THIS VALUE
+
+// DAMobj object property ids
+const		qlong cHostName											= 7000,
+							cUserName								= 7001,
+							cPassWord								= 7002,
+							cState									= 7003,
+							// cr1001 start
+							cTranMode								= 7004,	
+							cAutoBegin								= 7005,
+							cCommitMode								= 7006,
+							cRollbackMode							= 7007,
+							// cr1001 end
+							// cr1005 start 
+							cLobThreshold							= 7008,	
+							cLobChunkSize							= 7009, 
+							// cr1005 end
+							// cr1012 start
+							cSessionErrorCode						= 7010, 
+							cSessionNativeErrorCode					= 7011,
+							cSessionNativeErrorText					= 7012,
+							cSessionNativeErrorPending				= 7013,
+							// cr1012 end
+							cSessionCodePage						= 7014, // gra0670
+							// cr1030 start
+							cSessionMapTable						= 7015,
+							cSessionCharMap							= 7016,
+							// cr1030 end
+							cBlobSize								= 7017,
+							cDefaultDate							= 7018, //gra0005
+							cSessionStripSpaces						= 7019,	// cr1069
+							// cr1071	 start
+							cDamName								= 7020,									
+							cDBVersion								= 7021,	// cr1075						
+							cApiVersion								= 7022,
+							cSessionErrorText						= 7023,	// cr1109
+							cDecSeparator							= 7024, // cr1110
+							cThouSeparator							= 7025,	// cr1110
+							cAllowsTransactions						=	7026,	// cr1114
+							// cr1071 end
+							cEmptyDateIsNull						= 7027,	//gra0090
+							cDatabaseEncoding						= 7028, //gra0491
+							cDebugFile								= 7029, //gra0530
+							cDebugLevel								= 7030,	//gra0530
+							cUnicode								= 7031,	//gra0612
+							cQuotedIdentifier				= 7032,	//CR0055
+							cFetch64BitInts					= 7033, //gra0884
+							cCommitRetries					= 7034, //gra0947
+							cCommitDelay						= 7035, //gra0947
+							cBytesReceived					= 7036, //gra0990
+							cBytesSent							= 7037, //gra0990
+							cDebugSize              = 7038, //gra1041
+							
+							cDAMPropertyId_FirstStandard = 7000,
+							cDAMPropertyId_LastStandard = 7038;	// rmmdocgen: IF YOU ADD A NEW STANDARD PROPERTY, CHANGE THIS VALUE
+
+// Statement object method ids
+// rmm3568: added meta-data methods
+const qlong cStatMethodId_Prepare							= 9000,
+						cStatMethodId_Execute				= 9001,
+						cStatMethodId_Fetch					= 9002,
+						cStatMethodId_Clear					= 9003,
+						cStatMethodId_FetchInto				= 9004,	// rmm4282
+						cStatMethodId_FetchToFile			= 9005,	//gra0210
+						cStatMethodId_Tables				= 9100,
+						cStatMethodId_Columns				= 9101,
+						cStatMethodId_Indexes				= 9102,
+						cStatMethodId_Results				= 9103,
+						cStatMethodId_NextNativeError		= 9110,
+						cStatMethodId_ExecDirect			= 9111,
+						cStatMethodId_Rpc					= 9120,	// rmm3693
+						cStatMethodId_RpcProcedures			= 9104,	// rmm3693
+						cStatMethodId_RpcParameters			= 9105;	// rmm3693
+
+// Statement object constants
+const	qlong cStatementName								= 10000,
+						cStatementText						= 10001,
+						cResultsPending						= 10002,
+						cStatementState						= 10003,
+						cRowsAffected						= 10004,
+						cColumnCount						= 10005,
+						cRowCount							= 10006,
+						cRowsFetched						= 10007,
+						// cr1012 start
+						cStatementErrorCode					= 10008,
+						cStatementNativeErrorCode			= 10009,
+						cStatementNativeErrorText			= 10010,
+						cStatementNativeErrorPending		= 10011,
+						// cr1012 end
+						cRpcReturnValue						= 10012,	// rmm3693
+						// cr1018
+						cStatementUseCursor					= 10020,
+						cStatementStripSpaces				= 10021,	// cr1069
+						cStatementErrorText					= 10022,	// cr1109
+						cStatementMaxBufferSize				= 10023,	//gra0204
+						cStatementBatchSize					= 10024,	//gra0204
+						cStatementColumnDelimiter			= 10025,	//gra0210
+						cStatementRowDelimiter				= 10026,	//gra0210
+						cStatementEffectiveBatchSize = 10027; //gra0580
+// End rmmdocgen
+
+// MHMACHTB begins
+const qlong cTABflagTableMask = 0xffffL;					// Index to server table
+const qlong cTABflagIsPrimaryKey = 0x10000L;			// True if the column is a primary key
+const qlong cTABflagExcludeFromInsert = 0x20000L;	// rmm2897: True if the column is excluded from inserts
+const qlong cTABflagExcludeFromUpdate = 0x40000L;	// rmm2897: True if the column is excluded from updates
+const qlong cTABflagCalculated = 0x80000L;				// rmm2899: True if the column is calculated
+const qlong cTABflagSequenceType = 0x100000L;			// rmm3030: True if the underlying OMNIS data type of the column is fftSequence
+const qlong cTABflagExcludeFromWhere = 0x200000L;	// rmm3273: True if the column is excluded from where clauses
+// MHMACHTB ends
+
+// cr1135    
+GCC_SET_BYTE_PACKING_ON // MHMACH
+#pragma SET_BYTE_PACKING_ON   
+
+#ifndef isRCCLIB
+
+struct DAMthreadLocalStorage //gra0858
+{
+	threadStorageIndex dmVarsIndex, gmVarsIndex, mStackIndex;	// CR0333
+	void *dmVars, *gmVars, *mStack;
+};
+
+#ifndef isOMNISCORE
+	#ifndef _EXTFVAL_HE_
+	#	include "extfval.he"
+	#endif
+
+	class DAMbindVariables;
+	qret DAMprepareBindVariables(EXTCompInfo *pEci, EXTfldval &pInStatement, qchar *pPlaceHolder, EXTfldval &pOutStatement, DAMbindVariables &pBindVariables);
+	void DAMallocBindVariables(EXTCompInfo *pEci, DAMbindVariables &pBindVariables, qshort pBindCount);		// rmm3693
+	qret DAMgetBindVariableValues(EXTCompInfo *pEci, DAMbindVariables &pBindVariables);
+	// You do not need to call this, as the DAMbindVariables destructor will do so.  If you do call this, its harmless.
+	void DAMfreeBindVariables(DAMbindVariables &pBindVariables, qbool pFreeVariablesArray);
+
+	void DAMgetDataTypeText(qlong pType, qshort pSubType, qlong pLen, str255 *pTypeText);	// rmm3568
+
+	// rmm9474: qbool DAMconvcset(csettype pCSetIn, csettype pCSetOut, qchar *pData, qlong pDataLen);	// cr1030
+	void	DAMgetDateString(datestamptype *pDate, str255 *pDateFormat, str255 *pOutString);	// cr1031 //cr1059
+
+	qbool DAMregisterSession(EXTCompInfo *pEci, str255 *pHostName, str255 *pUserName, str255 *pPassword, str255 *pSessionName);		// rmm3679
+	void DAMunregisterSession(str255 *pSessionName);					// rmm3679
+	qret DAMputBindVariableValues(DAMbindVariables &pBindVariables);	//<ijt063>	
+	qret DAMgetSeparators(str15 &pSeparators); //gra0778		
+	qbool DAMreleasePoolRef(qobjinst pInst); //gra0838									
+	void DAMgetThreadLocalStorage(DAMthreadLocalStorage *tls); //gra0858							
+#endif
+
+// rmm3693: added bind type defines
+// For the RPC types, the mDataRef (in the DAMsingleBindVariable structure) is the parameter number in the EXTCompInfo; parameter
+// number zero represents the return value.
+// Also, a DAMbindVariables class referencing a DAMsingleBindVariable array for RPCs, cannot be used with DAMprepareBindVariables.
+#define DAM_BIND_TYPE_NORMAL						0						// Normal bind variable in a SQL statement
+#define DAM_BIND_TYPE_RPC_INPUT					1						// Input bind variable to an RPC
+#define DAM_BIND_TYPE_RPC_OUTPUT				2						// Output bind variable from an RPC
+#define DAM_BIND_TYPE_RPC_INPUT_OUTPUT	3						// Input Output bind variable to and from an RPC
+#define DAM_BIND_TYPE_WRITEBACK			4						//<ijt063> Normal Bind variables that will contain output values
+
+struct DAMsingleBindVariable
+{
+	ffttype		mType;														// Data type
+	qshort		mSubType;													// Data sub-type
+	qlong			mFieldLen;												// Max field length (for types such as fftCharacter)
+	qlong			mOffset;													// Zero-based offset to bind variable place-holder in output statement
+	void			*mDataRef;												// Reference to the data (reserved for use by the core)
+	qfldval		mData;														// Bind variable value (set by DAMgetBindVariableValues)
+	qbool			mDataIsMine;											// Reserved for use by the core
+	qchar			mBindType;												// rmm3693: one of the DAM_BIND_TYPE_... defines above
+	char			mSpare[8];												// Reserved for future use
+	qlong			mFlags;														// gra1130: combination of cTABflag...s
+
+	void			newFldval();											// rmm3693: allocate a new fldval if necessary
+};
+
+class DAMbindVariables
+{
+	public:
+		qshort										mBindVariableCount;
+		DAMsingleBindVariable			*mBindVariables;
+
+		void setBindVariables(qshort pBindVariableCount, DAMsingleBindVariable *pBindVariables, qbool pFreeVariablesArray)
+			{ mBindVariableCount = pBindVariableCount; mBindVariables = pBindVariables; mFreeVariablesArray = pFreeVariablesArray; }
+		qbool freeVariablesArray() { return mFreeVariablesArray; }	// rmm3693
+	private:
+		qbool											mFreeVariablesArray;
+		qchar											mSpare[8];
+
+	#ifndef isOMNISCORE	// This class is only constructed or destructed by the DAM
+	public:							// cr1006 make public
+		DAMbindVariables() { fillc(this, sizeof(*this), 0); }
+		~DAMbindVariables() { DAMfreeBindVariables(*this, mFreeVariablesArray); }
+	#endif
+};
+
+// rmm3690: DAMcolText: wParam parameter to ECM_DAM_GETCOLTEXT message
+struct EXTparamTypeInfo;
+struct DAMcolText
+{
+	EXTparamTypeInfo		*mTypeInfo;			// Used to supply the type of the column
+	str255							*mColText;			// Used to return the coltext for the column
+};
+
+#endif
+// cr1135
+GCC_SET_BYTE_PACKING_OFF // MHMACH
+#pragma SET_BYTE_PACKING_OFF            
+
+#endif

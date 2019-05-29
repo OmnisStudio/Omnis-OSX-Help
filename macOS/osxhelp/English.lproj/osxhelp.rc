@@ -1,0 +1,64 @@
+/* $Header: */
+
+/* Changes
+Date			Edit			Fault				Description
+04-Mar-19	CR0580										Initial Omnis implementation ( tidy up not marked ).
+*/
+
+1   BITMAP  DISCARDABLE     "osxhelp.bmp"
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+	// Name of component
+	1000									"OSXHelp"
+
+	// Objects
+	2000  "OSXHelp:OSX Help Object"
+	
+	// Object Instance methods
+	6000	"$loadhandler:$loadhandler() Loads the menu handler"
+	6001	"$unloadhandler:$unloadhandler() Unloads the menu handler"
+	6002	"$help:$help(menuitemname) Method called when menu item selected"
+	6003	"$addhelpitem:$addhelpitem(menuitemname,shortcutkey,handledbystudio) Adds the menu item to the Help menu and returns the item's index"
+	6004	"$deletehelpitem:$deletehelpitem(menuitemindex) Removes the menu item from the Help menu"
+	6005	"$enablehelpitem:$enablehelpitem(menuitemindex) Enables the menu item in the Help menu"
+	6006	"$disablehelpitem:$disablehelpitem(menuitemindex) Disables the menu item in the Help menu"
+	6007	"$sethelpitem:$sethelpitem(menuitemindex,menuitemname,shortcutkey,handledbystudio) Sets the Help menu item properties"
+	6008	"$gethelpitem:$gethelpitem(menuitemindex,menuitemname,shortcutkey,handledbystudio) Gets the Help menu item properties"
+	6009	"$counthelpitems:$counthelpitems() Returns the number of items in the Help menu"
+	6010	"$clearhelpmenu:$clearhelpmenu() Clears the Help menu"
+	6011	"$registerhelpbook:$registerhelpbook(helpbookpackagepath) Registers the Help book package"
+	6012	"$unregisterhelpbook:$unregisterhelpbook(helpbookpackagepath) Unregisters the Help book package"
+	6013	"$openhelp:$openhelp() Opens the Apple Help viewer"
+	6014	"$gotopage:$gotopage(bookname,pageurl,anchorname) Displays the specified page from the Help book"
+	6015	"$gotoanchor:$gotoanchor(bookname,anchorname) Displays the Help book page containing the anchor"
+	6016	"$search:$search(bookname,searchstring) Searches the Help book page with the specified string"
+	6017	"$enablepreferences:$enablepreferences() Enables the Preferences menu item"
+	6018	"$disablepreferences:$disablepreferences() Disables the Preferences menu item"
+	6019	"$about:$about() Opens the about box"
+	
+	// Object method parameters
+	7000  	"MenuItemIndex:The index of the menu item"
+	7001  	"MenuItemName:The name of the new Help menu item"
+	7002  	"ShortCutKey:The menu item's shortcut key"
+	7003  	"HandledByStudio:The menu item is a standard Studio help item"
+	7004  	"HelpBookPackagePath:The path to the help book package file"
+	7005  	"HelpBookName:The name of the help book"
+	7006  	"HelpBookPageURL:The URL of the help book page"
+	7007  	"HelpBookAnchorName:The name of the anchor within the help book page"
+	7008  	"HelpBookName:The name of the help book"
+	7009  	"HelpBookAnchorName:The name of the anchor within the help book page"
+	7010  	"HelpBookName:The name of the help book"
+	7011  	"SearchString:The string to search for"
+	7012  	"MenuItemIndex:The index of the menu item"
+	7013  	"MenuItemName:The name of the new Help menu item"
+	7014  	"ShortCutKey:The menu item's shortcut key"
+	7015  	"HandledByStudio:The menu item is a standard Studio help item"
+	
+	// Static Methods
+
+	// Entry Point
+	31000                 "OSXHelpProc"
+END
+
+

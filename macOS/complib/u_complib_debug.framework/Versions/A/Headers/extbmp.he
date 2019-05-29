@@ -1,0 +1,142 @@
+/* $Header: svn://svn.omnis.net/trunk/Studio/EXTCOMP/CALLBACK/extbmp.he 9349 2014-05-12 17:27:57Z crichardson $ */
+
+// Q4 BMPREF.HE
+// external bmpref.he
+// Copyright (C) Blyth Holdings Inc 1996
+
+/**************** Changes ******************
+Date			Edit				Bug					Description
+12-May-14	CR64BIT									64-bit changes.								
+03-Jun-13	rmm7990			ST/RC/1175	Added PDF device support for styled text icons.
+15-Jun-09	rmm_nc									New controls and supporting APIs.
+07-Apr-09	rmm_iphone23						Tabbar field.
+03-Apr-09	rmm_iphone22						Toolbar field.
+12-Mar-09	rmm_iphone15						Bitmap manager for iPhone.
+20-Oct-08	rmm6484			ST/BE/259		Headed list columns can now be dragged to change column ordering - added Vista drag and drop drag shape support from core.
+05-May-06	rmm5745			ST/WT/1098	Drag and drop did not work in OSX Web Client.
+18-Jan-06 MHMACH7                 Mach-O changes
+09-Dec-05 MHMACH4                 Mach-O changes
+13-Oct-99	AE4973									Thin-client cursors
+16-Jun-99 PKMACCLIENT							Macclient changes
+07-Jan-99	AE4890									Attached bitmap manager to instance for thin client
+19 JAN 98 mpm4425									Implements new callbacks to support external printing code and fixes locp problem
+13-May-97	mt40261									Dragging with Different color for masks
+
+********************************************/
+
+
+#ifndef _EXTBMP_HE_
+#define	_EXTBMP_HE_
+
+#include	"basics.h"
+#include	"gdi.he"
+
+typedef enum { picNormal=0, picChecked, picHilited, picCheckedHilited, picApplyColorToPixmap } ePicModes;	// rmm_iphone22
+typedef enum { ePicDef = 0, ePic16, ePic32, ePic48 } ePicSize;
+
+// rmm_iphone23: added cBMPicon... constants.  Add these to the base icon id to specify the desired size.
+const qlong cBMPicon16x16 = 0x90000000,
+						cBMPicon32x32 = 0xA0000000,
+						cBMPicon48x48 = 0xC0000000,
+						cBMPiconSizeMask = 0xF0000000;
+
+class tqappfile;
+typedef tqappfile* qapp;
+
+#ifndef isXCOMPLIB
+	class BMPpage;	// rmm_iphone15
+#endif
+
+#ifdef isiphone	// rmm_iphone15
+	#ifndef __OBJC__
+		struct UIImage;
+		struct NSMutableDictionary;
+	#endif
+#else
+	// PKMACCLIENT
+	#if defined(ismac) && defined(isRCCLIB)
+	GCC_EXPORT_ON // MHMACH4
+	#pragma export on
+	#endif
+
+	// AE4973
+	class BMPAPI EXTCURref // MHMACH7
+	{
+		private:
+			qlongptr mData;		// CR64BIT
+		public:
+
+		#ifdef isXCOMPLIB
+			EXTCURref(qlong pIconId, qlong pDefault = 0, qapp pApp = 0); 
+		#else
+			EXTCURref(qlong pIconId, qlong pDefault, qapp pApp );  // AE4890
+		#endif
+		~EXTCURref ();
+	
+		HCURSOR getCursor();	
+		qlong getCursorId();	
+	};
+#endif
+
+// PKMACCLIENT
+class BMPAPI EXTBMPref // MHMACH7 
+{
+	private:
+		qlongptr mData;	// CR64BIT
+	public:
+		#ifdef isXCOMPLIB
+			EXTBMPref(qlong pIconId, qlong pDefault = 0, qapp pApp = 0); 
+			EXTBMPref(qlong pIconId, qapp pApp); // rmm7990: Second constructor that always uses pApp directly
+		#else
+			EXTBMPref(qlong pIconId, qlong pDefault, qapp pApp );  // AE4890
+			qbool		isAlpha();	// rmm5745
+		#endif
+		~EXTBMPref ();
+
+		qbool   operator !() {return(mData == 0);}
+    
+		qlong 	getIconId();
+		void		getRect( qrect *pRect, ePicSize pSize = ePic16 );
+		qbool		hasSize( ePicSize pSize = ePic16 );
+		qbool	 	hasMode( ePicModes pMode = picNormal );
+	
+		#ifdef isiphone
+			UIImage *getUIImage(ePicSize pSize = ePicDef, ePicModes pWhich = picNormal, qbool pDisabled = qfalse);	// rmm_iphone15
+		#else
+			HBITMAPMASK copyMask( ePicSize pSize = ePicDef ); 	// PK4293
+			HBITMAP 		copyImage(ePicSize pSize = ePicDef );   // PK4293
+			HBITMAP 		copyImage( qcol pFillColor, ePicSize pSize = ePicDef );   // mpm4425
+			qcol 				transparentColor();   // mt40261
+	
+			void 		drawMask( HDC pHDC, qrect* pRect, ePicSize pSize = ePicDef , ePicModes pWhich = picNormal, qbool pScale = qfalse, qjst pJstHoriz = jstLeft, qjst pJstVert = jstLeft );
+			void 		draw( HDC pHDC, qrect* pRect, ePicSize pSize = ePicDef , ePicModes pWhich = picNormal, qbool pDisabled = qfalse, qcol pHilited = colNone, qbool pScale = qfalse , qjst pJstHoriz = jstLeft, qjst pJstVert = jstLeft);
+		#endif
+
+		static 	qlong 		addBmpSize( qlong pIconID, ePicSize pSize );
+		static 	ePicSize 	getBmpSize( qlong pIconID );
+		#ifndef isXCOMPLIB
+			static	void	setSuppressAllDrawing(qbool pSuppressAllDrawing); // rmm6484
+			// Start rmm_iphone15
+			private:
+				void			adjustRectIfSizeNotPresent(qrect &pRect, ePicSize pSize);
+				ePicSize	checkSize(ePicSize pSize);
+				void			getRectInPage(qrect &pRect, BMPpage *pParent, ePicSize pSize, ePicModes pWhich, qbool &pDisabled);
+				friend class BMPpage;
+			// End rmm_iphone15
+		#endif
+};
+
+#ifndef isiphone	// rmm_iphone15
+	// PKMACCLIENT
+	#if defined(ismac) && defined(isRCCLIB)
+		GCC_EXPORT_OFF // MHMACH4
+		#pragma export off
+	#endif
+#endif
+
+#if !defined(isXCOMPLIB) && !defined(isiphone)	// rmm_iphone15
+	extern qbool gBMPsuppressAllDrawing;	// rmm5745
+#endif
+
+#endif
+// End of file

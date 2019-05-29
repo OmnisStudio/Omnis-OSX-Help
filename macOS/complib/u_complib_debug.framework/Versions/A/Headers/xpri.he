@@ -1,0 +1,134 @@
+/* $Header:   K:\o7exe\mac\xpri.hev   1.1   05 May 2011 14:30:20   mmonscha  $ */
+
+//Q4 XPRI.HE
+//Print manager Mac interface
+//Copyright (C) Blyth Holdings Inc 1996
+
+/**************** Changes ******************
+Date			Edit				Bug					Description
+26-May-16	CR0355									Review and remove COCOA q q q marks. ( Removed legacy routine descriptor calls )
+28-Sep-05 MHMACH                  Mach-o changes
+24 Feb 04	gra0200									Casts added for CW9 compile
+27 JUN 02 mpm5142			st/pf/205		Changing printer in job setup was ignored
+13 MAR 00 MHPRN										Add missing header file for non carbon use.
+25 NOV 99 MHPORT									PRIportParmStruct is now the same on all platforms.
+01 NOV 99 mpmCarbon2							Carbon port
+04-Feb-98	mpm4436									fixes PriProc virtual callbacks
+26-Jan-98	mt40428									now have SET_CORE_PACKING && SET_BYTE_PACKING directives
+17 NOV 97 mpmPRIs									External interface implementation
+21 OCT 97 mpmPRIa									Removed convIWriter
+18 JUN 97	mpmPRI									New file
+
+********************************************/
+
+#ifndef	_XPRI_HE_
+#define _XPRI_HE_
+
+#ifdef iscarbon // mpmCarbon2
+#ifndef __PMAPPLICATION__
+#include <PMApplication.h>
+#endif
+#else
+//#include <Printing.h> // MHPRN
+#endif
+
+GCC_SET_CORE_PACKING_ON // MHMACH
+#pragma	 SET_CORE_PACKING_ON
+
+// ######################## types ####################
+
+
+#define	PRI_PORT_MODEM				0
+#define PRI_PORT_PRINTER			1
+
+#define PRI_PORT_NOHANDSHAKE	0
+#define PRI_PORT_XONXOFF			1
+#define PRI_PORT_HARDWARE			2
+
+#define PRI_PORT_NOPARITY			0
+#define PRI_PORT_ODDPARITY		1
+#define PRI_PORT_EVENPARITY		2
+
+#define PRI_PORT_7DATABITS		0
+#define PRI_PORT_8DATABITS		1
+
+#define PRI_PORT_1STOPBIT			0
+#define PRI_PORT_2STOPBITS		1
+
+/* MHPORT - removed PRIportParms
+struct PRIportParms
+{
+	qulong		mSpeed;						// port speed
+	qulong		mHandShake:2;			// 0 = No hand shake, 1 = xon/xoff, 2 = Hardware
+	qulong		mParity:2;				// 0 = No parity, 1 = odd, 2 = even
+	qulong		mDataBits:1;			// 0 = 7 data bits, 1 = 8 data bits
+	qulong		mStopBits:1;			// 0 = 1 stop bit, 1 = 2 stop bits // mpmPRIa
+};
+*/
+
+// MHPORT begins.
+// As of Studio 3.0, this structure is now the same on all platforms.
+struct PRIportParmStruct
+{
+	qlong			mPort;						// Port Number. On the mac 0 = Modem Port , 1 = Printer Port, 2 and above = extended ports.
+	qulong		mSpeed;						// port speed
+	qulong		mHandShake:2;			// 0 = No hand shake, 1 = xon/xoff, 2 = Hardware
+	qulong		mParity:2;				// 0 = No parity, 1 = odd, 2 = even
+	qulong		mDataBits:1;			// 0 = 7 data bits, 1 = 8 data bits
+	qulong		mStopBits:1;			// 0 = 1 stop bit, 1 = 2 stop bits // mpmPRIa
+	qulong    mReserved1;       // MHPORT: Reserved for future use.
+	qulong    mReserved2;       // MHPORT: Reserved for future use.
+	str255		mPortName;	      // MHPORT: Port Name.
+	str255		mPortProfile;     // MHPORT: Port Profile Name.
+};
+// MHPORT ends.
+
+// mpmCarbon2 / moved here from PRI.HE
+#if defined(iscarbon) ||  defined(isCOCOA)
+	struct PRIdrvInfo
+	{
+		PRIdrvInfo() {}
+		PRIdrvInfo( qniltype qnil ) { GDIignore(&qnil); mSigniture = 0; mPageFormat = NULL; mPrintSettings = NULL; } // mpm_cw
+		~PRIdrvInfo() {}
+		
+		qulong					mSigniture;			// printer type
+		PMPrintSession	mPrintSession;	// current print session (created during print job) // mpm5142
+		PMPageFormat		mPageFormat;		// page format information
+		PMPrintSettings	mPrintSettings;	// job setup information
+		qlong						mHRes;					// printers horizontal Dots per inch
+		qlong						mVRes;					// printers vertical Dots per inch
+	};
+#else
+	struct PRIdrvInfo
+	{
+		PRIdrvInfo() {}
+		PRIdrvInfo( qniltype qnil ) { mSigniture = 0; mData = NULL; }
+		~PRIdrvInfo() {}
+		
+		qulong	mSigniture;	// printer type
+		THPrint	mData;			// printer data
+		qlong		mHRes;			// printers horizontal Dots per inch
+		qlong		mVRes;			// printers vertical Dots per inch
+	};
+#endif
+
+GCC_SET_CORE_PACKING_OFF // MHMACH
+#pragma	 SET_CORE_PACKING_OFF
+
+inline FARPROC PRImakeCustomProc( PRIcustomFunc pPRIcustomFunc, HINSTANCE pInstance )
+{
+	GDIignore(&pInstance); // mpm_cw
+	return (FARPROC)pPRIcustomFunc; //CR0355
+}
+
+inline void PRIdisposeCustomProc( FARPROC pProc )
+{
+	GDIignore(&pProc); // mpm_cw
+}
+// mpmPRIs ends
+
+
+
+#endif
+
+/* eof */

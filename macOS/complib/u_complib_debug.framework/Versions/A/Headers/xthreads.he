@@ -1,0 +1,60 @@
+/* $Header: svn://svn.omnis.net/trunk/Studio/EXTCOMP/CALLBACK/COCOA/xthreads.he 12993 2015-11-16 13:42:08Z bmitchell $ */
+/*************** Changes
+Date			Edit				Bug					Description
+29-Apr-15	rmm_dep									Replaced some calls to Cocoa deprecated functions.
+27-Oct-14 gra1010                 Cocoa porting
+03-Sep-12 gra0863									Mac compile issue
+19-Apr-12	gra0844									Worker support
+31-Aug-04	MHn0401			ST/PF/318		Implemented extcomp version of threadcritical.
+*/
+
+#ifndef _xthreads_he_
+#define _xthreads_he_
+
+#if defined(isiphone)	// pkiphone
+	#ifndef _basics_
+		#include "basics.h"
+	#endif
+#else
+	#ifndef _extcomp_
+		#include "extcomp.he"
+	#endif
+#endif
+
+#include <pthread.h>	//gra1010
+
+//gra0844 start
+// rmm_dep: EXTcriticalSection defined for COCOA
+class EXTcriticalSection
+{
+public:
+	EXTcriticalSection()
+	{
+		mLock = nil;
+	}
+	NSRecursiveLock	*mLock;
+};
+
+typedef pthread_t EXTthreadHandle;
+typedef void *(*EXTstartRoutine)(void *);
+
+void ECOinitCriticalSection();
+qbool ECOenterCriticalSection();
+qbool ECOleaveCriticalSection();
+
+qbool ECOinitCriticalSection(EXTcriticalSection *cs);
+qbool ECOenterCriticalSection(EXTcriticalSection *cs);
+qbool ECOtryEnterCriticalSection(EXTcriticalSection *cs);
+qbool ECOleaveCriticalSection(EXTcriticalSection *cs);
+qbool	ECOdestroyCriticalSection(EXTcriticalSection *cs);
+
+qbool ECOcreateThread(EXTthreadHandle &pHandle, void *pAttribs, EXTstartRoutine pThreadProc, void *pParams);
+#define ECOexitThread(n) pthread_exit(NULL)	//gra0844 end
+#ifdef EXTPROC
+	#undef EXTPROC	// Defined in /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.10.sdk/usr/include/termios.h
+#endif
+#define EXTPROC void * //gra0863: the return type from a thread proc
+
+#define ECOsleep(uSec) usleep(uSec*1000) //gra1010
+
+#endif

@@ -1,0 +1,120 @@
+/* $Header: svn://svn.omnis.net/trunk/Studio/O7EXE/COCOA/xnav.he 19745 2018-05-03 07:54:27Z bmitchell $ */
+
+//Q4 XNAV.HE
+//Navigation services implementation
+//Copyright (C) Blyth Holdings Inc 1999
+
+/**************** Changes ******************
+Date			Edit				Bug					Description
+30-Aug-16	rmm9025			ST/NV/059		Added support for long pathnames to FileOps and to core qfile.
+14-Apr-16	rmm8865			ST/IE/129		If necessary, add .lbs file extension to new library file name.
+14-Aug-07	rmm6216									OSX look and feel improvements (required for Leopard).
+17-Feb-04 MHn0316			ST/HE/664		Prevented users from accessing files on server volumes that are not mounted.
+08-Dec-03	rmmuni_osx5							Mac OSX Unicode port.
+29-Sep-03	rmm4736			ST/WO/1446	Paste from file did not work on OSX.
+10 DEC 02 mpmSheets								Implements sheets on OSX
+09 DEC 02 mpm5161			st/he466		Package support for navigation
+30 OCT 01 MHn0175									OSX Apple Event Changes
+04 AUG 00 mpm4727									New navigation for OS8/9 (many changes)
+05 NOV 99 mpmCarbon4							More Carbon port
+03 NOV 99 mpmCarbon3							Carbon port
+01 NOV 99 mpmCarbon2							Carbon port
+
+********************************************/
+
+#ifndef _XNAV_HE_
+#define _XNAV_HE_
+
+#ifndef isXCOMPLIB
+	#ifndef _xgstuff_
+	#include "xgstuff.h"
+	#endif
+	
+	#ifndef _xfile_
+	#include "xfile.h"
+	#endif
+
+	// rmm9025:
+	#ifndef _EXTCOMP_HE_
+	#include "extcomp.he"
+	#endif
+#endif
+
+enum eXNavigate { eXNavGetFile = 1, 
+									eXNavPutFile = 2, 
+									eXNavNewFolder = 3,
+									eXNavChooseFile = 4, 
+									eXNavChooseFolder = 5,
+									eXNavChooseObject = 6,
+									eXNavCanRun = 255
+								};
+
+const qlong kNetDriveNotMounted = -5555; // MHn0316
+
+@class NavDelegate;
+
+struct tXNavInfo
+{
+	filevref						mFileVRef;		// <-> 	initial vol/dir ref and result (overides mPath, internal core use only)
+	qfldval							mPath;				// <-> 	initial and result folder // rmm9025
+	qfldval							mFileName;		// <-> 	initial and result file name // rmm9025
+	str255							mTitle;				// <-- 	title for dialog
+	str255							mMessage;			// <--	message to display on dialog
+	NSArray*						mExtArr;			// <--	allowed file extensions format = ".lbs|.lbr|.app"
+	str255							mAction;			// <--  Action button label // MHn0175
+
+  qlong               mCreator;			// <--	creator type (if zero Omnis creator is assumed, '????' means any)
+	OSType*							mTypeArr;			// <--	allowed file types
+	qlong								mTypeArrCnt;	// <--	number of array entries in mTypeArr
+	qlongptr						mSelLstPtr;		// -->	Pointer to list containing selection. // MHn0175
+	NSArray*						mPopupTextArray;	// <-- rmmuni_osx5: If not-null, tells the interface it should use the strings stored here, to override the strings stored in mNavMenuItemSpecHandle
+	
+	NavDelegate*				mDelegate;
+
+	qbool								mResult:1;		// -->	if false, navigation was canceled
+	qbool								mSelection:1; // if true, allow multiple selection. // MHn0175
+	qbool								mSupportPackages:1;		// if true, packages can be selected // mpm5161
+	qbool								mAllowOpenPackages:1;	// if true, packages can be opened and navigated // mpm5161
+	qbool								mIDE:1;								// rmm6216: if true,a call from an IDE window,so use a sheet if possible
+	
+	// Start rmm9025
+	void clear()
+	{
+		mFileVRef = 0;
+		mPath = mFileName = 0;
+		mCreator = 0;
+		mTypeArr = 0;
+		mTypeArrCnt = 0;
+		mSelLstPtr = 0;
+		mPopupTextArray = 0;
+		mResult = mSelection = mSupportPackages = mAllowOpenPackages = mIDE = qfalse;
+	}
+	#ifdef isXCOMPLIB
+		tXNavInfo(EXTfldval &pFileName, EXTfldval *pInitDir);
+		~tXNavInfo();
+		void getPath(EXTfldval &pPath);
+	#else
+		tXNavInfo() { clear(); mFileName = new fldval; mPath = new fldval; }
+		~tXNavInfo() { delete mFileName; delete mPath; }
+		void setFromName(fldval& pTheName);
+	#endif
+	// End rmm9025
+};
+typedef struct tXNavInfo tXNavInfo; // affirm as type
+
+#ifndef isXCOMPLIB
+	extern OSErr XNavigate( eXNavigate pMode, tXNavInfo* pInfo, qbool pFromCallback = qfalse ); // rmm4736
+#else
+	extern OSErr XNavigate( eXNavigate pMode, tXNavInfo* pInfo ); // rmm4736
+#endif
+
+inline qret XNavGetFile( tXNavInfo* pInfo ) { return XNavigate( eXNavGetFile, pInfo ); }
+inline qret XNavPutFile( tXNavInfo* pInfo ) { return XNavigate( eXNavPutFile, pInfo ); }
+inline qret XNavPutFolder( tXNavInfo* pInfo ) { return XNavigate( eXNavNewFolder, pInfo ); }
+inline qret XNavChooseFile( tXNavInfo* pInfo ) { return XNavigate( eXNavChooseFile, pInfo ); }
+inline qret XNavChooseFolder( tXNavInfo* pInfo ) { return XNavigate( eXNavChooseFolder, pInfo ); }
+inline qret XNavChooseObject( tXNavInfo* pInfo ) { return XNavigate( eXNavChooseObject, pInfo ); }
+
+inline qbool NavCanRun() { return XNavigate( eXNavCanRun, 0 ); }
+
+#endif

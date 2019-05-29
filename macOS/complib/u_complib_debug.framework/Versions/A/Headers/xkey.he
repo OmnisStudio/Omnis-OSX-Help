@@ -1,0 +1,186 @@
+/* $Header:   U:\vcs\studio60\extcomp\callback\mac\xkey.hev   1.24   11 May 2011 11:08:14   CRICHARD  $ */
+ 
+/*
+   	OMNIS 7 Version 4.0 - External component interface header
+	 	Copyright (C) Blyth Holdings Inc 1996
+		external qkey and APIs which are common to both complib and orfcmain
+*/
+
+/**************** Changes ******************
+Date			Edit				Bug					Description
+25-Jun-18	CR0525			ST/DC/672		Rationalise file operation errors ( kerr.. and kFileOps.. ).
+30-Aug-16	rmm9025			ST/NV/059		Added support for long pathnames to FileOps and to core qfile.
+14-Aug-08	pkiphone								iphone pass 1
+09-Dec-05 MHMACH4                 Mach-O changes
+26-Oct-05 MHMACH2                 Mach-o changes
+09-Aug-05 PK6738									Key support for nsapi
+02-Jun-04	rmm4977			ST/WT/856		Added keyboard state hash variable support for web client.
+23-Mar-04 rmmuni_osx10						Mac OSX Unicode web client port.
+04-Mar-04	rmmuni_osx8							Mac OSX component file APIs.
+27-Nov-03	rmmuni_osx4							MacOSX Unicode port.
+18-Dec-02	MHCW8										CW8 changes
+16-Jun-99	PKMACCLIENT							Mac client updates
+*/
+
+#ifndef _qkey_he_
+#define _qkey_he_
+
+#include "basics.h" // PKMACCLIENT
+#include "gdi.he"		// CR_cw
+
+typedef qchar pchar;
+
+enum    vchar { vcNil=0, vcF1, 
+								vcUp=vcF1+16, vcDown, vcLeft, vcRight, 
+								vcPup, vcPdown, vcPleft, vcPright, vcHome, vcEnd,
+								vcTab, vcReturn, vcEnter, vcBack, vcClear, vcCancel, vcMove,
+								vcDel,vcIns };
+
+enum		keybits {bitShift=9, bitOption=10, bitControl=11, 
+								 bitPchar=12, bitVchar=13, bitQueued=14}; 
+
+
+RCCAPI qbool OMNISAPI getkeystate(keybits bit);
+inline qlong  loWord(qint4 n) { return n & 0x0000ffff; }
+inline qlong  hiWord(qint4 n) { return (n>>16) & 0x0000ffff; }
+inline qbool  bitTest(qint4 x, qshort n) { return ((x & (1L<<n))!=0); } 
+inline void   bitSet(qint4& x, qshort n) { x|=(1L<<n); }
+inline void   bitSet(qint4& x, qshort n, qbool val) { qlong x1=(qlong)1L<<n; if (val) x|=x1; else x&=~x1; } //DRSxDAT
+inline void   bitClear(qint4& x, qshort n) { x&=~(1L<<n); }
+inline qbool	isShift() { return getkeystate(bitShift); }
+inline qbool	isAlt() { return getkeystate(bitOption); }
+inline qbool	isControl() { return getkeystate(bitControl); }
+
+
+// key Processing
+// PKMACCLIENT
+#if defined(isRCCLIB)
+GCC_EXPORT_ON // MHMACH4
+#pragma export on
+#endif
+
+GCC_SET_BYTE_PACKING_ON // MHMACH2
+#pragma	 SET_BYTE_PACKING_ON
+
+class RCCAPI qkey // MHMACH4
+{
+	// rmmuni_osx4: separated into character and flags: made appropriate changes throughout
+	private:
+		qchar			mKeyChar;
+		qlong			mKeyFlags;
+	public:
+		qkey();
+		qkey(pchar pch, qbool shift, qbool option, qbool control);		
+		qkey(vchar vch, qbool shift, qbool option, qbool control);
+		// rmmuni_osx4: qkey(LPARAM pKeyValue);	// used for keyDown messges
+		qkey(vchar vch);	// PKMACCLIENT
+
+		void			setCurrentKeyState();	// rmm4977: new method, used just to set the current key state for shift, ctrl and alt
+		qlong			getKeyStateValue();		// rmm4977: new method, to generate a cross-platform value for the key state (shift/control/alt)
+
+		void			uppc();
+		
+		qbool     operator !() { return qbool(mKeyChar == 0 && mKeyFlags == 0); }
+		void      operator =(qniltype qnil1) { GDIignore(&qnil1); mKeyChar = 0; mKeyFlags = 0; } // mpm_cw
+		void      operator =(const qkey& key1) { mKeyChar = key1.mKeyChar; mKeyFlags = key1.mKeyFlags; }          
+		qbool     operator ==(const qkey& key1) const { return qbool(mKeyChar == key1.mKeyChar && 
+																												  			 ((mKeyFlags & 0x0000FFFFL) == (key1.mKeyFlags & 0x0000FFFFL))); }
+		qbool     operator !=(const qkey& key1) const { return qbool(mKeyChar != key1.mKeyChar || 
+																												  			 ((mKeyFlags & 0x0000FFFFL) != (key1.mKeyFlags & 0x0000FFFFL))); }
+
+		qbool     isShift() const { return bitTest(mKeyFlags,bitShift); }
+		qbool     isAlt() const { return bitTest(mKeyFlags,bitOption); }
+		qbool     isControl() const { return bitTest(mKeyFlags,bitControl); }
+
+		pchar     getPChar() const { return bitTest(mKeyFlags,bitPchar) ? pchar(mKeyChar) : 0; }
+		vchar     getVChar() const { return bitTest(mKeyFlags,bitVchar) ? vchar(mKeyChar) : vcNil; }
+		
+		void			setMessage(qlong pMessage) { mKeyFlags |= ((pMessage<<16)&0xFFFF0000); }	// rmmuni_osx4: store part of mac message in flags
+
+		// PK6738
+		qchar 		keyChar() { return mKeyChar; }
+		qlong 		keyFlags() { return mKeyFlags; }
+		// PK6738
+		void 			keyChar(qchar pChar) { mKeyChar = pChar;}
+		void 			keyFlags(qlong pFlags) { mKeyFlags = pFlags;}
+};
+
+#pragma	 SET_BYTE_PACKING_OFF
+GCC_SET_BYTE_PACKING_OFF // MHMACH2
+
+#if defined(isRCCLIB)
+GCC_EXPORT_OFF // MHMACH4
+#pragma export off
+#endif
+
+// Start rmmuni_osx8
+#if defined(ismobile) 	// pkiphone
+	// Not required for iPhone
+#elif defined(ismacosx)
+	// these map directly to a subset of the fileops error codes.
+	enum
+	{
+		// Independent
+		kECOFileOpsOK = 0,
+		kECOFileOpsNoOperation = 999,
+		kECOFileOpsParamError = 1,
+		kECOFileOpsOutOfMemory = 12,
+		kECOFileOpsInvalidEncoding = 1000,
+		
+		// Mac Specific
+		kECOFileOpsDirFull = -33,
+		kECOFileOpsDiskFull = 101206,								// CR0525	E_DISKFULL
+		kECOFileOpsVolumeNotFound = -35,
+		kECOFileOpsDiskIOError = -36,
+		kECOFileOpsBadName = -37,
+		kECOFileOpsFileNotOpen = 101202,						// CR0525 E_NOTOPEN
+		
+		kECOFileOpsTooManyFilesOpen = -42,
+		kECOFileOpsFileNotFound = 101201,						// CR0525	E_NOTFOUND
+		kECOFileOpsHardwareVolumeLock = -44,
+		kECOFileOpsFileLocked = 101205,							// CR0525 E_LOCKED
+		kECOFileOpsSoftwareVolumeLock = -46,
+		kECOFileOpsMoreFilesOpen = -47,
+		kECOFileOpsAlreadyExists = 101215,					// CR0525 E_ALREADYEXISTS
+		kECOFileOpsAlreadyWriteOpen = -49,
+		kECOFileOpsNoDefaultVolume = -50,
+		kECOFileOpsBadFileRef = -51,
+		kECOFileOpsVolumeNotOnline = -53,
+		
+		kECOFileOpsBadDrive = -56,
+		kECOFileOpsInvalidFormat = -57,
+		kECOFileOpsExternalSystemError = -58,
+		
+		kECOFileOpsBadMasterBlock = -60,
+		kECOFileOpsCantOpenLockedFile = -61,
+		kECOFileOpsDirectoryNotFound = -120,
+		kECOFileOpsTooManyDirOpen = -121,
+		
+		kECOFileOpsDifferentVolume = -124,
+		kECOFileOpsInternalSystemError = -127,
+		kECOFileOpsUnknownError = 998
+	};
+
+	typedef qlong OpsErr;
+	
+	RCCAPI OpsErr ECOosxNSErrorToOpsErr(NSError* pError);
+	RCCAPI NSURL* ECOosxMakeURL(const strxxx &pPathName, OpsErr &errorCode);
+	RCCAPI void  OMNISAPI ECOosxGetDirPathAndFileNameFromPath(const strxxx &pPath, strxxx &pDirPath, strxxx &pFileName);
+	RCCAPI NSURL* OMNISAPI ECOosxCreateFile(strxxx &pPath, OpsErr &errorCode);
+	RCCAPI NSURL* OMNISAPI ECOosxCreateDirectory(strxxx &pPath, OpsErr &errorCode);
+	RCCAPI void	 OMNISAPI ECOosxGetTempFolderPath(strxxx &pPath);	// Returns Posix path to temporary files folder, with trailing ':'
+	// Start rmm9025
+	RCCAPI NSURL* ECOosxMakeURL(EXTfldval &pPathName, OpsErr &errorCode);
+	RCCAPI void  OMNISAPI ECOosxGetDirPathAndFileNameFromPath(EXTfldval &pPath, EXTfldval &pDirPath, strxxx &pFileName);
+	RCCAPI NSURL* OMNISAPI ECOosxCreateFile(EXTfldval &pPath, OpsErr &errorCode);
+	RCCAPI NSURL* OMNISAPI ECOosxCreateDirectory(EXTfldval &pPath, OpsErr &errorCode);
+	RCCAPI void	 OMNISAPI ECOosxGetTempFolderPath(EXTfldval &pPath);	// Returns Posix path to temporary files folder, with trailing ':'
+	// End rmm9025
+#endif
+// End rmmuni_osx8
+#ifdef ismac
+	// rmmuni_osx10:
+	RCCAPI qlong OMNISAPI ECOmacCopyResourceString(qbyte *pSource, qchar *pDestBuffer, qlong pDestBufferLength);	// rmmuni_osx10
+#endif
+
+#endif

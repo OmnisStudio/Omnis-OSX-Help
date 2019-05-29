@@ -1,0 +1,165 @@
+/* $Header: svn://svn.omnis.net/trunk/Studio/EXTCOMP/CALLBACK/extfile.he 15155 2016-09-05 15:43:48Z bmitchell $ */
+
+//Q4 FILE.HE
+//OMNIS file manager interface
+//Copyright (C) Blyth Holdings Inc 1997
+
+/**************** Changes ******************
+Date			Edit				Bug					Description
+30-Aug-16	rmm9025			ST/NV/059		Added support for long pathnames to FileOps and to core qfile.
+19-Aug-16	rmm9010			ST/EC/1416	Added support for large files (files with a size > maximum signed 32 bit integer).
+11-Apr-14	rmm_rwslog							Logging (added as part of RESTful web services)
+06-Jul-07	rmm6147									Vista UAC changes - separate install directory for directories containing writeable files.
+19-Feb-04	rmmuni_osx6							Mac OSX Unicode Port.
+23 AUG 02 MHOFC										Added getOmnisFolder callback
+29 NOV 00 mpmCarbon								Implements FILEopenResources
+12-Oct-98	AE4844									Added filevref for external callbacks (Changed FILEfullName & fullName)
+
+********************************************/
+
+#ifndef	_EXTFILE_HE_
+#define _EXTFILE_HE_
+
+#ifndef _basics_
+#	include "basics.h"
+#endif
+
+#ifndef _STRCLASS_HE_
+#	include "strclass.he"
+#endif
+
+// ######################## types ####################
+
+class qfile;
+
+typedef qfile* qfileptr;
+
+
+#pragma SET_RETURN_REGISTER_ON
+// ######################## functions ####################
+
+qfileptr OMNISAPI	FILEcreateInst();
+void OMNISAPI	FILEdestroyInst( qfileptr pFilePtr );
+
+qret OMNISAPI	FILEcreate( qfileptr pFilePtr, strxxx& pPath, qbool pExclusive );
+qret OMNISAPI	FILEcreate(qfileptr pFilePtr, EXTfldval& pPath, qbool pExclusive); // rmm9025
+qret OMNISAPI	FILEcreateTemp( qfileptr pFilePtr );
+qret OMNISAPI	FILEopen( qfileptr pFilePtr, strxxx& pPath, qbool pReadOnly, qbool pExclusive );
+qret OMNISAPI	FILEopen(qfileptr pFilePtr, EXTfldval& pPath, qbool pReadOnly, qbool pExclusive); // rmm9025
+#ifdef ismac // mpmCarbon begins
+	qret OMNISAPI	FILEopenResources( qfileptr pFilePtr, strxxx& pName, qbool pReadOnly, qbool pExclusive );
+#else
+	inline qret FILEopenResources( qfileptr pFilePtr, strxxx& pName, qbool pReadOnly, qbool pExclusive ) { return 1/*e_negative*/; }
+#endif // mpmCarbon ends
+void OMNISAPI	FILEclose( qfileptr pFilePtr );
+
+qret OMNISAPI	FILEdelete(strxxx& pPath);
+qret OMNISAPI	FILEdelete(EXTfldval& pPath); // rmm9025
+void OMNISAPI	FILEsetMacTypeCreator( qfileptr pFilePtr, qint4 pMacType, qint4 pMacCreator );
+
+void 	OMNISAPI FILEfullName(strxxx& pName, filevref pMacVolRef=0); // AE4844
+void 	OMNISAPI FILEfullName(EXTfldval& pName, filevref pMacVolRef = 0); // rmm9025
+qbool	OMNISAPI FILEexists(strxxx& pPath, qbool pIsFolder = qfalse );
+qbool	OMNISAPI FILEexists(EXTfldval& pPath, qbool pIsFolder = qfalse); // rmm9025
+
+// Start rmm9010: These calls now use qlong64 where appropriate
+qret  OMNISAPI FILEread(qfileptr pFilePtr, void* pData, qlong64 pOffset, qlong pLength );
+qret	OMNISAPI FILEread(qfileptr pFilePtr, void* pData, qlong64 pOffset, qlong pMaxLength, qlong& pActLength );
+qret	OMNISAPI FILEwrite(qfileptr pFilePtr,void* pData, qlong64 pOffset, qlong pLength );
+
+qlong64	OMNISAPI FILEgetPosition(qfileptr pFilePtr, qbool pLimitToQlong = qtrue);
+qret		OMNISAPI FILEsetPosition(qfileptr pFilePtr,qlong64 pPosition);
+
+qlong64	OMNISAPI FILEgetLength(qfileptr pFilePtr, qbool pLimitToQlong = qtrue);
+qret		OMNISAPI FILEsetLength(qfileptr pFilePtr, qlong64 pLength);
+// End rmm9010
+
+void OMNISAPI FILEflush(qfileptr pFilePtr);	// rmm_rwslog
+
+qret	OMNISAPI FILEsetEmpty(qfileptr pFilePtr);
+void	OMNISAPI FILEgetName(qfileptr pFilePtr, strxxx& pFilenameOrPath, qbool pInclpath=qtrue);
+void	OMNISAPI FILEgetName(qfileptr pFilePtr, EXTfldval& pFilenameOrPath, qbool pInclpath = qtrue); // rmm9025
+void	OMNISAPI FILEgetOmnisFolder( qfileptr pFilePtr, str255& pFilename ); // MHOFC
+void	OMNISAPI FILEgetOmnisProgramFolder( qfileptr pFilePtr, str255& pFilename ); // rmm6147
+
+// Start rmm_rwslog: API to generate a list of files or folders directly contained within pFolder
+//			pReturnedList receives a two column list of file or folder names: column 1 is the name, column 2 is the mod date
+//			pListFolders is true to list folders, false to list files
+//			pSortByModDate is true to sort the returned list by mod date, false to sort it by name (case insensitive)
+//			pExtension is null to list all files or folders, or a file extension to list all files or folders with the 
+//			extension.  pExtension does not include the dot, and is case insensitive
+//			Returns true if the files or folders were listed successfully
+qbool OMNISAPI FILElistFiles(EXTfldval &pReturnedList, str255 &pFolder, qbool pListFolders, qbool pSortByModDate, str15 *pExtension = 0);
+qbool OMNISAPI FILElistFiles(EXTfldval &pReturnedList, EXTfldval &pFolder, qbool pListFolders, qbool pSortByModDate, str15 *pExtension = 0); // rmm9025
+qbool OMNISAPI FILEcreateFolder(str255 &pFolder);
+qbool OMNISAPI FILEcreateFolder(EXTfldval &pFolder); // rmm9025
+// End rmm_rwslog
+
+// ######################## EXTfile class ####################
+
+class EXTfile
+{
+	public:
+		EXTfile() { mFile = FILEcreateInst(); }
+		~EXTfile() { FILEdestroyInst( mFile ); }
+
+		enum FILEconversionType	// The conversion type to use when converting an 8-bit file to qchar, in the Unicode version
+		{
+			eFILEconvertFromLatin1Api = 0,
+			eFILEconvertFromUtf8 = 1,
+			eFILEnoConversion = 2
+		};
+		qret create(strxxx& pPath, qbool pExclusive ) { return FILEcreate(mFile, pPath, pExclusive); }
+		qret create(EXTfldval& pPath, qbool pExclusive) { return FILEcreate(mFile, pPath, pExclusive); } // rmm9025
+		qret createTemp() { return FILEcreateTemp( mFile ); }
+		qret open(strxxx& pPath, qbool pReadOnly, qbool pExclusive) { return FILEopen( mFile, pPath, pReadOnly, pExclusive ); }
+		qret open(EXTfldval& pPath, qbool pReadOnly, qbool pExclusive) { return FILEopen(mFile, pPath, pReadOnly, pExclusive); } // rmm9025
+		qret openResources( strxxx& pName, qbool pReadOnly, qbool pExclusive ) { return FILEopenResources( mFile, pName, pReadOnly, pExclusive ); } // mpmCarbon
+		void close() { FILEclose( mFile ); }
+
+		// Start rmm9010
+		qret  	read	(void* pData, qlong64 pOffset, qlong pLength ){ return FILEread(mFile, pData, 	pOffset, pLength ); }
+		qret		read	(void* pData, qlong64 pOffset, qlong pMaxLength, qlong& pActLength ){ return  FILEread(mFile, pData, pOffset, pMaxLength, pActLength ); }
+		qret  	write	(void* pData, qlong64 pOffset, qlong pLength ){ return FILEwrite(mFile,pData,pOffset, pLength );}
+		// End rmm9010
+		qret		readIntoHandle(qHandle &pHan);		// rmmuni: Read the raw contents of a file into a handle
+		qret		readCharacterData(qHandle &pHan, FILEconversionType pConvType);	// rmmuni: read file containing character data into a handle which becomes an array of qchars
+
+		// Start rmm9010
+		qlong64	getPosition(qbool pLimitToQlong = qtrue) { return FILEgetPosition(mFile, pLimitToQlong); }
+		qret  	setPosition(qlong64 pPosition){ return FILEsetPosition(mFile, pPosition); }
+		qlong64	getLength(qbool pLimitToQlong = qtrue){ return FILEgetLength(mFile, pLimitToQlong); }
+		qret  	setLength(qlong64 pLength){ return FILEsetLength(mFile,pLength); }
+		// End rmm9010
+		qret		setEmpty(){ return FILEsetEmpty(mFile); }
+
+		void		flush() { return FILEflush(mFile); }	// rmm_rwslog
+
+		void		getName(strxxx& pNameOrPath, qbool pInclpath=qtrue ){ FILEgetName( mFile, pNameOrPath, pInclpath); }
+		void		getName(EXTfldval& pNameOrPath, qbool pInclpath = qtrue) { FILEgetName(mFile, pNameOrPath, pInclpath); } // rmm9025
+		void 		setMacTypeCreator( qint4 pMacType, qint4 pMacCreator ) { FILEsetMacTypeCreator( mFile, pMacType, pMacCreator ); }
+
+		/*!
+		Gets the path to the folder containing the Omnis executable. Including trailing path separator.
+     @param pFilename		Ref to receive the path to the Omnis executable.
+		*/
+		void		getOmnisFolder( str255& pFilename ){ FILEgetOmnisFolder( mFile, pFilename); }	// MHOFC	
+		void		getOmnisProgramFolder( str255& pFilename ){ FILEgetOmnisProgramFolder( mFile, pFilename); } // MHOFC // rmm6147
+		
+		static qret deleet(strxxx& pPath) { return FILEdelete(pPath); }
+		static qret deleet(EXTfldval& pPath) { return FILEdelete(pPath); } // rmm9025
+		static void fullName(strxxx& pName, filevref pMacVolRef=0) { FILEfullName(pName, pMacVolRef); } // AE4844
+		static void fullName(EXTfldval& pName, filevref pMacVolRef=0) { FILEfullName(pName, pMacVolRef); } // rmm9025
+		static qbool exists(strxxx& pPath, qbool pIsFolder = qfalse ){ return FILEexists(pPath, pIsFolder); }
+		static qbool exists(EXTfldval& pPath, qbool pIsFolder = qfalse) { return FILEexists(pPath, pIsFolder); } // rmm9025
+
+	private:
+		qfileptr mFile;
+};
+
+#pragma SET_RETURN_REGISTER_OFF
+
+#endif
+
+/* eof */
+

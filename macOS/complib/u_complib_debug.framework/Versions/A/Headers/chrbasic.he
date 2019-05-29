@@ -1,0 +1,1203 @@
+/* $Header: svn://svn.omnis.net/trunk/Studio/O7EXE/INDY/chrbasic.he 21464 2018-11-14 09:04:10Z bmitchell $ */
+
+/* Q4 chrbasic.he
+Header file for basic character set handling
+Copyright (C) Raining Data 2002
+
+Changes
+Date			Edit				Bug					Description
+12-Nov-18	rmm9827			ST/FU/728		Added URL encoding and padding options to bintobase64() and binfrombase64().
+12-Jul-18	rmm9734			ST/HE/1616	Tooltip line wrap issue.
+30-May-18	rmm9685			ST/DF/246		OmnisSQL issue with LIKE and national fields.
+19-Dec-17	rmm_emat								Text editor for Omnis language.
+18-Dec-17	rmm9591									Tidied up Scanf and made a few performance improvements.
+28-Jul-17	rmm9440									OW3 component - IMAP Worker.
+23-May-17	rmm9425									OWWW component.
+19-May-17 rmm9389									Added HTTPMethod command.
+16-May-17	rmm9377									Problems uncommenting for commands with no from component or a variable named from as the from component.
+15-May-17	jmg0582									Used init() pattern for CHRtokenize rather than delegating constructors as Mac compiler doesn't currently support C++ 11.
+12-May-17	jmg0579b								Preprocess out strxxx functions of CHRtokenize when not in the core or Extcomp.
+12-May-17	jmg0579a								Improved CHRtokenize class.
+11-May-17	jmg0579									Added CHRtokenize class to assist in tokenising various string types.
+06-Apr-17	rmm9311			ST/WN/074		Added optional charset parameter to FTPConnect.
+12-Jan-17	rmm9190			ST/NT/708		Problem with pathnames with leading or trailing spaces.
+10-Oct-16	rmm9092									Performance improvements.
+22-Sep-16	rmm9053			ST/DB/897		Added option to show control characters in variable windows etc.
+30-Aug-16	rmm9025			ST/NV/059		Added support for long pathnames to FileOps and to core qfile.
+26-Aug-16	rmm9020									Renamed CHR...EncodedCharacters to CHR...Utf8 and modified their interface.Also made some other small improvements.
+25-Aug-16	rmm9018									Miscellaneous tidying up - removed some non-Unicode code for example.
+30-Jul-15	jmgunmarked							Removed jmg0295 - GDIDrawTextEng no longer does the conversion to spaces on Windows, as it conflicts with escape characters used for formatting columns.
+29-Jul-15	jmg0295									Added pConvertTabs param to CHRconvToOs - if true, tabs will be maintained through the conversion on Windows (rather than converted to spaces).
+28-Jul-15	jmg0294			ST/HE/1160	Convert tabs etc (characters < space) to spaces for display on Windows, as those characters aren't rendered.
+01-Dec-14	rmm8465									SMTP worker.
+21-Oct-14	rmm8448									Memory leaks.
+23-Apr-14	CRJSC										Fix location of cfstring.h on OSX for Base SDK >= 10.7.
+24-Dec-13	rmm8189									Removed gra0948 as the Mac core build was broken by this.
+23-Dec-13	gra0948									pkiphone breaks JDBC DAM
+02-Sep-13	CR0110			ST/EC/1332	Prevent compiler removing public xcomp API functions and methods.
+19-Aug-13	rmm64bitux							Linux 64 bit port.
+06-Jun-13	CRCOCOA									Cocoa target.
+26-Apr-12	rmm64bit2								64 bit portability changes.
+17-Apr-12	rmm64bit1								First set of changes for 64 bit support: 64 bit Omnis data type.
+06-Apr-10	rmm6949			ST/EC/1244	CHR_FILL_BUFFER external component SDK issue.
+02-Mar-10	rmm6921			ST/PF/523		Added offset and length arguments to $readcharacter.
+25-Jan-10	rmm6877			ST/DB/789		SQL tokenization issue caused by the variable length of UTF-8 encoding.
+18-Jan-10	rmm6862			ST/CO/282		Omnis to Unicode conversion issues.
+13-Jan-10	gra0697									Added Ustrlen
+17-Nov-09	rmm6788			ST/HE/1065	Add non-Unicode text to clipboard as well as Unicode.
+24-Sep-09	gra0670			ST/*P/024		Problem fetching Latin1 bytes
+15-Jun-09	gra0614									Windows compile issue (500-008)
+19-Dec-08	rmm_ssl									Added OpenSSL support to WebEnabler: added ISO-8859 character conversion.
+24-Oct-08	gra0579			ST/*Y/053		Handle ANSI extended characters in Unicode version
+14-Aug-08	pkiphone								iphone pass 1
+18-Feb-08	rmm_mobile							Mobile device support.
+01-Jun-07	rmm6088									Proper conversion of data files to Unicode.
+08-May-07	rmmunilnx3							Unicode Linux stage 3.
+07-Jul-06	rmm5848			ST/NV/043		Problem with file names containing non ASCII characters on MacOSX.
+10-Mar-06 MHMACHUNI               Mach-O unicode changes
+28-Feb-06	rmm5654									MachO Unicode compile.
+08-Dec-05	rmm_macho								Unicode functions implemented (because qoschar and wchar_t are 2 and 4 bytes respectively in Unicode builds)
+26-Oct-05 MHMACH2                 Mach-o changes
+10-Oct-05 MHMACH1                 Mac Intel changes
+27-Sep-05 MHMACH                  Mach-o changes
+18-Apr-05	rmm5334			UN/IE/092		...continued: $importencoding and $exportencoding.
+14-Apr-05	rmm5333			UN/IE/092		Unicode version import-export now supports different Ansi code pages.
+06-Apr-05 ijt267			ST/DF/143		Added function to determine the type of string (ascii or unicode)
+17-Mar-05	rmm5308			UN/FU/430		Added unichr() and unicode() functions (equivalent to chr() and asc()).
+23-Nov-04	rmm5184									Added binary data editor grid.
+14-Sep-04	rmm5093									Fileops now recognises Unicode encodings; Formfile recognises some additional Unicode encodings.
+31-Aug-04	rmm5078									Added uniconv() function.
+13-Jul-04	rmmCW9a									CodeWarrior 9 Unicode changes.								
+05-Jul-04	rmmCW9									CW9 changes.
+07-Jun-04	rmm4980			ST/WT/868		Crash in web client, caused by memory being returned to the wrong heap.
+20-Apr-04	rmm4917			ST/HE/696		Introduced font mapping tables (currently core only) to allow use of fonts such as "Zapf Dingbats"
+																	drawn with ATSUI, but using MacRoman characters 0-255 (provides compatibility with pre-ATSUI
+																	text drawing). 
+14-Apr-04 MHn0342									Added typedef for non-unicode definition of UniChar
+30-Mar-04	rmmww32									WebWin32 component.
+30-Jan-04	rmm4852			ST/WT/829		Added $encoding property to formfile, to allow reading and writing files as character, rather than just binary.
+04-Dec-03	grauni5									Made UTF16 conversion functions available to complib
+14-Nov-03	rmmuni_osx3							MacOSX Unicode port.
+04-Nov-03	rmmuni_osx2							MacOSX Unicode port.
+14-Oct-03	rmmuni_osx							Mac OSX Unicode port.
+13-Oct-03	rmm4764									MacOSX Unicode port.					
+10-Oct-03	rmm4763									ICU 2.6 for Unicode version.
+24-Dec-02 MHUX4										Unix changes
+25-Nov-02	rmm4320									Paste from file did not work in the Unicode version, for text files.
+28-Feb-02	rmm											New file.
+*/
+#if !defined(_CHRBASIC_HE_) && !defined(OMSTRING_C)
+#define _CHRBASIC_HE_
+
+#include <string.h>
+#include <stdlib.h> // rmm9020
+#if defined(iswin32)
+	#include <tchar.h>
+#else
+	#ifdef ismacosx
+		#if defined(ismobile) || defined(isCOCOA)	|| MAC_OS_X_VERSION_MAX_ALLOWED	>= 1070 //CRCOCOA //CRJSC
+			#include <CoreFoundation/cfstring.h> // rmmuni_osx
+		#else
+			#include <cfstring.h> // rmmuni_osx
+		#endif
+	#endif
+	#if defined(ismacosx)
+		#if defined(ismach_o) || defined(ismobile)	// pkiphone
+			// rmm_macho: Add to these as we find they are neededß
+			#define _tcslen			OMstrlen
+			#define _tcscpy     OMstrcpy
+			#define _tcsncpy    OMstrncpy
+			#define _tcscat     OMstrcat
+			#define _tcsncat    OMstrncat
+			#define _tcsstr     OMstrstr
+			#define _tcschr     OMstrchr
+			#define _tcsrchr    OMstrrchr
+			#define _tcscmp     OMstrcmp
+			#define _tcsnccmp   OMstrncmp
+			#define _tcsspn     OMstrspn
+			#define _tcspbrk    OMstrpbrk
+			#define _tcstoul    OMstrtoul
+			#define _tcstok     OMstrtok
+			#define _stprintf		OMsprintf	// rmm5654
+		#else
+			// rmmuni_osx: MacOSX Unicode string functions
+			#include <wchar.h>
+			#define _tprintf		wprintf
+			#define _stprintf   swprintf
+			#define	_tfopen			_wfopen
+			#define _fgettc     fgetwc
+			#define _fgetts     fgetws
+			#define _fputtc     fputwc
+			#define _fputts     fputws
+			#define _gettc      getwc
+			#define _gettchar   getwchar
+			#define _getts      _getws
+			#define _puttc      putwc
+			#define _puttchar   putwchar
+			#define _putts      _putws
+			#define _ungettc    ungetwc
+			#define _tcstod     wcstod
+			#define _tcstol     wcstol
+			#define _tcstoul    wcstoul
+			#define _ttoi       _wtoi
+			#define _ttol       watol
+			#define _tcscat     wcscat
+			#define _tcscpy     wcscpy
+			#define _tcslen     wcslen
+			#define _tcschr     wcschr
+			#define _tcscspn    wcscspn
+			#define _tcsncat    wcsncat
+			#define _tcsncpy    wcsncpy
+			#define _tcspbrk    wcspbrk
+			#define _tcsrchr    wcsrchr
+			#define _tcsspn     wcsspn
+			#define _tcsstr     wcsstr
+			#define _tcstok     wcstok
+			#define _tcscmp     wcscmp
+			#define _tcsnccmp   wcsncmp
+			#define _tcsncmp    wcsncmp
+			#define	_tremove		_wremove
+		#endif	
+	#else
+		#define _tprintf		printf
+		#define _stprintf   sprintf
+		#define	_tfopen			fopen
+		#define _fgettc     fgetc
+		#define _fgetts     fgets
+		#define _fputtc     fputc
+		#define _fputts     fputs
+		#define _gettc      getc
+		#define _gettchar   getchar
+		#define _getts      gets
+		#define _puttc      putc
+		#define _puttchar   putchar
+		#define _putts      puts
+		#define _ungettc    ungetc
+		#define _tcstod     strtod
+		#define _tcstol     strtol
+		#define _tcstoul    strtoul
+		#define _ttoi       atoi
+		#define _ttol       atol
+		#define _tcscat     strcat
+		#define _tcscpy     strcpy
+		#define _tcslen     strlen
+		#define _tcschr     strchr
+		#define _tcscspn    strcspn
+		#define _tcsncat    strncat
+		#define _tcsncpy    strncpy
+		#define _tcspbrk    strpbrk
+		#define _tcsrchr    strrchr
+		#define _tcsspn     strspn
+		#define _tcsstr     strstr
+		#define _tcstok     strtok
+		#define _tcscmp     strcmp
+		#define _tcsnccmp   strncmp
+		#define _tcsncmp    strncmp
+		#define	_tremove		remove
+	#endif
+#endif
+
+// Basic string and memory runtime functions.
+// rmm_macho: include omstring.c for mach_o Unicode, as it defines functions via templates
+#if defined(ismacosx) && defined(ismobile)	// pkiphone
+	#include "omstring.cpp"
+#elif defined(ismach_o)
+	#include "omstring.c"
+#else
+	#include "omstring.h"	// Only ever included here, when building the core and external components
+#endif
+
+#ifndef ismobile	// rmm_mobile: avoid packing on mobile devices as alignment issues cause crashes
+	#ifndef OMNIS_WEB_ENABLER
+		GCC_SET_BYTE_PACKING_ON // MHMACH
+		#pragma	SET_BYTE_PACKING_ON
+	#else
+		typedef int16_t qshort; // MHMACHUNI
+		typedef uint16_t qushort; // MHMACHUNI
+		typedef	qshort preconst;	// rmm5334a
+		// MHUX4 begins
+		#ifndef OMNIS_WEB_ENABLER
+			extern "C" void __stdcall MEMmovel(const void *pSource,void *pDest,qint4 pLen);
+			#define movel MEMmovel
+		#endif
+		// MHUX4 ends
+	#endif
+#endif
+
+#define	UTF8_MAX_BYTES_PER_CHAR	4						// rmmuni: Maximum number of bytes per character when encoded in UTF-8
+#define CHR_MAX_UNICODE_CHAR		0x10FFFFL		// rmm5308: Maximum valid Unicode character value
+const qchar cCHRzeroWidthSpace = 0x200b;			// rmm9377
+class strxxx;
+
+#if defined(_DEBUG) && !defined(issolaris) && defined(isomnischrdebug)	// rmm6949: added isomnischrdebug
+	extern GDIAPI void CHRfillBuffer(qbyte *pPtr, qlong pLen);
+	#define CHR_FILL_BUFFER(_p, _l) CHRfillBuffer((qbyte *) (_p), (_l));
+#else
+	#define CHR_FILL_BUFFER(_p, _l)
+#endif
+
+// Start rmm4980
+// rmm4980: Moved these definitions here
+// Start rmmuni_osx2
+#if (defined(isXCOMPLIB) || defined(isWEB) || defined(isGDIHWNDLIB) || defined(isRCCLIB) || defined(isEXECLIB) || defined(OMNIS_WEB_ENABLER)) //grauni5 // rmm4852 // rmmCW9a
+	typedef unsigned short UChar; //grauni5: was qoschar
+	qlong Ustrlen(UChar *strPtr); //gra0697
+#endif
+
+#define	QUCBYTELEN(_a) ((_a)*sizeof(UChar))	
+#define QUCCHARLEN(_a) ((_a)/sizeof(UChar))	
+// End rmmuni_osx2
+
+#ifdef isOMNISCORE
+	// ICU interface for a thread
+	// rmm4764:
+	#if !defined(_ICUAPI_HE_)
+		#include "icuapi.he"
+	#endif
+	inline void CHRfreeByteArray(qbyte *pMemory) { free(pMemory); }
+	inline void	CHRfreeCharArray(qchar *pMemory) { free(pMemory); }
+	inline void	CHRfreeOscharArray(qoschar *pMemory) { free(pMemory); }
+	inline void	CHRfreeUcharArray(UChar *pMemory) { free(pMemory); }
+#else
+	// Exported by the GDI, so the same DLL frees the memory, as the DLL which allocated it
+	GDIAPI void	OMNISAPI CHRfreeByteArray(qbyte *pMemory);
+	GDIAPI void	OMNISAPI CHRfreeCharArray(qchar *pMemory);
+	GDIAPI void	OMNISAPI CHRfreeOscharArray(qoschar *pMemory);
+	GDIAPI void	OMNISAPI CHRfreeUcharArray(UChar *pMemory);
+#endif
+// End rmm4980
+
+// Character conversion classes - these convert between qchar and Operating system API character strings if necessary.
+struct fldval;		// rmm9017
+class	EXTfldval;	// rmm9025
+// Start rmm9053: Render modes for CHRconvToOs
+const qbyte cCHRrenderNotRendering = 0,
+						cCHRrenderForUser = 1,
+						cCHRrenderShowAllControlCharacters = 2,
+						cCHRrenderShowAllControlCharactersExceptCarriageReturns = 3,
+						cCHRrenderShowAllControlCharactersCheckForStyles = 4,
+						cCHRrenderShowAllControlCharactersExceptCarriageReturnsAndCheckForStyles = 5;	// rmm9734
+// End rmm9053
+const qchar cCHRcarriageReturnEscape = 0x2ffff;	// 2ffff is guaranteed not to be a character by the Unicode standard
+// rmm9025: Reworked CHRconvToOs (improved performance and added fldval constructor)
+class GDIAPI CHRconvToOs
+{
+private:
+	qoschar			*mAdd;
+	qlong				mLen;
+	qlong				mBufferLen;
+	qoschar			mBuffer[1024];
+	qbool				mDynamicBuffer;		// Must occur after mBuffer, so mBuffer is aligned on a 16 bit boundary
+public:
+	#if !defined(isEXECLIB) && !defined(isRCCLIB)
+		CHRconvToOs(strxxx &pString);	// Implemented in strclass.cpp, and only used by code which includes strclass.he
+	#endif
+	// Start rmm9025
+	#if defined(isOMNISCORE)
+		CHRconvToOs(fldval &pFval, qbool pIsPathName) { init(pFval, pIsPathName); }
+		CHRconvToOs(fldval &pFval) { init(pFval, qfalse); }
+		void init(fldval &pFval, qbool pIsPathName);
+	#elif defined(isXCOMPLIB)
+		CHRconvToOs(EXTfldval &pFval, qbool pIsPathName) { init(pFval, pIsPathName); }
+		CHRconvToOs(EXTfldval &pFval) { init(pFval, qfalse); }
+		void init(EXTfldval &pFval, qbool pIsPathName);
+	#endif
+	// End rmm9025
+	CHRconvToOs(qchar *pAdd, qlong pLen, qbool pForRender = qfalse) { mLen = 0; init(pAdd, pLen, pForRender); } // jmg0294: pForRender
+	CHRconvToOs(qchar *pAdd) { mLen = 0; init(pAdd, OMstrlen(pAdd) + 1); --mLen; } // pAdd -> null terminated string; --mLen since the converted data includes the null terminator
+	CHRconvToOs(qchar *pAdd, qlong pLen, qoschar *pDestBuffer);
+	~CHRconvToOs() { if (mDynamicBuffer) CHRfreeOscharArray(mAdd); CHR_FILL_BUFFER(mBuffer, sizeof(mBuffer)); } // rmm4980
+	static qlong convToOs(qchar *pAdd, qlong pLen, qoschar *pDestBuffer);
+	qoschar			*dataPtr()	{ return mAdd; }
+	qlong				len()				{ return mLen; }
+	qlong				internalBufferSize() { return QOSCHARLEN(sizeof(mBuffer)); } // rmm9025
+	qoschar			*internalBuffer() { return mAdd; }	// rmm9025
+private:
+	void init(qchar *pAdd, qlong pLen, qbool pForRender = qfalse, qbool pNullTerminate = qfalse); // jmg0294: pForRender should be true if the text is being converted for rendering. (Windows needs to do some extra conversions in this case, as tabs & LFs etc aren't rendered)
+	void doConvToOs(qchar *pAdd, qlong pLen, qbyte pRenderMode); // rmm9053
+	inline qbool outputChar(qoschar pChar)
+	{
+		if (mLen >= mBufferLen)
+			expandBuffer();
+		mAdd[mLen++] = pChar;
+		return qtrue;
+	}
+	inline void expandBuffer()
+	{
+		mBufferLen += 1024;
+		qoschar *newBuffer = (qoschar *)malloc(QOSBYTELEN(mBufferLen)); // rmm9020
+		memcpy(newBuffer, mAdd, QOSBYTELEN(mLen));
+		if (mAdd != mBuffer) free(mAdd); // rmm9020
+		mAdd = newBuffer;
+	}
+	// rmm9053: Get char to render for a non-zero pRenderMode
+	// pChar is either < 0x20 or it is 0x7f (del)
+	// When showing control characters, we use the Unicode page 0x2400 (control pictures)
+	inline qchar getCharToRender(qchar pChar, qbyte pRenderMode)
+	{
+		if (cCHRrenderForUser == pRenderMode)
+			return 0x20;
+		if (cCHRrenderShowAllControlCharacters == pRenderMode)
+		{
+			if (pChar < 0x20)
+				return 0x2400 + pChar;
+			// DEL
+			return 0x2421;
+		}
+		// cCHRrenderShowAllControlCharactersExceptCarriageReturns
+		if (0x7f == pChar)
+			return 0x2421;
+		if (pChar != 13) // Carriage return
+			return 0x2400 + pChar;
+		return pChar;
+	}
+};
+
+class GDIAPI CHRconvFromOs
+{
+private:
+	qchar				*mAdd;
+	qlong				mLen;
+	qchar				mBuffer[1024];
+	qbool				mDynamicBuffer;		// Must occur after mBuffer, so mBuffer is aligned on a 32 bit boundary
+	static void		doConvFromOs(qoschar *pSrcAdd, qlong pSrcLen, qchar *&pDestAdd, qlong &pDestLen, qlong pDestMaxLen);
+	static inline qbool outputChar(qchar pChar, qchar *&pDestAdd, qlong &pDestLen, qlong pDestMaxLen);
+public:
+	CHRconvFromOs(qoschar *pAdd, qlong pLen) { init(pAdd, pLen); }
+	CHRconvFromOs(qoschar *pAdd) { init(pAdd, (qlong) _tcslen(pAdd) + 1); --mLen; } // pAdd -> null terminated string; --mLen since the converted data includes the null terminator // MHMACH2 //gra0614(cast) // rmm64bit2
+	#ifdef ismacosx
+		CHRconvFromOs(CFStringRef pCFStringRef);	// rmmuni_osx
+	#endif
+	~CHRconvFromOs() { if (mDynamicBuffer) CHRfreeCharArray(mAdd); CHR_FILL_BUFFER(mBuffer, sizeof(mBuffer)); } // rmm4980
+	static qlong convFromOs(qoschar *pSrcAdd, qlong pSrcLen, qchar *pDestAdd, qlong pDestMaxLen);	// Only needed if character sets are different
+	static void	convFromOs(qoschar *pSrcAdd, qlong pSrcLen, strxxx &pDestStr);
+	static void	pascalStringFromOs(qoschar *pSrcAdd, qlong pSrcLen, qchar *pDestStr, qlong pDestMaxLen);
+	qchar				*dataPtr()	{ return mAdd; }
+	qlong				len()				{ return mLen; }
+private:
+	void init(qoschar *pAdd, qlong pLen);
+};
+
+#ifdef isOMNISCORE
+	class GDIAPI CHRconvToAscii
+	{
+	private:
+		char				mAdd[256];	// Enough space for a null-terminated str255
+		qlong				mLen;
+	public:
+		CHRconvToAscii(strxxx &pString);
+		char				*dataPtr()	{ return mAdd; }
+		qlong				len()				{ return mLen; }
+	};
+#endif
+
+class handle;
+// Class for dealing with different Unicode encodings.
+class GDIAPI CHRunicode
+{
+	public:
+		#ifdef isXCOMPLIB	//CR0110
+			static qlong utf8EncodeChar(qulong pChar, qbyte *pOutUtf8, qbool pCanFatal);									// UTF-8 encode a single character, and return the encoded length in bytes
+		#else
+			static inline qlong utf8EncodeChar(qulong pChar, qbyte *pOutUtf8, qbool pCanFatal);						// UTF-8 encode a single character, and return the encoded length in bytes
+		#endif
+		static qlong utf8EncodedCharLen(qulong pChar);																									// rmm6877: get the number of bytes used by the UTF-8 encoding of the supplied character
+		#ifdef isXCOMPLIB	//CR0110
+			static qulong getUtf8EncodedChar(qbyte *pBuffer, qlong pInLen, qlong &pIndex);				// Get a UTF-8 encoded character from the buffer // rmm4852 // rmm9092
+		#else
+			static inline qulong getUtf8EncodedChar(qbyte *pBuffer, qlong pInLen, qlong &pIndex);	// Get a UTF-8 encoded character from the buffer // rmm4852 // rmm9092
+		#endif
+		static qlong	charToUtf8(qchar *pInChar, qlong pInLen, qbyte *pOutUtf8);												// converts Unicode characters to UTF-8
+		static qlong	utf8ToChar(qbyte *pInUtf8, qlong pInLen, qchar *pOutChar, qlong pOutBufLen = 0);	// converts UTF-8 encoded data to Unicode
+		static void		convertOmnisToUnicode(qbyte *pOmnisDataChars, qlong pLen, strxxx &pDestStr);			// convert Omnis data, and store result in pDestStr
+		static void		convertOmnisToUnicode(qbyte *pOmnisDataChars, qlong pLen, handle &pDest);					// convert Omnis data, and store result in pDest
+		static void		convertOmnisToUnicode(qbyte *pOmnisDataChars, qlong pLen, qchar *pDest, qlong pDestBufLen = 0);		// convert Omnis data, and store result in pDest
+		static qbool	isBigEndian()	// rmm5334: returns qtrue if the machine is big-endian
+		{
+			#if defined(ordermsb) // || defined(ismac) MHMACH1
+				return qtrue;
+			#else
+				return qfalse;
+			#endif
+		}
+		static qbool	is7Bit(qchar *pAdd, qlong pLen);	// rmm6088: returns qtrue if the data is 7-bit (so UTF-8 and Omnis encodings are identical)
+		static qbool	isUtf8Data(qbyte *pAdd, qlong pLen); //gra0579: returns qtrue if the data satisfies the UTF8-encoding rules
+};
+
+#if (defined(isOMNISCORE) || defined(isXCOMPLIB) || defined(isWEB) || defined(isGDIHWNDLIB)) || (defined(ismacosx) && defined(ismobile)) 	// pkiphone	//grauni5 // rmm4852
+	// rmm4852: also available in non-Unicode version
+	// Class that converts a buffer from UTF-8 to UTF-16, defaulting to the normal big-endian/little endian behaviour of the machine.
+	// The pSwap parameter overrides this behaviour, resulting in the opposite endian.
+	class GDIAPI CHRconvToUtf16 // rmm4852
+	{
+	private:
+		UChar				*mAdd;
+		qlong				mLen;
+		qbool				mDynamicBuffer;
+		UChar				mBuffer[1024];
+	public:
+		CHRconvToUtf16(qbyte *pAdd, qlong pLen, qbool pSwap = qfalse, qbool pAddBom = qfalse); // rmm4852
+		~CHRconvToUtf16() { if (mDynamicBuffer) CHRfreeUcharArray(mAdd); CHR_FILL_BUFFER(mBuffer, sizeof(mBuffer)); } // rmm4980
+		UChar				*dataPtr()	{ return mAdd; }
+		qlong				len()				{ return mLen; }
+	};
+
+	// rmm4852: also available in non-Unicode version
+	// Class that converts a buffer from UTF-16 to UTF-8, defaulting to the normal big-endian/little endian behaviour of the machine.
+	// The pSwap parameter overrides this behaviour, using the opposite endian.
+	class GDIAPI CHRconvFromUtf16 // rmm4852
+	{
+	private:
+		qbyte				*mAdd;
+		qlong				mLen;
+		qbool				mDynamicBuffer;
+		qbyte				mBuffer[1024];
+		static inline UChar swap(UChar pChar) { return ((pChar >> 8) & 0xff) | ((pChar << 8) & 0xff00); } // rmm4852 // rmm9092
+	public:
+		CHRconvFromUtf16(UChar *pAdd, qlong pLen, qbool pSwap = qfalse);	// rmmuni_osx2
+		~CHRconvFromUtf16() { if (mDynamicBuffer) CHRfreeByteArray(mAdd); CHR_FILL_BUFFER(mBuffer, sizeof(mBuffer)); } // rmm4980
+		qbyte				*dataPtr()	{ return mAdd; }
+		qlong				len()				{ return mLen; }
+
+		friend class CHRconvToUtf16;	// rmm4852
+	};
+#endif
+
+#if (defined(isOMNISCORE) || defined(isXCOMPLIB) || defined(OMODBC) || (defined(isGDIHWNDLIB) && defined(iswin32)))	// rmm5093: added isGDIHWNDLIB && iswin32 test
+	// rmm4763: renamed from CHRconvFromAnsi
+	class CHRconvFromLatin1ApiBytes
+	{
+	private:
+		qchar				*mAdd;
+		qlong				mLen;
+		qbool				mDynamicBuffer;
+		qchar				mBuffer[1024];
+
+	public:
+		CHRconvFromLatin1ApiBytes(qbyte *pAdd, qlong pLen) { init(pAdd, pLen); }
+		CHRconvFromLatin1ApiBytes(qbyte *pAdd) { init(pAdd, (qlong) strlen((char *) pAdd) + 1); --mLen; } // pAdd -> null terminated string; --mLen since the converted data includes the null terminator // rmm64bit2
+		#if !defined(isXCOMPLIB)
+			~CHRconvFromLatin1ApiBytes() { deleteBuffer(); }	// rmm4763
+			void deleteBuffer() { if (mDynamicBuffer) CHRfreeCharArray(mAdd); CHR_FILL_BUFFER(mBuffer, sizeof(mBuffer)); mDynamicBuffer = qfalse; } // rmm4763 // rmm4980
+		#else
+			~CHRconvFromLatin1ApiBytes();
+		#endif
+		qchar				*dataPtr()	{ return mAdd; }
+		qlong				len()				{ return mLen; }
+	private:
+		void				init(qbyte *pAdd, qlong pLen);
+
+		friend void OMNISAPI doECO_convFromLatin1ApiBytes(CHRconvFromLatin1ApiBytes *pConv, qbyte *pAdd, qlong pLen);
+	};
+
+	class CHRconvToLatin1ApiBytes
+	{
+	private:
+		qbyte				*mAdd;
+		qlong				mLen;
+		qbool				mDynamicBuffer;
+		qbyte				mBuffer[1024];
+
+	public:
+		CHRconvToLatin1ApiBytes(qchar *pAdd, qlong pLen) { init(pAdd, pLen); }
+		CHRconvToLatin1ApiBytes(qchar *pAdd) { init(pAdd, OMstrlen(pAdd) + 1); --mLen; } // pAdd -> null terminated string; --mLen since the converted data includes the null terminator
+		#if !defined(isXCOMPLIB)
+			~CHRconvToLatin1ApiBytes() { deleteBuffer(); } // rmm4763
+			void deleteBuffer() { if (mDynamicBuffer) CHRfreeByteArray(mAdd); CHR_FILL_BUFFER(mBuffer, sizeof(mBuffer)); mDynamicBuffer = qfalse; } // rmm4763 // rmm4980
+		#else
+			~CHRconvToLatin1ApiBytes();
+		#endif
+		qbyte				*dataPtr()	{ return mAdd; }
+		qlong				len()				{ return mLen; }
+
+	private:
+		void				init(qchar *pAdd, qlong pLen);
+
+		friend void OMNISAPI doECO_convToLatin1ApiBytes(CHRconvToLatin1ApiBytes *pConv, qchar *pAdd, qlong pLen);
+	};
+#endif
+
+#ifndef ismobile	// rmm_mobile
+	#ifndef OMNIS_WEB_ENABLER
+		GCC_SET_BYTE_PACKING_OFF // MHMACH
+		#pragma	SET_BYTE_PACKING_OFF
+	#endif
+#endif
+
+// Unicode constants
+#define CHR_UNICODE_BOM						UChar(0xfeff)			// rmm4852: changed these to UChar (always short) from qoschar
+#define CHR_UNICODE_BOM_SWAPPED		UChar(0xfffe)			// Byte-swapped BOM
+
+#ifdef isOMNISCORE
+	// National ordering types
+	typedef   qbyte   nattype[256];   //used for national field ordering
+	const qshort cNATdiskOrderingValueLen = 256;
+#endif
+
+
+#if defined(isOMNISCORE)
+
+class NATordering;
+
+class CHRicu
+{
+private:
+	Locale						*mLocale;													// Current cached locale for this thread
+	Collator					*mCollator;												// Current cached collator object for the locale mLocale
+	nattype						mNatType;													// Value from which mLocale (if not NULL) was created.
+	qbool							mNationalFieldCompareChars;				// rmm9685: If true, national field comparisons are performed character by character
+public:
+	CHRicu();
+	~CHRicu();
+
+	// Start rmm9440
+	static UConverter		*smIMAPMailboxNameConverter;		// Modified UTF-7 for IMAP mailbox names
+	static UConverter		*smUTF7converter;								// Standard UTF-7
+	// End rmm9440
+	static UConverter		*smUTF8converter;
+	// Start rmm5078
+	static UConverter		*smUTF32BEconverter;
+	static UConverter		*smUTF32LEconverter;
+	static UConverter		*smUTF16BEconverter;
+	static UConverter		*smUTF16LEconverter;
+	// End rmm5078
+	static UConverter		*smLatin1ApiBytesConverter;	// rmm4763: converter for Latin 1 characters encoded as bytes
+																									// (in other words the 256 byte API character set)
+
+	static qbool				initialise();
+	static void					terminate();
+	static inline qchar	upperCaseChar(qchar pChar);
+	static inline qchar	lowerCaseChar(qchar pChar);
+	static char  lowerIfAscii(qchar pChar, char pInvalid)			// rmm_emat: Return lower case value of pChar if pChar is ASCII; otherwise return pInvalid
+	{		
+		return (pChar < 128) ? (char)smLowerCaseArray[pChar] : pInvalid;
+	}
+	static qbool			isAscii(strxxx &pString);					//<ijt267>
+
+	void							convCase(qchar *pSrcAdd, qchar *pDestAdd, qlong pLen, qbool pUpperCase);					// Convert string to upper or lower case
+	qshort						compare(qchar *a0, qlong len0, qchar *a1, qlong len1, NATordering *pNatOrdering);	// Compare two character strings according to the national ordering
+	qshort						compare(UChar *a0, qlong len0, UChar *a1, qlong len1, NATordering *pNatOrdering);	// Compare two character strings according to the national ordering
+	static qshort			caseIndependentCompare(const qchar *add0, const qchar *add1, qlong len);					// Compare two character strings, case independently, according to the numeric values of the characters
+
+	void							setupLocale(NATordering *pNatOrdering);
+	static Locale *		createLocale(qbyte *pNatType);
+private:
+	static qchar			smUpperCaseArray[256];
+	static qchar			smLowerCaseArray[256];
+};
+
+// Start rmm5078
+#if (defined(ismac) && defined(ordermsb)) || (defined(issolaris) && defined(ordermsb)) // MHMACH1
+	#define smUTF16converter smUTF16BEconverter
+	#define smUTF32converter smUTF32BEconverter
+#else
+	#define smUTF16converter smUTF16LEconverter
+	#define smUTF32converter smUTF32LEconverter
+#endif
+// End rmm5078
+
+#endif
+
+// Class for managing sets of characters
+#ifdef isOMNISCORE
+	class CHRsets
+	{
+	public:
+		static qbool charInValch(qchar pChar);		// Returns qtrue if the character is valid
+	};
+#endif
+
+// rmm9020: Renamed CHRconvToEncodedCharacters to CHRconvToUtf8 - it now exclusively operates on Utf8
+class GDIAPI CHRconvToUtf8
+{
+private:
+	qbyte				*mAdd;
+	qlong				mLen;
+	qbool				mDynamicBuffer;
+	qbyte				mBuffer[1024];
+
+	void				init(qchar *pAdd, qlong pLen, qlong pExtra = 0); // rmm9018
+public:
+	CHRconvToUtf8() { mAdd = 0; mLen = 0; mDynamicBuffer = qfalse; } // rmm9425: Allows set to be called at a later point
+	CHRconvToUtf8(qchar *pAdd, qlong pLen) { init(pAdd, pLen); }
+	CHRconvToUtf8(qchar *pAdd) { init(pAdd, OMstrlen(pAdd) + 1); --mLen; } // pAdd -> null terminated string; --mLen since the converted data includes the null terminator
+	#ifdef isOMNISCORE
+		CHRconvToUtf8(fldval &pFval); // rmm9018: Convert fldval and add null terminator
+	#endif
+	#ifdef isXCOMPLIB
+		CHRconvToUtf8(EXTfldval &pFval); // rmm9025: Convert EXTfldval and add null terminator
+	#endif
+	virtual ~CHRconvToUtf8() { if (mDynamicBuffer) CHRfreeByteArray(mAdd); CHR_FILL_BUFFER(mBuffer, sizeof(mBuffer)); } // rmm4980
+	qbyte				*dataPtr()	{ return mAdd; }
+	qlong				len()				{ return mLen; }
+	#if defined(ismacosx)
+		void		makeCanonical();	// rmm5848: Make UTF-8 representation canonical, for MacOSX file system calls - assumes the buffer contains UTF-8
+	#endif
+	// rmm9425: Added set
+	void set(qchar *pAdd, qlong pLen, qbool pNullTerminate = qfalse)
+	{
+		if (mDynamicBuffer)
+			CHRfreeByteArray(mAdd);
+		init(pAdd, pLen, pNullTerminate ? 1 : 0);
+		if (pNullTerminate)
+			mAdd[mLen] = 0;
+	}
+};
+
+// rmm9020: Renamed CHRconvFromEncodedCharacters to CHRconvFromUtf8 - it now exclusively operates on Utf8
+class GDIAPI CHRconvFromUtf8
+{
+protected:
+	qchar				*mAdd;
+	qlong				mLen;
+	qbool				mDynamicBuffer;
+	qchar				mBuffer[1024];
+
+	void				init(qbyte *pAdd, qlong pLen);
+public:
+	CHRconvFromUtf8() { mAdd = 0; mLen = 0; mDynamicBuffer = qfalse; } // rmm9425: Allows set to be called at a later point
+	CHRconvFromUtf8(qbyte *pAdd, qlong pLen) { init(pAdd, pLen); }
+	CHRconvFromUtf8(qbyte *pAdd) { init(pAdd, (qlong) strlen((char *) pAdd) + 1); --mLen; } // pAdd -> null terminated string; --mLen since the converted data includes the null terminator // rmm64bit2
+	virtual ~CHRconvFromUtf8() { if (mDynamicBuffer) CHRfreeCharArray(mAdd); CHR_FILL_BUFFER(mBuffer, sizeof(mBuffer)); } // rmm4980
+	qchar				*dataPtr()	{ return mAdd; }
+	qlong				len()				{ return mLen; }
+	// rmm9425: Added set
+	void set(qbyte *pAdd, qlong pLen)
+	{
+		if (mDynamicBuffer)
+			CHRfreeCharArray(mAdd);
+		init(pAdd, pLen);
+	}
+};
+
+// Start rmm4852: added these new classes
+// Convert from qchar to Omnis character set characters (as bytes)
+// Note that this means in the non-Unicode version, no conversion is required
+class GDIAPI CHRconvToOmnis
+{
+private:
+	qbyte				*mAdd;
+	qlong				mLen;
+	qbool				mDynamicBuffer;
+	qbyte				mBuffer[1024];
+
+	void				init(qchar *pAdd, qlong pLen);
+public:
+	CHRconvToOmnis(qchar *pAdd, qlong pLen) { init(pAdd, pLen); }
+	~CHRconvToOmnis() { if (mDynamicBuffer) CHRfreeByteArray(mAdd); CHR_FILL_BUFFER(mBuffer, sizeof(mBuffer)); } // rmm4980
+	qbyte				*dataPtr()	{ return mAdd; }
+	qlong				len()				{ return mLen; }
+};
+
+// Convert from Omnis character set characters (as bytes) to qchar
+// Note that this means in the non-Unicode version, no conversion is required
+class GDIAPI CHRconvFromOmnis
+{
+private:
+	qchar				*mAdd;
+	qlong				mLen;
+	qbool				mDynamicBuffer;
+	qchar				mBuffer[1024];
+
+	void				init(qbyte *pAdd, qlong pLen);
+public:
+	CHRconvFromOmnis(qbyte *pAdd, qlong pLen) { init(pAdd, pLen); }
+	~CHRconvFromOmnis() { if (mDynamicBuffer) CHRfreeCharArray(mAdd); CHR_FILL_BUFFER(mBuffer, sizeof(mBuffer)); } // rmm4980
+	qchar				*dataPtr()	{ return mAdd; }
+	qlong				len()				{ return mLen; }
+};
+// End rmm4852
+
+#if defined(isOMNISCORE) || defined(OMNIS_WEB_ENABLER) || defined(isXCOMPLIB) || defined(isGDIHWNDLIB) || defined(isRCCLIB) || defined(OMODBC)
+	// Classes that convert between characters and a stream of bytes
+	// In the Unicode version, the characters are encoded using UTF-8; in the non-Unicode version, the characters are unchanged.
+	// rmm9020: subclass CHRconvToUtf8
+	class GDIAPI CHRconvToBytes : public CHRconvToUtf8
+	{
+	public:
+		CHRconvToBytes(qchar *pAdd, qlong pLen) : CHRconvToUtf8(pAdd, pLen)
+		{
+		}
+		CHRconvToBytes(qchar *pAdd) : CHRconvToUtf8(pAdd)
+		{
+		}		
+		// rmmuni_osx:
+		#if defined(ismacosx)
+			static void makeUtf8PascalString(qchar *pAdd, qlong pLen, qbyte *pPascalString, qlong pPascalStringBufferLength); // rmmuni_osx3
+		#endif
+	};
+
+	// rmm9020: subclass CHRconvFromUtf8
+	class GDIAPI CHRconvFromBytes : public CHRconvFromUtf8
+	{
+	private:
+		void				initWithCodepage(qbyte *pAdd, qlong pLen, preconst pCodepage); //gra0670
+	public:
+		CHRconvFromBytes(qbyte *pAdd, qlong pLen) : CHRconvFromUtf8(pAdd, pLen)
+		{
+
+		}
+		CHRconvFromBytes(qbyte *pAdd) : CHRconvFromUtf8(pAdd)
+		{
+
+		}
+		CHRconvFromBytes(qbyte *pAdd, qlong pLen, preconst pCodepage); //gra0670
+	};
+#endif
+
+extern qbyte gUtf8Signature[];		// rmm4320: Utf8 encoded BOM
+extern qbyte gUtf16LESignature[];	// rmm5334: Signatures for other Unicode encodings
+extern qbyte gUtf16BESignature[];
+extern qbyte gUtf32LESignature[];
+extern qbyte gUtf32BESignature[];
+
+const qulong   CHR_UTF_SIGNATURE_LEN	= 3,		// rmm4320: length of UTF-8 signature // rmmCW9
+							 CHR_UTF16_SIGNATURE_LEN	= 2,	// rmm5334
+							 CHR_UTF32_SIGNATURE_LEN	= 4;	// rmm5334
+
+#ifndef OMNIS_WEB_ENABLER
+	#ifndef ismobile	// rmm_mobile: avoid packing on mobile devices as alignment issues cause crashes
+		GCC_SET_BYTE_PACKING_ON // MHMACH
+		#pragma	SET_BYTE_PACKING_ON
+	#endif
+	// rmmuni_osx2: OSX uses the UniChar type in both the Unicode and non-Unicode version.
+	// This class (equivalent to CHRconvToOs in the Unicode version) converts to UniChar from qchar
+	#ifdef iswin32
+		typedef unsigned short UniChar;
+	#endif
+	class GDIAPI CHRconvToUniChar
+	{
+		private:
+			#ifdef ismacosx
+				CFStringRef	mStringRef;
+				qbool				mDeleteDataPtr;
+			#else
+				UniChar			mBuffer[1024];
+				qbool				mDynamicBuffer;
+			#endif
+			qlong				mLen;
+			UniChar			*mDataPtr;
+				
+			void				init(qchar *pAdd, qlong pLen);
+		public:
+			#ifdef ismacosx
+				CHRconvToUniChar() { mStringRef = 0; mDeleteDataPtr = qfalse; }	// rmm4917
+				void set(qchar *pAdd, qlong pLen) { init(pAdd, pLen); }					// rmm4917
+				CFStringRef getCFStringRef() { return mStringRef; }	// rmm6788
+			#endif
+			CHRconvToUniChar(qchar *pAdd, qlong pLen) { init(pAdd, pLen); }
+			~CHRconvToUniChar();
+			UniChar			*dataPtr() { return mDataPtr; }
+			qlong				len() { return mLen; }
+	};
+	#ifndef ismobile	// rmm_mobile
+		GCC_SET_BYTE_PACKING_OFF // MHMACH
+		#pragma	SET_BYTE_PACKING_OFF
+	#endif
+#endif	// #ifndef OMNIS_WEB_ENABLER
+
+// Start rmm5333
+// rmm5334: removed CHRansiCodePage - we now use the preconst values for the kUniTypeAnsi... constants
+// rmm_ssl: renamed these classes - see #defines in rmm_ssl block below
+class GDIAPI CHRconvFromCodePage
+{
+private:
+	qchar				*mAdd;
+	qlong				mLen;
+	qbool				mDynamicBuffer;
+	qchar				mBuffer[1024];
+	qbool				mCodePageOk;
+
+	void				init(preconst pCodePage, qbyte *pAdd, qlong pLen); // rmm5334
+public:
+	CHRconvFromCodePage(preconst pCodePage, qbyte *pAdd, qlong pLen) { init(pCodePage, pAdd, pLen); } // rmm5334
+	~CHRconvFromCodePage()	{ if (mDynamicBuffer) CHRfreeCharArray(mAdd); CHR_FILL_BUFFER(mBuffer, sizeof(mBuffer)); }
+	qchar				*dataPtr()			{ return mCodePageOk ? mAdd : 0; }
+	qlong				len()						{ return mCodePageOk ? mLen : 0; }
+	qbool				codePageOk()		{ return mCodePageOk; }
+
+	// getCodePage returns code page (array of 256 unsigned shorts mapping from code page to Unicode)
+	static qushort *getCodePage(preconst pCodePage);	// rmm5334
+};
+
+class GDIAPI CHRconvToCodePage
+{
+private:
+	qbyte				*mAdd;
+	qlong				mLen;
+	qbool				mDynamicBuffer;
+	qbyte				mBuffer[1024];
+	qbool				mCodePageOk;
+
+	void				init(preconst pCodePage, qchar *pAdd, qlong pLen); // rmm5334
+
+	static qbyte *reverseCodePage(qushort *pCodePage, qbyte *&pReverseCodePage);
+public:
+	CHRconvToCodePage(preconst pCodePage, qchar *pAdd, qlong pLen) { init(pCodePage, pAdd, pLen); } // rmm5334
+	~CHRconvToCodePage()	{ if (mDynamicBuffer) CHRfreeByteArray(mAdd); CHR_FILL_BUFFER(mBuffer, sizeof(mBuffer)); }
+	qbyte				*dataPtr()		{ return mCodePageOk ? mAdd : 0; }
+	qlong				len()					{ return mCodePageOk ? mLen : 0; }
+	qbool				codePageOk()	{ return mCodePageOk; }
+
+	// getCodePage returns an array to be indexed by Unicode character values.
+	// The first 4 bytes of the array are to be cast to a long, and indicate the number of significant bytes
+	// in the array.
+	// Unicode characters past the end of the array do not exist in the code page, so we map them to a dot
+	static qbyte *getCodePage(preconst pCodePage); // rmm5334
+	#ifdef isOMNISCORE
+		static void freeReverseCodePages();	// rmm8448
+		static void freeReverseCodePage(qbyte *&pReverseCodePage); // rmm8448
+	#endif
+};
+// Start rmm_ssl: added these defines, in case any old code still uses these renamed classes
+#define CHRconvFromAnsiCodePage CHRconvFromCodePage
+#define CHRconvToAnsiCodePage		CHRconvToCodePage
+// End rmm_ssl
+// End rmm5333
+
+// Start rmm5093: classes to handle Unicode encodings in components
+#if defined(isOMNISCORE) || defined(isRCCLIB) || defined(isGDIHWNDLIB) || defined(isEXECLIB) || defined(isXCOMPLIB) // rmm5184: now in the core
+	// rmm5334: removed FFencoding - we now use the preconst value of the kUniType... constants
+
+	// Convert data from a Unicode encoding, typically after reading from file
+	class GDIAPI CHRconvFromUnicodeEncoding
+	{
+		public:
+			CHRconvFromUnicodeEncoding(preconst pReadEncoding, qbyte *pData, qlong pByteLen) { init(pReadEncoding, pData, pByteLen); } // rmm5334
+			~CHRconvFromUnicodeEncoding();
+			qbool			isChar()				{ return mIsChar; }	// Returns qtrue if the data after conversion is character data
+			qchar			*charDataPtr()	{ return (qchar *) mDataPtr; }
+			qlong			charLen()				{ return QCHARLEN(mLen); }
+			qbyte			*dataPtr()			{ return mDataPtr; }
+			qlong			len()						{ return mLen; }
+			preconst	getActualEncoding() { return mActualEncoding; }	// rmm6921: the actual encoding of the data (either set or detected by auto encoding detection)
+			static preconst detectEncoding(qbyte *pData, qlong pByteLen);	 // rmm8465
+		private:
+			void			init(preconst pReadEncoding, qbyte *pData, qlong pByteLen); // rmm5334
+			void			setChar(qchar *pCharData, qlong pCharLen);
+			void			setChar(preconst pCodePage, qbyte *pData, qlong pByteLen); // rmm5333 // rmm5334
+			void			setBinary(qbyte *pBinData, qlong pByteLen);
+
+			qbyte			*mDataPtr;
+			qlong			mLen;
+			qbool			mIsChar;				// True, if character data
+			preconst	mActualEncoding;// rmm6921
+	};
+
+	// Convert data to a Unicode encoding, typically to write to file
+	class GDIAPI CHRconvToUnicodeEncoding 
+	{
+		public:
+			CHRconvToUnicodeEncoding(preconst pWriteEncoding, qbyte *pData, qlong pByteLen, qbool pAddBom = qtrue);	// Character data for the non-Unicode version must be in the Omnis character set (except when writing native characters or binary) // rmm5334
+			~CHRconvToUnicodeEncoding();
+			qbyte			*dataPtr()	{ return mDataPtr; }
+			qlong			len()				{ return mLen; }
+		private:
+			void			setData(qbyte *pData, qlong pDataLen, qbyte *pHeader = 0, qlong pHeaderLen = 0);
+			void			setData(preconst pCodePage, qchar *pData, qlong pCharLen); // rmm5333 // rmm5334
+
+			qbyte			*mDataPtr;
+			qlong			mLen;
+	};
+
+	// Convert from char to UTF-32
+	typedef qlong U32Char;
+	#define QU32CCHARLEN(_len) ((_len)/sizeof(U32Char))
+	#define QU32CBYTELEN(_len) ((_len)*sizeof(U32Char))	
+
+	class CHRconvToUtf32FromChar
+	{
+		public:
+			CHRconvToUtf32FromChar(qchar *pData, qlong pLen, qbool pOppositeEndian, qbool pAddBom = qfalse);
+			~CHRconvToUtf32FromChar();
+						
+			U32Char *dataPtr()	{ return mDataPtr; }
+			qlong		len()				{ return mLen; }
+		private:
+			U32Char *mDataPtr;
+			qlong		mLen;
+	};
+
+	// Convert from UTF-32 to char
+	class CHRconvFromUtf32ToChar
+	{
+		public:
+			CHRconvFromUtf32ToChar(U32Char *pData, qlong pLen, qbool pOppositeEndian);
+			~CHRconvFromUtf32ToChar();
+						
+			qchar		*dataPtr()	{ return mDataPtr; }
+			qlong		len()				{ return mLen; }
+		private:
+			qchar		*mDataPtr;
+			qlong		mLen;
+	};
+#endif
+// End rmm5093
+// Start rmm9311: Used to interface with the core implementation of these classes
+// Indices into mData - used to interface with the core - outside the #ifdef OMNIS_WEB_ENABLER so the core can use them too
+const qlong cUEIencoding = 0,
+						cUEIobjectPtr = 1,
+						cUEIinputDataPtr = 2,
+						cUEIinputDataLen = 3,
+						cUEIoutputDataPtr = 4,
+						cUEIoutputDataLen = 5,
+						cUEIsize = 6;	// Adjust this if you add or remove an index
+#ifdef OMNIS_WEB_ENABLER
+	class GDIAPI CHRconvFromUnicodeEncoding
+	{
+		public:
+			CHRconvFromUnicodeEncoding(qproc pCallback, preconst pReadEncoding, qbyte *pData, qlong pByteLen);
+			~CHRconvFromUnicodeEncoding();
+			qchar			*charDataPtr();
+			qlong			charLen();
+		private:
+			qlongptr	mData[cUEIsize];
+			qproc			mCallback;
+	};
+
+	class GDIAPI CHRconvToUnicodeEncoding 
+	{
+		public:
+			CHRconvToUnicodeEncoding(qproc pCallback, preconst pWriteEncoding, qchar *pData, qlong pLen);
+			~CHRconvToUnicodeEncoding();
+			qbyte			*dataPtr();
+			qlong			len();
+		private:
+			qlongptr	mData[cUEIsize];
+			qproc			mCallback;
+	};
+#endif
+// End rmm9311
+
+// Start rmm6862: class to manage the Omnis to Unicode and Unicode to Omnis conversion tables
+// The class operates on Omnis characters 128 to 255, since 0-127 always map to the same value.
+#ifdef isOMNISCORE
+	class lsttype;
+	class qfile;
+	class CHRomnisUnicodeConversionTable
+	{
+		public:
+			static void loadFromDisk();
+			static lsttype *getAsList();
+			static qret setFromList(lsttype *pOmnisToUnicodeList, qbool pWriteToDisk);
+			static qret openFile(qfile &pFd, qbool pReadOnly);
+	};
+#endif
+// End rmm6862
+
+// Start rmm9190: Moved to here and renamed OMstripWhitespace to OMstripSpaces - available in components as well as core
+// Start rmm_rws:
+template <class OMchar> qbool OMisWhitespace(OMchar pC)
+{
+	return ' ' == pC || '\t' == pC || '\r' == pC || '\n' == pC;
+}
+
+template <class OMstring> OMstring * OMstripSpaces(OMstring *pString, qlong &pStringLen)
+{
+	// Check if there is anything to strip
+	if (!pStringLen)
+		return pString;
+	if (*pString != ' ' && pString[pStringLen - 1] != ' ')
+		return pString;
+	// There are spaces to strip
+	int i;
+	// Strip trailing spaces
+	for (i = pStringLen - 1; i >= 0; --i)
+	{
+		if (' ' == pString[i])
+			--pStringLen;
+		else
+			break;
+	}
+	// Strip leading spaces
+	int lenToStrip = 0;
+	for (i = 0; i < pStringLen; ++i)
+	{
+		if (' ' == pString[i])
+			++lenToStrip;
+		else
+			break;
+	}
+	pString += lenToStrip;
+	pStringLen -= lenToStrip;
+	return pString;
+}
+// End rmm_rws
+// End rmm9389a:
+template <class OMstring> OMstring * OMstripWhitespace(OMstring *pString, qlong &pStringLen)
+{
+	// Check if there is anything to strip
+	if (!pStringLen)
+		return pString;
+	if (!OMisWhitespace(*pString) && !OMisWhitespace(pString[pStringLen - 1]))
+		return pString;
+	// There is whitespace to strip
+	int i;
+	// Strip trailing whitespace
+	for (i = pStringLen - 1; i >= 0; --i)
+	{
+		if (OMisWhitespace(pString[i]))
+			--pStringLen;
+		else
+			break;
+	}
+	// Strip leading whitespace
+	int lenToStrip = 0;
+	for (i = 0; i < pStringLen; ++i)
+	{
+		if (OMisWhitespace(pString[i]))
+			++lenToStrip;
+		else
+			break;
+	}
+	pString += lenToStrip;
+	pStringLen -= lenToStrip;
+	return pString;
+}
+
+ // Start jmg0579
+/**
+ A class to help tokenize various different string classes. Tokens returned will be destroyed when
+ the tokenizer is.
+ */
+class CHRtokenize
+{
+private:
+	qchar *mStringPtr;
+	qchar *mDelimiter;
+	qchar mSingleDelimiter; // jmg0579a
+	qlong mStringLength;
+	qlong mDelimiterLength;
+	qlong	mCurrentPos;
+
+// Start jmg0579a
+	inline void setDelimiter(qchar* pDelimiter) { mDelimiter = pDelimiter; mDelimiterLength = OMstrlen(pDelimiter); }
+	inline void setDelimiter(qchar pDelimiter) { mSingleDelimiter = pDelimiter; mDelimiter = &mSingleDelimiter; mDelimiterLength = 1; }
+	
+ // Start jmg0582
+#if defined(isOMNISCORE) 
+	void init(fldval &pFval);
+#elif defined(isXCOMPLIB)
+	void init(EXTfldval &pFval);
+#endif
+	void init(qchar *pString, qlong pStringLength);
+
+#if defined(isOMNISCORE) || defined(isXCOMPLIB) // jmg0579b: strxxx classes not available to EXTERNALs
+	void init(strxxx &pString);
+#endif // jmg0579b
+
+
+public:
+	/*** Constructors taking a fldval/EXTfldval source string ***/
+#if defined(isOMNISCORE) 
+	CHRtokenize(fldval &pFval, qchar *pDelimiter) { init(pFval); setDelimiter(pDelimiter); }; /**< Construct a tokenizer using a fldval, with the specified delimiter */
+	CHRtokenize(fldval &pFval, qchar pDelimiter) { init(pFval); setDelimiter(pDelimiter); }; /**< Construct a tokenizer using a fldval, with the specified single qchar delimiter */
+#elif defined(isXCOMPLIB)
+	CHRtokenize(EXTfldval &pFval, qchar *pDelimiter) { init(pFval); setDelimiter(pDelimiter); }; /**< Construct a tokenizer using an EXTfldval, with the specified delimiter */
+	CHRtokenize(EXTfldval &pFval, qchar pDelimiter) { init(pFval); setDelimiter(pDelimiter); }; /**< Construct a tokenizer using an EXTfldval, with the specified single qchar delimiter */
+#endif
+
+	/*** Constructors taking a qchar* source string ***/
+	CHRtokenize(qchar *pString, qchar *pDelimiter) { init(pString, OMstrlen(pString)); setDelimiter(pDelimiter); }; /**< Construct a tokenizer using a null-terminated qchar*, with the specified delimiter */
+	CHRtokenize(qchar *pString, qlong pStringLength, qchar *pDelimiter) { init(pString, pStringLength); setDelimiter(pDelimiter); } /**< Construct a tokenizer using a qchar*, with the specified delimiter */
+	CHRtokenize(qchar *pString, qchar pDelimiter) { init(pString, OMstrlen(pString)); setDelimiter(pDelimiter); }; /**< Construct a tokenizer using a null-terminated qchar*, with the specified single qchar delimiter */
+	CHRtokenize(qchar *pString, qlong pStringLength, qchar pDelimiter) { init(pString, pStringLength); setDelimiter(pDelimiter); } /**< Construct a tokenizer using a qchar*, with the specified single qchar delimiter */
+
+#if defined(isOMNISCORE) || defined(isXCOMPLIB) // jmg0579b: strxxx classes not available to EXTERNALs
+	/*** Constructors taking a strxxx source string ***/
+	CHRtokenize(strxxx &pString, qchar *pDelimiter) { init(pString); setDelimiter(pDelimiter); }; /**< Construct a tokenizer using a str class, with the specified delimiter */
+	CHRtokenize(strxxx &pString, qchar pDelimiter) { init(pString); setDelimiter(pDelimiter); }; /**< Construct a tokenizer using a str class, with the specified single qchar delimiter */
+#endif // jmg0579b
+// End jmg0582
+
+	void reset(); /**< Sets the current position in the source string back to the start, so the next call to next() will return the first token. */
+
+	/*** next() returning token into a qchar* ***/
+	qbool next(qchar *&pToken, qlong &pTokenLen); /**< Get the next token, using the current delimiter. */
+	qbool next(qchar *&pToken, qlong &pTokenLen, qchar *pDelimiter) { setDelimiter(pDelimiter); return next(pToken, pTokenLen); } /**< Get the next token, using a new delimiter. */
+	qbool next(qchar *&pToken, qlong &pTokenLen, qchar pDelimiter) { setDelimiter(pDelimiter); return next(pToken, pTokenLen); } /**< Get the next token, using a new single qchar delimiter. */
+
+#if defined(isOMNISCORE) || defined(isXCOMPLIB) // jmg0579b: strxxx classes not available to EXTERNALs
+	/*** next() returning token into a strxxx ***/
+	qbool next(strxxx &pToken); /**< Get the next token into a strxxx, using the current delimiter. */
+	qbool next(strxxx &pToken, qchar *pDelimiter) { setDelimiter(pDelimiter); return next(pToken); } /**< Get the next token into a strxxx, using a new delimiter. */
+	qbool next(strxxx &pToken, qchar pDelimiter) { setDelimiter(pDelimiter); return next(pToken); } /**< Get the next token into a strxxx, using a new single qchar delimiter. */
+#endif // jmg0579b
+
+	/*** next() returning token into a fldval/EXTfldval ***/
+#if defined(isOMNISCORE) 
+	qbool next(fldval &fval); /**< Get the next token into a fldval, using the current delimiter. */
+	qbool next(fldval &pToken, qchar *pDelimiter) { setDelimiter(pDelimiter); return next(pToken); } /**< Get the next token into a fldval, using a new delimiter. */
+	qbool next(fldval &pToken, qchar pDelimiter) { setDelimiter(pDelimiter); return next(pToken); } /**< Get the next token into a fldval, using a new single qchar delimiter. */
+#elif defined(isXCOMPLIB)
+	qbool next(EXTfldval &fval); /**< Get the next token into an EXTfldval, using the current delimiter. */
+	qbool next(EXTfldval &pToken, qchar *pDelimiter) { setDelimiter(pDelimiter); return next(pToken); } /**< Get the next token into an EXTfldval, using a new delimiter. */
+	qbool next(EXTfldval &pToken, qchar pDelimiter) { setDelimiter(pDelimiter); return next(pToken); } /**< Get the next token into an EXTfldval, using a new single qchar delimiter. */
+#endif
+};
+// End jmg0579 // End jmg0579a
+
+// Start rmm9425: Rationalised base64 support
+// rmm9827: Added pUseURLEncoding parameter
+extern qbyte *CHRencodeAsBase64(unsigned char const *pBuffer, qlong pLen, qlong &pEncodedLen, qbool pUseURLEncoding = qfalse, qbool pAddPadding = qtrue);
+extern qbyte *CHRdecodeFromBase64(unsigned char const *pBase64, qlong pBase64Len, qlong &pDecodedLen, qbool pUseURLEncoding = qfalse, qbool pExpectPadding = qtrue);
+// End rmm9425
+
+// Start rmm9591
+// Cross-platform, single implementation (replaces Scanf and byteScanf)
+template <class CHR> qlong OMscanf(qshort eq, qlong n, CHR ch, const CHR *a)
+{
+	if (n < 0)
+	{
+		if (eq)
+		{
+			for (qlong i = 0; i>n; i--)
+			{
+				if (*a-- == ch)
+					return i;
+			}
+		}
+		else
+		{
+			for (qlong i = 0; i>n; i--)
+			{
+				if (*a-- != ch)
+					return i;
+			}
+		}
+	}
+	else
+	{
+		if (eq)
+		{
+			for (qlong i = 0; i<n; i++)
+			{
+				if (*a++ == ch)
+					return i;
+			}
+		}
+		else
+		{
+			for (qlong i = 0; i<n; i++)
+			{
+				if (*a++ != ch)
+					return i;
+			}
+		}
+	}
+	return n;
+}
+
+#ifdef isOMNISCORE
+	#define Scanf(_wEq,_lNum,_cCh,_pP) OMscanf((_wEq), (_lNum), (qchar)(_cCh), (_pP))
+	#define byteScanf(_wEq,_lNum,_cCh,_pP) OMscanf((_wEq), (_lNum), (qbyte)(_cCh), (_pP))
+	void fillchar(void *pDst, qint4 lNum, qchar cCh);
+#else
+	#define MEMcharScanf(_wEq,_lNum,_cCh,_pP) OMscanf((_wEq), (_lNum), (qchar)(_cCh), (_pP))
+	#define MEMbyteScanf(_wEq,_lNum,_cCh,_pP) OMscanf((_wEq), (_lNum), (qbyte)(_cCh), (_pP))
+	void MEMmemFillChar(void *pDst, qint4 lNum, qchar cCh);
+#endif
+// End rmm9591
+
+// _CHRBASIC_HE_:
+#endif

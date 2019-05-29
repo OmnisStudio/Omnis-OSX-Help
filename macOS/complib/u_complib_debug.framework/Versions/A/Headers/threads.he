@@ -1,0 +1,35 @@
+/*************** Changes
+Date			Edit				Bug					Description
+ 14-Aug-08	pkiphone							iphone pass 1
+31-Aug-04	MHn0401			ST/PF/318		Implemented extcomp version of threadcritical.
+*/
+
+#ifndef _threads_he_
+#define _threads_he_
+
+#ifndef _xthreads_he_
+	#include "xthreads.he"
+#endif
+
+#if !defined(isiphone)	// pkiphone
+#ifndef _extcomp_
+	#include "extcomp.he"
+#endif
+#endif
+
+class threadCritical {
+
+protected:
+	qbool		mSet;
+	qbool		mCriticalBlockClaimed;	// rmm4995: true if the OS critical block has really been claimed
+	
+public:
+	threadCritical();
+	threadCritical(qbool pSet);
+	~threadCritical();
+	
+	void	set();
+	void	clear();
+
+};
+#endif

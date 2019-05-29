@@ -1,0 +1,207 @@
+/* $Header: svn://svn.omnis.net/trunk/Studio/O7EXE/INDY/localise.he 17915 2017-09-06 09:53:26Z bmitchell $ */
+//Omnis 7 Version 4.0: localisation support
+//Module LOC; File localise.he: public structures and definitions
+//Copyright (C) Blyth Holdings Inc 1996
+/* Changes
+Date			Edit				Bug					Description
+24-Aug-17	jmg0630			ST/LO/161		Refactored LOCdataItem::setData(&pString) to be an inline call through to the qchar* version of setData, to avoid code duplication.
+23-Aug-17	jmg0629			ST/LO/161		Decimal & thousand separators specifiec in omnisloc were not sent to the JS client (always used language's default ICU values).
+21-Aug-14	rmm8419			ST/NT/686		Programmatically changing $language is now silent - messages are only displayed when using the property inspector.
+23-Dec-13	rmm8186			ST/JS/913		Per-serverstack dpch and coch.
+15-Nov-11	rmm_jscs2								JavaScript client - client scripting part 2.
+14-Sep-11	rmm7241									More strings localised for JavaScript client.
+18-Jul-11	rmm7186									JavaScript client date formatting and parsing.
+13-Jan-10	rmm6861			ST/LO/138		Extended Studio 5.0 localisation locale support to allow locale variants.
+26-May-09	rmm_loc4								Studio 5.0 localisation: C++ resource translation.
+18-May-09	rmm_loc1								Studio 5.0 localisation: allow $language to be changed on the fly.
+16-Jan-09	rmm6572			ST/WO/2131	Certain date formats in languages where abbreviated month and day names are the same did not work correctly.
+01-Jun-07	rmm6088									Proper conversion of data files to Unicode.
+21-Apr-00	rmm3735			ST/FU/252		Use localised day names for the calendar (non-Web) component.
+12-Feb-96	rmm_cset								Added cset parameter to readDataItem
+18-Jan-96	rmm_loc									Initial implementation of localisation support.
+*/
+#ifndef _LOCALISE_HE_
+#define _LOCALISE_HE_
+
+// Includes
+#ifdef isOMNISCORE	// rmm3735
+	#ifndef _dminterface_
+	#	include "dminterf.h"
+	#endif
+	
+	// rmm6861
+	#ifndef _SSZ_HE_
+		#include "ssz.he"
+	#endif
+#endif
+
+// Constants
+// Field numbers (xns) in the localisation database
+// Xns in the language record; the language name is also the first (and only) xn in the current
+// language record, so that we use the same constant for that.
+const qshort	cLOCxnLanguageName = 1,													// Name of the language for which this is the record
+							cLOCxnNationalSortOrder = 2,										// National sort ordering
+							cLOCxnFirstDataItem = cLOCxnNationalSortOrder, 	// First data item (xn 2) for this language
+							cLOCxnDecimalPoint = 3,													// Decimal point character
+							cLOCxnThousandsSeparator = 4,										// Thousands separator character
+							cLOCxnFunctionParameterSeparator = 5,						// Function parameter separator
+							cLOCxnTableDotColumnSeparator = 6,							// Table.column separator
+							cLOCxnYesText = 7,															// Text for yes
+							cLOCxnNoText = 8,																// Text for no
+							cLOCxnOkText = 9,																// Text for ok
+							cLOCxnCancelText = 10,													// Text for cancel
+							cLOCxnTrueText = 11,														// Text for true
+							cLOCxnFalseText = 12,														// Text for false
+							cLOCxnAbbMonText = 13,													// Abbreviated text for Monday; other days of the week follow in consecutive xns
+							cLOCxnFullMondayText = 20,											// Full text for Monday; other days of the week follow in consecutive xns
+							cLOCxnAbbJanText = 27,													// Abbreviated text for January; other months follow in consecutive xns
+							cLOCxnFullJanuaryText = 39,											// Full text for January; other months follow in consecutive xns
+							cLOCxnAmText = 51,															// Text for AM
+							cLOCxnPmText = 52,															// Text for PM
+							cLOCxnOnText = 53,															// Text for On
+							cLOCxnOffText = 54,															// Text for Off
+							cLOCxnNameQuoteText = 55,												// Text for name quoting by the notation
+							cLOCxnImportDecimalPoint = 56,									// Import decimal point character
+							cLOCxnImportFieldSeparator = 57,								// Import field separator character
+							cLOCxnDefaultsFlag = 58,												// rmmuni: Boolean which indicates where default values come from 
+																															// (always False for non-Unicode; True means use sort order locale rather than default OS locale)
+							cLOCxnOrdinalDateSuffixes = 59,									// rmm_jscs2
+							cLOCxnLastDataItem = cLOCxnOrdinalDateSuffixes;	// UPDATE THIS CONSTANT IF YOU ADD MORE FIELDS // rmm_jscs2
+
+#ifdef isOMNISCORE	// rmm3735
+
+// Classes
+// This class is used to hold a single localisation data item
+class LOCdataItem
+{
+private:
+	void removeData ();															// Remove any data attached to the item
+public:
+	qshort	mLength;																// Length in characters of the data item
+	qchar		*mData;																	// Pointer to the data item
+
+	LOCdataItem ()																	// Class constructor
+	{
+		mData = 0;
+		mLength = 0;		
+	}
+	~LOCdataItem ()																	// Class destructor
+	{
+		removeData ();
+	}
+
+	// Method to set the data for this item; it removes any data already attached
+	qret setData(strxxx &pString) { // jmg0630
+		return setData(&pString[1], pString.length());
+	}
+	qret setData (qchar *pData, qlong pLength);										// Method to set the data for this item; it removes any data already attached // jmg0629
+	void getData (strxxx &pString);																// Method to return a copy of the data as a string
+	void getData (qchar* pBuffer, qshort pBufferSize);						// Method to return a copy of the data as a qchar*
+};
+
+// Start rmm7241: class holding data items for a language
+class LOCdataItemArray
+{
+public:
+	LOCdataItem		mDataItems[cLOCxnLastDataItem + 1];		// Indexed by xn; hence the +1, which means that item zero is not used.
+};
+// End rmm7241
+
+// This class is used to manage a linked list of languages
+// The data item contains the language name, and data for the language
+class LOClanguage : public LOCdataItem
+{
+public:
+	LOClanguage				*mNext;														// Address of next language in the linked list
+	NATordering				mNatOrdering;											// rmm7241: Locale for this language
+	LOCdataItemArray	mDataItemArray;										// rmm7241: Array of data items for this language
+};
+
+// This is the main localisation class.
+// Omnis constructs just one instance of this class at startup, and
+// destructs it at shutdown.
+// It provides the interface to the localisation data
+class LOCdata
+{
+private:
+	// Interface to the data manager
+	tqchan				*mLocDatabaseChannel;																									// Data manager channel to the localisation database
+	ttrans				*mTrans;																															// Data manager transaction
+	locptype  		mLocp;																																// Context for using the data manager
+
+	// List of language names present in the data file
+	LOClanguage		*mFirstLanguage;																											// First entry on linked list of languages present in the database
+	LOClanguage		*mLastLanguage;																												// Last entry on linked list of languages present in the database
+	LOClanguage		*mCurrentLanguage;																										// Pointer to the member of the linked list, for the language Omnis is currently using
+	lsttype				*mSortOrderLocales;																										// rmm6088: list of sort order locales for data file conversion
+	
+	// Localisation data items; these are stored as individually allocated items, in order to 
+	// minimise memory usage.
+	// The array always contains the data for the current language.
+	// The data is stored in the data manager character set.
+	// The array is sparse, in the sense that the national sort order, separator and name quote string do not use
+	// their entries in this array.
+	LOCdataItemArray	mDataItemArray;	// rmm7241
+
+	// National field ordering: 
+	NATordering		mNatOrdering;
+
+	qbool					mInitialised;																													// qfalse unless initialise () has been called and worked; if false, the public read methods return data from the resources
+	qbool					mSetCurrLangFileNumber;																								// rmm_loc1: qtrue when curr language file number has been set
+	qbool					mSetLangDataFileNumber;																								// rmm_loc1: qtrue when lang data file number has been set
+	qbool					mDuplicateDateAbbreviations;																					// rmm6572: qtrue if the abbreviated month names and abbreviated day names share at least one value (occurs in Italy - Tuesday and March are both MAR)
+
+	// Miscellaneous private methods
+	qret 					readLanguageDataItems (fldfnxn &pFileFnxn, LOCdataItemArray &pDataItemArray, NATordering &pNatOrdering, qbool pForLangEntry, qbool pForCurrentLanguage);	// Read the language data items into the mDataItems array // rmm7241
+	qret					setFileNumber (rstrno pFileNameResource, qlong pFileNumber,						// Set the file number for the named slot
+															 rstrno pErrorCode);
+	qret 					readFirstRecord (fldfnxn &pFileFnxn, fldfnxn &pIndexFnxn,							// Read the first record in a slot
+															 	 dmref &pSearchTable, handle &pSearchHan);
+	void 					finishSlotAccess (fldfnxn &pFnxn,	handle &pSearchHan,									// Clean-up after accessing a data file slot
+																	dmref &pSearchTable);
+	qret					addLanguage (str80 &pLanguage, str255 &pSortOrderLocale, qbool pIsCurrentLanguage, fldfnxn *pFileFnxn);	// Add a language to the linked list // rmm6088 // rmm7241
+	void					deleteLanguageNames ();																								// Delete the linked list of language names
+
+public:
+	static qbool	smOpeningLocalisationDatafile;	// rmmuni
+
+	// Initialisation and termination
+	LOCdata ();																																					// Class constructor
+	~LOCdata ();																																				// Class destructor
+
+	qbool					initialise ();																												// Open the data file, and read the data for the current language // rmm_loc1: qbool return value
+	void					terminate ();																													// Close the data file
+	qbool					initialised() { return mInitialised; } // rmmuni
+	qbool					duplicateDateAbbreviations() { return mDuplicateDateAbbreviations; }	// rmm6572
+
+	// Language management
+	qret					nextLanguage (strxxx &pLanguageName, void  *&pContext);								// Method to read the name of the next language in the database
+	qret					setLanguage (strxxx &pLanguageName, qbool pFromPropInspector);				// Method to set the current language in the data file; this new language is not used until Omnis restarts // rmm8419
+	void					getCurrentLanguage (strxxx &pLanguageName);														// Returns the name of the language Omnis is currently using
+
+	// Methods to access localisation items for the current language
+	void					readDataItem (qshort pFieldNumber, strxxx &pDataReturnedHere, qbool pStripAccelAndUpperCase = qfalse);
+	NATordering *	readNationalOrdering ();																							// Used to read the national field ordering
+	void					copyDataToList (fldfnxn &pListFieldFnxn);															// Copy the data to a list; used by the locdump function
+
+	// National ordering methods
+	qbool					isCurrLangSortOrder (tqchan *pChan);																	// Checks the current sort order against that in the supplied data file
+	qbool					setCurrLangSortOrder (tqchan *pChan, qbool pAskUser = qtrue);					// Sets the sort order in the supplied data file to that for the current language
+	qshort 				nationalCompare (exfldval *pValue1, exfldval *pValue2);								// Compares 2 national character values; both are in the mac character set
+	lsttype *			getSortOrderLocales() { return mSortOrderLocales; }										// rmm6088
+	
+	static void		readInitialLocale(STUlocale &pInitialLocale);													// rmm_loc4 // rmm6861
+	void					reloadStudioStringTable();																						// rmm_loc4: reload local\studio.stb
+	void					getLocale(STUlocale &pLocale, qret pErrorStatus = e_ok);							// rmm_loc4: get locale // rmm6861
+	
+	friend lsttype *LOCgetLocaleDataRow(qbyte *pLocaleId);	// rmm7241
+};
+
+// Externs
+extern LOCdata *gLOCdata;													// Pointer to the single localisation data instance
+
+extern lsttype *LOCgetLocaleDataRow(qbyte *pLocaleId);	// rmm7186
+
+#endif	// rmm3735: isOMNISCORE
+
+#endif

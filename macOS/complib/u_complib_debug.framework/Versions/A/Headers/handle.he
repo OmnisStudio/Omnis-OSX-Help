@@ -1,0 +1,72 @@
+/* $Header:   K:\extcomp\callback\handle.hev   1.10   05 May 2011 14:28:14   mmonscha  $ */
+
+// Q4 HANDLE.HE
+// external handle.he
+// Copyright (C) Blyth Holdings Inc 1997
+
+/**************** Changes ******************
+Date			Edit				Bug					Description
+08-May-08	rmm_handle							Implemented platform independent handle classes as part of mobile device support.
+23-Jul-02 MHUNICODE								Mac unicode changes
+30-Jan-98	mpm4434									fixes handleReAlloc
+********************************************/
+
+
+#ifndef _handle_he_
+#define _handle_he_
+
+RCCAPI qHandle	OMNISAPI HANglobalAlloc		( qlong pLength, 		qbool pZeroInited=qfalse );
+RCCAPI qbool		OMNISAPI HANglobalReAlloc ( qHandle& pHandle, qlong pNewLen ); // mpm4434
+RCCAPI void			OMNISAPI HANglobalFree	 	( qHandle pHandle );
+			 qlong						 HANglobalSize 		( qHandle pGlobal ); // mpm4434
+
+
+class qHandlePtr 
+{
+protected:
+	qHandle mHandle; 
+	qlong 	mOffset;
+	
+public:
+	qHandlePtr()                            		{ mHandle=0; }
+	qHandlePtr(qHandle pHandle, qlong pOffset) 	{ mHandle=pHandle; mOffset=pOffset; }
+	qHandlePtr(const qHandlePtr& pHptr)     		{ mHandle=pHptr.mHandle; mOffset=pHptr.mOffset; }
+
+	void    		operator =(qniltype qnil1)    			{ GDIignore(&qnil1); mHandle=0; } // mpm_cw
+	void    		operator =(const qHandlePtr& pHptr) { mHandle=pHptr.mHandle; mOffset=pHptr.mOffset; }
+	void    		operator +=(qlong pInc)        			{ mOffset+=pInc; }
+	void    		operator -=(qlong pDec)        			{ mOffset-=pDec; }
+	qHandlePtr 	operator +(qlong pInc) const   			{ qHandlePtr hptr1(mHandle,(mOffset+pInc)); return hptr1; }
+	qHandlePtr 	operator -(qlong pDec) const   			{ qHandlePtr hptr1(mHandle,(mOffset-pDec)); return hptr1; }
+	qbool   		operator !() const            			{ return !mHandle; }
+
+	// rmm_handle: removed Mac-specific block
+	qbyte*  operator *() const 						{	return MEMincAddr(mHandle->mData,mOffset);}
+	qbyte*  operator *(qlong pDel) const 	{	return MEMincAddr(mHandle->mData,(mOffset + pDel));}
+	qbyte&  operator [](qlong pDel) const {	return *(MEMincAddr(mHandle->mData,(mOffset + pDel)));}
+	qulong 	dataLen() const               { return mHandle->mDataLen; }
+	void  	dataLen(qulong pSize) const   { mHandle->mDataLen=pSize; }
+
+	qlong   getOffset() const             		{ return mOffset; }
+	void    getHandle(qHandle& pHan) const		{ pHan = mHandle; } 
+	void    set(qHandle pHan, qlong pOffset)	{ mHandle=pHan; mOffset=pOffset; }
+	void    setOffset(qlong pOffset)      		{ mOffset=pOffset; }
+	void    setNull()                     		{ mHandle=0; }	
+};
+
+// rmmuni:
+class qHandleTextPtr: public qHandlePtr
+{
+public:
+	qHandleTextPtr() : qHandlePtr()																								{}
+	qHandleTextPtr(qHandle pHandle, qlong pOffset) : qHandlePtr(pHandle, pOffset)	{}
+	qHandleTextPtr(const qHandlePtr& pHptr) : qHandlePtr(pHptr)										{}
+
+	// rmm_handle: removed Mac-specific block
+	qchar*  operator *() const 						{	return (qchar *) MEMincAddr(mHandle->mData,QBYTELEN(mOffset));}
+	qchar*  operator *(qlong pDel) const 	{	return (qchar *) MEMincAddr(mHandle->mData,QBYTELEN(mOffset + pDel));}
+	qchar&  operator [](qlong pDel) const {	return *(qchar *) (MEMincAddr(mHandle->mData,QBYTELEN(mOffset + pDel)));}
+	qulong  charLen() const								{ return QCHARLEN(mHandle->mDataLen); }
+};
+
+#endif

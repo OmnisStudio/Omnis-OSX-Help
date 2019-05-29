@@ -1,0 +1,109 @@
+/* $Header: svn://svn.omnis.net/trunk/Studio/O7EXE/INDY/extcrb.he 11384 2015-03-03 07:46:53Z bmitchell $ */
+
+//Q4 CRB.HE
+//OMNIS data collection type interface
+//Copyright (C) Blyth Holdings Inc 1997
+
+/**************** Changes ******************
+Date			Edit				Bug					Description
+03-Mar-15	rmm8513			ST/EC/1357	Added CRBgetLong64 and CRBsetLong64.
+27 JUN 01 mpm4733									moved qapp typedef to basics.h
+15 APR 99 mpm4570									EXTcrb::makeMine was not testing mIsMine
+18-Aug-98	DRSfval									Version for self contained fldval and list classes (changes mostly unmarked)
+19 NOV 97 mpmPRIs									External interface implementation
+21-Oct-97	AEPRT										Windows Print changes	[not marked]
+18 JUN 97	mpmPRI									New file
+
+********************************************/
+
+#ifndef	_EXTCRB_HE_
+#define _EXTCRB_HE_
+
+#ifndef _basics_
+#	include "basics.h"
+#endif
+
+
+// ######################## types ####################
+
+class crbtype;
+struct fldval;
+struct objinst;
+
+typedef crbtype*		qcrb;				// pointer to an internal OMNIS data collection		
+typedef qshort			qcrbindex;	// index to data item in qcrb ( starts at 1 )
+typedef fldval*			qfldval;		// pointer to a crb data item
+typedef	objinst*		qobjinst;		// Pointer to an internal object instance variable
+
+// ######################## functions ####################
+
+#pragma SET_RETURN_REGISTER_ON
+
+CRBAPI	qcrb		OMNISAPI	CRBcreate();
+CRBAPI	void		OMNISAPI	CRBdestroy( qcrb pCrb );
+CRBAPI	qcrb		OMNISAPI	CRBduplicate( qcrb pCrb );
+
+CRBAPI	qlong		OMNISAPI	CRBflatten( qcrb pCrb, qbyte* pBuffer, qlong pBufferLen );		// rmmuni
+CRBAPI	qbool		OMNISAPI	CRBunflatten( qcrb pCrb, qbyte* pBuffer, qlong pBufferLen );	// rmmuni
+CRBAPI	qlong		OMNISAPI	CRBgetFlatSize( qcrb pCrb );
+
+CRBAPI	qshort	OMNISAPI	CRBgetIndexCount( qcrb pCrb );
+CRBAPI	void		OMNISAPI	CRBgetData( qcrb pCrb, qcrbindex pIndex, qshort pFft, qshort pFdp, qfldval pCrbVal );
+CRBAPI	void		OMNISAPI	CRBsetData( qcrb pCrb, qcrbindex pIndex, qfldval pCrbVal );
+
+CRBAPI	qlong		OMNISAPI	CRBgetLong( qcrb pCrb, qcrbindex pIndex );
+CRBAPI	void		OMNISAPI	CRBsetLong( qcrb pCrb, qcrbindex pIndex, qlong pLongValue );
+CRBAPI	qlong64	OMNISAPI	CRBgetLong64(qcrb pCrb, qcrbindex pIndex); // rmm8513
+CRBAPI	void		OMNISAPI	CRBsetLong64(qcrb pCrb, qcrbindex pIndex, qlong64 pValue); // rmm8513
+
+CRBAPI	qreal		OMNISAPI	CRBgetReal( qcrb pCrb, qcrbindex pIndex );
+CRBAPI	void		OMNISAPI	CRBsetReal( qcrb pCrb, qcrbindex pIndex, qreal pRealValue );
+
+CRBAPI	qfldval	OMNISAPI	CRBgetDataRef( qcrb pCrb, qcrbindex pIndex, qbool pWillAlter );
+
+CRBAPI	qcrb		OMNISAPI	CRBgetCrbRef( qcrb pCrb, qcrb pTmpCrb, qcrbindex pIndex, qbool pWillAlter );
+
+// ######################## EXTcrb class ####################
+
+class EXTcrb
+{
+	public:
+		EXTcrb() { mCrb = CRBcreate(); mIsMine = qtrue; }
+		EXTcrb( qcrb pCrb ) { mCrb = pCrb; mIsMine = qfalse; }
+		~EXTcrb() { if ( mIsMine && mCrb ) CRBdestroy( mCrb ); }
+		
+		qcrb	crb() { return mCrb; }
+
+		void	makeMine() { if ( !mIsMine ) { mCrb = CRBduplicate( mCrb ); mIsMine = qtrue; } } // mpm4570
+		void	copy( EXTcrb& pCrb ) { if ( mIsMine && mCrb ) CRBdestroy( mCrb ); mCrb = CRBduplicate( pCrb.crb() ); mIsMine = qtrue; }
+
+		qlong	flatten( qbyte* pBuffer, qlong pBufferLen ) { return CRBflatten( crb(), pBuffer, pBufferLen ); }			// rmmuni
+		qbool	unflatten( qbyte* pBuffer, qlong pBufferLen ) { return CRBunflatten( crb(), pBuffer, pBufferLen ); }	// rmmuni
+		qlong getFlatSize() { return CRBgetFlatSize( crb() ); }
+		
+		qshort	getIndexCount() { return CRBgetIndexCount( crb() ); }
+		void		getData( qcrbindex pIndex, qshort pFft, qshort pFdp, qfldval pCrbVal ) { CRBgetData( crb(), pIndex, pFft, pFdp, pCrbVal ); }
+		void		setData( qcrbindex pIndex, qfldval pCrbVal ) { CRBsetData( crb(), pIndex, pCrbVal ); }
+		
+		qlong		getLong( qcrbindex pIndex ) { return CRBgetLong( crb(), pIndex ); }
+		void		setLong( qcrbindex pIndex, qlong pLongValue ) { CRBsetLong( crb(), pIndex, pLongValue ); }
+		
+		qreal		getReal( qcrbindex pIndex ) { return CRBgetReal( crb(), pIndex ); }
+		void		setReal( qcrbindex pIndex, qreal pRealValue ) { CRBsetReal( crb(), pIndex, pRealValue ); }
+		
+		qfldval	getDataRef( qcrbindex pIndex, qbool pWillAlter = qfalse ) { return CRBgetDataRef( crb(), pIndex, pWillAlter ); }
+
+		qcrb		getCrbRef( EXTcrb& pTmpCrb, qcrbindex pIndex, qbool pWillAlter = qfalse ) { return CRBgetCrbRef( crb(), pTmpCrb.crb(), pIndex, pWillAlter ); }
+		
+	private:
+		qcrb		mCrb;
+		qbool		mIsMine;
+};
+
+#pragma SET_RETURN_REGISTER_OFF
+
+#endif
+
+/* eof */
+
+

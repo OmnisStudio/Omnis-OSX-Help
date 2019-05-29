@@ -1,0 +1,670 @@
+/* $Header: svn://svn.omnis.net/trunk/Studio/O7EXE/INDY/commcomm.he 21608 2018-11-23 06:45:50Z bmitchell $ */
+
+//Q4 COMMCOMM.HE
+//OMNIS ORFC client/server comms interface
+//This file contains definitions which are common between the ORFC client and the OMNIS server
+//Copyright (C) Raining Data Corp 2002
+
+/**************** Changes ******************
+Date			Edit				Bug					Description
+23-Nov-18	rmm9841			ST/OO/133		Problems with inheritance when client method calls server method.
+15-Nov-18	jmg0815			ST/JS/1893	Added $closeurl() Remote form method and $showurl now returns an ID for closing.
+19-Jan-18	gra1125c								Support for DML mapping mode ($mapdmltodam)
+26-Jul-17	jmg0565			ST/BE/1298	Added Click & DoubleClick events to JS Complex Grid.
+24-May-17	rmm9394			ST/PF/1037	Multiple browser windows or tabs for the same browser client using the same web server only consume a single license.
+13-Oct-16	rmm9109			ST/BE/1161	$cinst.$objs.$remove() for remote form instances.
+18-Jul-16	rmm8982									Responsive design for JS client remote forms.
+23-Oct-15	rmm8670			ST/JS/1268	Push (using long polling) for JS client.
+22-Sep-15	rmm8620									Swagger 2.0.
+14-Jan-15	rmm8482									JS client complex grid performance improvements.
+02-Sep-14	rmm_rws7								RESTful web services event/push/threading support.
+18-Jul-14	rmm_rws2								RESTful web services phase 2.
+21-May-14	rmm8331			ST/JS/987		Added evDragBorder.
+27-Mar-14	rmm_rws									RESTful Web Services support.
+19-Dec-13	jmg0046									Added functionality for setting the value of a single column in a (nested) list.
+12-Sep-13	rmm8103			ST/JS/872		Improved performance when loading several subforms during form construction.
+29-Aug-13	rmm8091			OE-2349			Omnis X deployment web service needs to run on the main stack.
+19-Aug-13	rmm64bitux							Linux 64 bit port.
+01-Jul-13	rmm8028			ST/JS/832		Remote task string table is now sent to client as a JS script file.
+11-Mar-13	rmm7868									New string table mechanism for JavaScript client.
+01-Feb-13	rmm7822			ST/JS/712		Remote form instance $objs.$add().
+28-Jan-13	rmm7818			ST/JS/717		Added $root.$sfsmember().
+11-Oct-12	rmm7674									$close() changes for JS client remote subforms.
+24-Sep-12	rmm_pdf									Omnis PDF device for all platforms - modified version of Linux print device.
+02-Aug-12	rmm7590			ST/JS/400+1	$jslocaltime property for remote tasks.
+27-Jun-12	rmm7533									Improved comms reliability for JS client.
+15-Nov-11	rmm_jscs2								JavaScript client - client scripting part 2.
+09-Nov-11	rmm7328									MO/MB serial number support.
+09-Nov-11	rmm7326			ST/BE/701		JavaScript client - problem with empty character fields.
+24-Oct-11	rmm_jscs								JavaScript client - caching and preparation for client scripting.
+09-Aug-11	rmm7215			ST/BE/582		JavaScript client file upload and download support.
+25-May-11	rmm7138									Mobile device wrapper apps.
+04-Apr-11	rmm7098			ST/WT/1741	Firefox 4 issues on Win32.
+11-Mar-11	rmm7095									JavaScript client data grid component.
+18-Feb-11	rmm7086									JavaScript client tree component.
+15-Feb-11	rmm7085									Improved performance of HTTP server for JavaScript client.
+08-Feb-11	rmm7084									JavaScript client movie player control.
+19-Jan-11	rmm7073									Use HTTP POST to communicate with server, to avoid issues with escaped text and improve performance.
+21-Dec-10	rmm7029									Added JSON message log, to help debugging the JS client.
+29-Nov-10	rmm7008									Optionally re-instate client method execution for iOS.
+09-Sep-10	rmm_jsc									JavaScript client core changes.
+18-Feb-10	rmm6902			ST/PF/667		Added Close trace log command.
+02-Feb-10	rmm6888			ST/BE/525+ST/WT/1546	$clientcommand.
+13-Aug-09	rmm6734									Improvements to iPhone paged pane support.
+04-Aug-09	rmm6710			ST/WT/1464	evAnimationsComplete event for iPhone.
+26-May-09	rmm_loc4								Studio 5.0 localisation: C++ resource translation.
+16-Apr-09	rmm_iphone24						Navigation bar field.
+11-Feb-09	rmm_iphone7							Client method execution issues.
+05-Feb-09	rmm_iphone5							Improved resiliency of mobile device web client comms.
+23-Jan-09	rmm_iphone2							iPhone test form changes and removed dependency on _tcs... calls.
+03-Nov-08	rmm6489									Added mobile device screen size configuration.
+22-Jul-08	rmm_mobile2							Quit omnis command for client (Windows Mobile only).
+02-Jul-08	rmm_rfmenu							Context menus for remote forms.
+18-Feb-08	rmm_mobile							Mobile device support.
+14-May-07	rmmunilnx3							Unicode Linux stage 3.
+05-May-06	rmm5745			ST/WT/1098	Drag and drop did not work in OSX Web Client.
+22-Feb-06 MHMACH10                Mach-O Automatic update support for webclient
+28-Nov-05	rmm_wsk									Implemented Omnis client for Omnis web service.
+03-Nov-05	rmm_wsg									Define web service method list and row parameters to have a table instance if required.
+02-Nov-05	rmm_wsf									Use stricter XML schema types in the WSDL file for Omnis Web Services.
+28-Oct-05	rmm_wse									Made WSS error log easier to use.
+25-Oct-05	rmm_wsd									Moved some logic from the WSS library to the core, to improve performance.
+17-Oct-05	rmm_wsa									Web services - improved data structures with performance and thread safety in mind.
+14-Oct-05	rmm_ws8									Pass Web Service request into the core.
+10-Oct-05 MHMACH1                 Mac Intel changes
+06-Oct-05	rmm_ws6									Implemented HTTP support in the Omnis server.
+27-Sep-05 MHMACH                  Mach-o changes
+22-Jul-05	rmm5446									Improved web client socket bind retry logic.
+23-Jun-05	rmm5408			ST/PF/386		Repeatedly refreshing Internet Explorer locked up the browser.
+10-Mar-05	PK6466			ST/WO/1712	ellipsis are now optional
+02-Mar-05	rmm5289			ST/WT/933		Non-Unicode client can now update to become the Unicode client.
+07-Dec-04	rmm5190			ST/NT/497		Added $clib.$prefs.$reportcalculationerrors, to report errors in calculations, such as divide by zero.
+11-Oct-04	rmm_cldlu								Unicode control download.
+17-Sep-04	rmmuni_loc							Unicode locale() function.
+07-Sep-04 pknsapi									fat client windows
+02-Jul-04 MHCW9										CW9 changes.
+02-Jun-04	rmm4977			ST/WT/856		Added keyboard state hash variable support for web client.
+14-Nov-03 pkisalpha								Client alpha support
+09-Sep-03	rmm4694			ST/PF/265		When running as a service, retry socket bind for 30 seconds; when not running as a service, retry for 5 seconds.
+29-Aug-03	rmm4682			ST/DB/513		Fixed crash that occurred when using the debugger to step into an inherited method called using Do method.
+27-Nov-02	rmm4329			ST/WT/678		Added programmatic control over server comms timeout.
+07 FEB 02 mpmClientDebug					Implements client debugging
+08 AUG 01 mpmSubform2							Implements multiple subforms
+23 JUL 01 mpmSubform							Implements remote subforms
+16-Nov-00	rmm3935									Added webmessage() function.
+01-May-00	rmm3740									Added compression of initially downloaded form.
+16-Mar-00	rmm3681									Compatibility changes to allow a 2.4 client to access a 3.0 server using load sharing.
+14-Feb-00	rmm3624									Added evFormToTop event to remote form, to support multiple forms.
+02-Feb-00	rmm3616									Web Client Multiple Forms.
+28-Jan-00 MHHBOX			ST/WT/054		Multiple selection enhancement for headed list box.
+23-Dec-99	rmm_cldl								Automatic update of the main client components (orfcmain etc).
+17-Nov-99	rmm3525									Added 3rd argument to $showurl, to set the properties of the new browser window.
+19-Oct-99	rmm_ls									Studio 3.0 Load Sharing.
+07-Oct-99	DRS5100									Client method execution
+22-Sep-99	rmm_thindl							Control download for Web Client.
+30-Aug-99	PK4935									$changeform for client
+06 AUG 99 mpmTHINv								Fixes MAC client form caching
+2-Jul-99	DRS5000									Multithreading
+16-Mar-99	rmm3369									Added ability to abort current comms message on timeout.
+04-Mar-99	rmm3365									Mac comms for local testing.
+24 FEB 99 mpmTHINu								Client form caching
+09 FEB 99 mpmTHINq3								Showmessage can now take a title
+02 FEB 99 mpmTHINq								Implements $setcurfield and $showmessage
+20 JAN 99 mpmTHINm								Deals with inherited instance variables
+21-Jan-99	PK4868									classname support at runtime
+13-Jan-98	rmm3298									ORFC clipboard support.
+10-Dec-98	rmm3284									Added client IP address to messages; improved options for OMNIS server property.
+11 NOV 98 mpmTHINf								Thin client custom events
+05 NOV 98	mpmTHINe								Remote form implementation
+09-Nov-98 PK											Added eORFCmessAESetFocus
+13-Oct-98	PKrcc2									Custom messages
+12-Oct-98	PK_comm									New messages
+06-Oct-98	rmm_comm								ORFC comms implementation.
+********************************************/
+
+#ifndef	_COMMCOMM_HE_
+#define _COMMCOMM_HE_
+
+// rmm_cldl:
+#ifndef ismobile	// rmm_mobile: avoid packing on mobile devices as alignment issues cause crashes
+	#ifdef SET_BYTE_PACKING_ON
+		GCC_SET_BYTE_PACKING_ON // MHMACH
+		#pragma SET_BYTE_PACKING_ON
+	#endif
+#endif
+
+#define COMM_MIN_LEN_OF_MESSAGE_SENT_BY_CLIENT	23						// Minimum length in bytes of message sent by client // rmm3284: added 4 bytes for client IP address
+#define COMM_MIN_LEN_OF_MESSAGE_SENT_BY_SERVER	18						// Minimum length in bytes of message sent by server
+#define COMM_MESSAGE_MARKER											"OMNIS_ORFC"	// Marker sent in all messages
+const unsigned int COMM_MESSAGE_MARKER_LEN	= 10;							// Length of marker MHCW9 // rmm64bitux
+#define COMM_MESSAGE_VERSION1		1															// Message version sent in all messages
+#define COMM_VERSION_FLAG_HEAD_METHOD 0x4000									// rmm_pdf: Sent with the version - if true, this is a HEAD method request
+
+// rmm3681: client version for 3.0 and later clients (until we need to change it again)
+// We send this in the client IP address field of the message, except when local testing, when it stays as zero.  
+// For 2.4 and earlier, this was always sent as zero.  Note - we only send zero when local testing, so that
+// the client IP address property of the remote task remains as 0.0.0.0 in this case.
+#define COMM_CLIENT_VERSION30	1
+
+// Communication messages
+enum eORFCmess
+{
+	eORFCmessNone = 0,
+	eORFCmessConnect = 1,			// connect message (send to server)
+	eORFCmessRConnect = 2,		// connect result (received from server)
+	eORFCmessDisconnect = 3,	// disconnect message (send to server)
+	eORFCmessRDisconnect = 4,	// disconnect result (received from server)
+	eORFCmessEvent = 5,				// event message (send to server)
+	eORFCmessREvent = 6,			// event result (received from server)
+	eORFCmessHTML = 7,				// request for HTML report (parameters are type=value&type1=value1&... from HTML form)
+	eORFCmessRHTML = 8,				// result of HTML report (parameters are pure HTML)
+	eORFCmessReConnect = 9,		// reconnect message (send to server)				// PK4868
+	eORFCmessRReConnect = 10,	// reconnect result (received from server)	// PK4868
+	eORFCmessMethod = 11,			// method call (send to server)  // DRS5100
+	eORFCmessRMethod = 12,		// method call result (received from server) // DRS5100
+	eORFCmessMethodError = 13,	  // report error in method execution (send to server)  // DRS5100
+	eORFCmessRMethodError = 14,		// acknowledge eORFCmessMethodError (received from server) // DRS5100
+	eORFCmessRequestLoadStats = 15,		// rmm_ls: sent from load sharing process to OMNIS server to request load statistics	
+	eORFCmessRRequestLoadStats = 16,	// rmm_ls: contains load statistics sent by OMNIS server to load sharing process
+	eORFCmessDownloadControl = 17,	// rmm_thindl: request from client to download a control
+	eORFCmessRDownloadControl = 18,	// rmm_thindl: response to a download control request
+	eORFCmessOpenAnotherForm = 19,	// rmm3616: open a further form in the context of the same remote task instance
+	eORFCmessROpenAnotherForm = 20,	// rmm3616: response to confirm whether or not the new form was opened
+	eORFCmessOpenSubform = 21,		// request to open and return a subform (send to server) // mpmSubform
+	eORFCmessROpenSubform = 22,		// open subform result containing subform classdata (received from server) // mpmSubform
+	eORFCmessCloseSubform = 23,		// request to close a subform (send to server) // mpmSubform
+	eORFCmessRCloseSubform = 24,	// close subform result (received from server) // mpmSubform
+
+	// rmm_ws6: web service messages
+	eORFCmessWebServicePost = 27,				// Post request to web service (send to server)
+	eORFCmessRWebServicePost = 28,			// Response to post to web service, successful execution (received from server)
+	eORFCmessRWebServicePostFault = 29,	// Response to post to web service, soap fault (received from server)
+	eORFCmessWebServiceGet = 30,				// Get request to web service (send to server)
+	eORFCmessRWebServiceGet = 31,				// Response to get from web service (received from server)
+	eORFCmessiPhoneTestFormConnect = 32,	// rmm_iphone2: iPhone client connecting in test form mode
+	eORFCmessRiPhoneTestFormConnect = 33,	// rmm_iphone2: Response to eORFCmessiPhoneTestFormConnect; content is new client configuration; connection remains open unless new configuration is empty
+	// Start rmm_jsc: JavaScript client
+	eORFCmessJavaScript = 34,						// Request from JavaScript client (parameters are ORFCMess=value&ORFCParam=<json>)
+	eORFCmessRJavaScript = 35,					// JavaScript response (encoded as JSON)
+	eORFCmessJavaScriptFile = 36,				// Request from JavaScript client for a file
+	eORFCmessRJavaScriptFile = 37,			// File response
+	// End rmm_jsc
+	eORFCmessRJavaScriptFileRange = 38,	// rmm7084: File range response
+	eORFCmessRJavaScriptFileUnchanged = 39,	// rmm7085: Unchanged file response
+	eORFCmessJavaScriptTestFormConnect = 40,	// rmm7138: JavaScript wrapper app client connecting in test form mode
+	eORFCmessRJavaScriptTestFormConnect = 41,	// rmm7138: Response to eORFCmessJavaScriptTestFormConnect; content is new HTML file name; connection remains open unless new configuration is empty
+	eORFCmessJavaScriptFileUpload = 42,				// rmm7215: JavaScript client file upload (received from Web Server plugin)
+	eORFCmessRJavaScriptFileUpload = 43,			// rmm7215: Response to eORFCmessJavaScriptFileUpload
+	eORFCmessGetClientScript = 44,						// rmm_jscs: Get client script request
+	eORFCmessRGetClientScriptNotModified = 45,// rmm_jscs: Response to get client script when script has not changed
+	eORFCmessRGetClientScript = 46,						// rmm_jscs: Response to get client script when script has changed or never been loaded before
+	eORFCmessBulkLoad = 47,										// rmm8103: bulk subform load (send to server)
+	eORFCmessRBulkLoad = 48,									// rmm8103: bulk subform load result (received from server)
+	eORFCmessRestful = 49,										// rmm_rws: Request to RESTful server (send to server)
+	eORFCmessRRestful = 50,										// rmm_rws: Result of request to RESTful server (received from server)
+	eORFCmessRRestfulStart = 51,							// rmm_rws: Result of request to RESTful server when there will be more content to come (received from server) // rmm_rws7
+
+	eORFCmessIgnore = 93,									// rmm_iphone7
+	eORFCmessErrorDisconnected = 94,			// rmm_iphone5: message to tell the client it has been disconnected
+	eCOMMerrorRetry = 95,									// rmm_iphone5: retry the request
+	eORFCmessAlreadyBuilt = 96,						// rmm_iphone5: used when retrying on application restart - the message is already completely built
+	// rmm3369: abort: send this message in order to abort the current message
+	eORFCmessDoAbort = 97,
+	eORFCmessAborted = 98,		// Sent to ORFC as the result, when message has been aborted
+
+	// Error indicator - this value is sent in a comms result notification to indicate that an error occurred
+	eORFCmessError = 99,
+
+	// messages for parent containers
+	eORFCmessNotForServer = 100,// All messages greater than or equal to this value are not sent to the OMNIS server
+	eORFCmessCtrlResize = 101,	// the parent container should be resized (pParams points to qrect)
+	eORFCmessCtrlDownLoad = 102,	// the parent container should down load the item (pParams points to char* )
+	eORFCmessCtrlSetFocus = 103,	// PK_comm the parent container should set the API focus to the hwnd passes in pParams
+	eORFCmessAESetFocus = 104,		// Sent to the ActiveX so focus is set on the main container
+	eORFCmessTrackingMenu = 105,		// Sent to the ActiveX while a context menu is being tracked // rmm3298
+	eORFCmessRedirectClient = 106,		// Sent to the container to redirect client // PK4906
+	eORFCmessChangeForm = 107,				// PK4935 sent to container to change form
+	eORFCmessReadVersion = 108,				// rmm_cldl: sent to container to read its version
+	eORFCmessClientUpdate = 109,			// rmm_cldl: update the client with the supplied list of files
+	eORFCmessGetCommsTimeout = 110,		// rmm4329: get the server comms timeout
+	eORFCmessSetCommsTimeout = 111,		// rmm4329: set the server comms timeout
+	eORFCmessAECanClick = 112,				// pknsapi
+	eORFCmessGetLocale = 113,					// rmmuni_loc: Get the locale (Unicode OSX only)
+	eORFCmessWaitForCommComplete = 114,	// rmm5408: wait for message response to arrive
+	eORFCmessRunningStandardAlert = 115,// rmm5745: tells plugin if a standard alert is running or not
+	eORFCmessCtrlScrollToView = 116,		// rmm_mobile: tells container to scroll current field (via a rectangle) to view (mobile devices only)
+	// rmm_mobile: 117 is available (no longer used)
+	eORFCmessEnableMenuBar = 118,				// rmm_rfmenu: tells container to enable or disable menu bar (mobile devices only)
+	eORFCmessSetMenuBar = 119,					// rmm_rfmenu: tells container to set the titles in the menu bar (mobile devices only)
+	eORFCmessMenuDone = 120,						// rmm_rfmenu: tells container that soft key menu has been processed (mobile devices only)
+	eORFCmessGetSoftKeyBarHwnd = 121,		// rmm_rfmenu: gets the soft key bar HWND from the container (mobile devices only)
+	eORFCmessQuit = 122,								// rmm_mobile2: tells the container to quit (mobile devices only)
+	eORFCmessGetMessageBoxHwnd = 123		// rmm7098: Get HWND for MessageBox API
+};
+
+inline int ORFCisWebServiceMessage(eORFCmess pMess) { return (pMess >= eORFCmessWebServicePost && pMess <= eORFCmessRWebServiceGet); }	// rmm_ws6
+
+// PK_comm
+enum eORFCparam // parameter types ( value of xnORFCparmType )
+{
+	eORFCparamStylesCached = -9,		// negativeparameter types for cached items // mpmTHINv
+	eORFCparamFontsCached = -8,
+	eORFCparamBitmapsCached = -7,
+	eORFCparamOpenFormCached = -4,
+	
+	eORFCparamConnectionID = 1,			// the connection ID 
+																		// send to server ( Data1 = conn Index, Data2 = conn ID, Data3 = formNumber, Data4 = client version, Data5 = canDebug )
+																		// send to client ( Data1 = conn Index, Data2 = conn ID, Data3 = isSecure, Data5 = canDebug ) // mpmClientDebug
+	eORFCparamVersion = 2,					// OMNIS version number ( Data1 = major , Data2 = minor, Data3 = cached form mod dates ) // mpmTHINu
+	eORFCparamConnectionParam = 3,	// Connection Parameter ( Data1 = parameter name , Data2 = value )
+	eORFCparamOpenForm = 4,					// Open Form ( Data1 = form number, Data2 = classdata , Data3 = instance vars data, Data4 = instance vars def )
+	eORFCparamSubForm = 5,					// Indicates to client that subsequent eORFCparamOpenForm is a subform ( Data1 = parent form number, Data2 = subform fldno ) // mpmSubform
+	eORFCparamInstanceVars = 6,			// Contains new data for instance vars ( Data1 = form number , Data2 = instance vars data )
+	eORFCparamBitmaps = 7,					// Contains cached bitmap pages ( Data1 = ID index list, Data2 = pages list )
+	eORFCparamFonts = 8,						// Contains list of fonts ( Data1 = List of font names )
+	eORFCparamStyles = 9,						// Contains styles for platform ( Data1 = Style information )
+	eORFCparamSetProperty = 10,			// Set property ( Data1 = form number, Data2 = obj number, Data3 = property number, Data4 = value )
+	eORFCparamRedraw = 11,					// Redraw ( Data1 = form number, Data2 = object number )
+	eORFCparamEvBefore = 12,				// Before event needs to exec on server ( Data1 = form number, Data2 = object number, Data3 = WndProc Message object )
+	eORFCparamEvAfter = 13,					// After event needs to exec on server ( Data1 = form number, Data2 = object number, Data3 = WndProc Message object )
+	eORFCparamEvGoto = 14,					// Normally result of Before/After but could be sent due to SNA ( Data1 = form number, Data2 = object number, Data3 = WndProc Message object )
+	eORFCparamEvNoAction = 15,			// Normally result of Before/After where method quits ( Data3 = WndProc Message object )
+	eORFCparamEvCustom = 16,				// PKrcc2 sent for customer events ( Data1 = form number, Data2 = object number, Data3 = evCode, Data4 = ParamList )
+	eORFCparamEvCustomR = 17,				// PKrcc2 reply to client ( Data1 = form number, Data2 = object number, Data3 = evCode, Data4 = result )
+	eORFCparamSetInstVar = 18,			// Contains new data for an instance variable ( Data1 = form number, Data2 = xn of combined instance vars, Data3 = value ) // mpmTHINm
+	eORFCparamSetInstVarSel = 19,		// Change current line of list ( Data1 = form number, Data2 = xn of combined instance vars, Data3 = value ) // mpmTHINm
+	eORFCparamShowMessage = 20,			// Display an ok message ( Data1 = message text[, Data2 = message title] ) // mpmTHINq3
+	eORFCparamRedirectClient = 21,	// Redirect Client into new window ( Data1 = url ) // PK4906
+	eORFCparamMethod = 22,					// Send for method calls ( Data1 = form number, Data2 = object number, Data3 = stack id, Data4 = methodinfo ) // DRS5100
+	eORFCparamMethodR = 23,					// Reply to method calls ( Data1 = form number, Data2 = object number, Data3 = stack id, Data4 = result ) // DRS5100
+	eORFCparamChangeForm = 24,			// PK4935 Client call to change form ( Data1 = new form name )
+	// rmm9841: Removed unused method error parameters (25 and 26)
+	eORFCparamNeedsCoreData = 27,		// Core data request ( Data1=Omnis version in cache) //DRS5100
+	eORFCparamCoreData = 28,				// Reply to core data request ( Data1=Omnis version string, Data4 = list containing core data ) // DRS5100
+	eORFCparamControlDownloadList = 29,	// rmm_thindl: list of available controls returned in connect responses
+	eORFCparamControlToDownload = 30,		// rmm_thindl: control to download
+	eORFCparamControlData = 31,					// rmm_thindl: returned data for the control
+	eORFCparamSetInstVarSelState = 32,	// Change current line of list with selection state ( Data1 = form number, Data2 = xn of combined instance vars, Data3 = value, Data4 = selection state ) // MHHBOX
+	eORFCparamSetInstVarCurSelState = 33,	// Change current line of list with selection state for the current line( Data1 = form number, Data2 = xn of combined instance vars, Data3 = value) // MHHBOX
+	eORFCparamMakeFormCurrent = 34,	// Make the form current (and therefore visible) ( Data1 = form number ) // rmm3616
+	eORFCparamOpenNamedForm = 35,		// Tells the client to request that this form is opened ( Data1 = form name ) // rmm3616
+	eORFCparamCloseForm = 36,				// Close the form ( Data1 = form number ) // rmm3616
+	eORFCparamOpenFormCompressed = 37,	// rmm3740: Open form (like eORFCparamOpenForm, except the class data is compressed)
+	eORFCparamIsAlpha = 38,							// pkisalpha - indicator if alpha is supported.
+	eORFCparamDesignDPI = 39,						// rmm_mobile: Design DPI of library containing form: Data1 = Win,Data2 = OSX,Data3 = Linux,Data4 = Windows Mobile
+	eORFCparamCloseURL = 40,						// jmg0815: $closeurl() method of a Remote Form
+	eORFCparamOpeningContextMenu = 41,	// rmm_rfmenu: Context menu in the process of opening - Data1 is menu list, Data2 is next ident for dynamically added lines
+	eORFCparamSetFormMenus = 42,				// rmm_rfmenu: New menus for the remote form (a list)
+	eORFCparamClientCommand = 43,				// rmm6888: $clientcommand
+	eORFCparamSetInstVarSelStateOnly = 44,	// rmm_jsc: New for JavaScript client - change selection state of line only - (Data1 = form number, Data2 = xn of combined instance vars, Data3 = line number, Data4 = new selection state)
+	eORFCparamStringTables = 45,						// rmm7028: JavaScript client only (Data 1 = remote form string table data, Data 2 = jsclient.stb (built-in translations for JavaScript strings, only present in connect response)
+	eORFCparamSetInstVarColumn = 46,				// rmm7086: Set a single column in a list
+	eORFCparamSetInstVarSelStateAll = 47,		// rmm7095: Set the entire selection state of a list
+	eORFCparamSetInstVarEmpty = 48,					// rmm7326: Set instance variable to empty ( Data1 = form number, Data2 = xn of combined instance vars, Data3 = fft )
+	eORFCparamClientInfo = 49,							// rmm7328: First parameter of connect request from JS client
+	eORFCparamClosedSubform = 50,						// rmm7674: Subform has been closed by $close() on the server ( Data1 = closed form number )
+	eORFCparamSFSMember = 51,								// rmm7818: SFS member information for a subform in a SFS
+	eORFCparamAddControl = 52,							// rmm7822: Add a new control to the form (Data1 = row of control information)
+	eORFCparamStringTableVar = 53,					// rmm8028: Name of string table variable loaded via script
+	eORFCparamBulkLoad = 54,								// rmm8103: A bulk load message embedded in another message (Data1 = message parameter array)
+	eORFCparamCachedDataId = 55,						// rmm8103: Identified of the saved cached data for the subform
+	eORFCparamSetInstVarNestedCell = 56,		// jmg0046: Set the specified cell of a (possibly nested) list instance variable.
+	eORFCparamClearExceptions = 57,					// rmm8482: Clear complex grid exceptions (Data 1 = form number, Data 2 = obj number, Data 3 = row number (can be zero))
+	eORFCparamDeleteControl = 58,						// rmm7822: Remove a control from the form (Data 1 = form number, Data 2 = object name)
+	eORFCparamOmnisClientID = 59						// rmm9394: Identifier (UUID) of Omnis client (allows multiple pages for the same site in a single browser to share the same license from the available server user count)
+};
+
+
+// mpmClientDebug start
+// execution modes returned by server (see eORFCparamDebugExec)
+enum eORFCdebugExec
+{
+	eORFCdebugExecNormal = 0,			// normal execution, no debugger intervention
+	eORFCdebugExecGo = 1,					// go
+	eORFCdebugExecStep = 2,				// execute current line only (step into called methods)
+	eORFCdebugExecStepOver = 3,		// execute current line only (do not step into called methods)
+	eORFCdebugExecTrace = 4,			// carry on executing and send trace messages to server
+	eORFCdebugExecClear = 5,			// clear the execution stack
+	eORFCdebugExecKill = 6				// clear the execution stack and quit browser (do not send further messages to server)
+};
+
+
+const short
+	// column numbers for stack list (see eORFCparamDebugStack)
+	xnORFCstackLocals = 1,
+	xnORFCstackParameters = 2,
+	xnORFCstackFormNumber = 3,
+	xnORFCstackObjectNumber = 4,
+	xnORFCstackSMethodNumber = 5,	// server method number as stored in class data
+	xnORFCstackCMethodNumber = 6,	// client unique method number as on stack
+	xnORFCstackLineNumber = 7,
+	xnORFCstackInheritanceLevel = 8,	// rmm4682: inheritance level of method
+	xnORFCstackServerFldno = 9,				// rmm4682: server field number
+
+	// columns for event parameter list in stack list
+	xnORFCparamCode = 1,
+	xnORFCparamName = 2,
+	xnORFCparamVal = 3;
+
+// mpmClientDebug ends
+
+// Start rmm_rws
+// enum to represent HTTP methods supported by the RESTful server
+enum eHttpMethod
+{
+	// These method enums must match the values of the kHttpMethod... constants in OWEBHTTP.java and OmnisRestServlet.java
+	eHttpDelete = 0,
+	eHttpGet = 1,
+	eHttpHead = 2,
+	eHttpOptions = 3,
+	eHttpPatch = 4,
+	eHttpPost = 5,
+	eHttpPut = 6,
+	eHttpTrace = 7,
+
+	eHttpFirstMethod = 0,
+	eHttpLastServerMethod = 6,	// rmm_rws2: Update this if you add a new method (see next line too)
+	eHttpLastMethod = 7,		// Update this if you add a new method - trace is excluded from the server, so must always have the last value
+	eNOTHttpMethod = -1			// rmm_rws2
+};
+
+// JSON member names
+#define JSONREST_REQUESTOBJ_MEMBER_URI							"uri"
+#define JSONREST_REQUESTOBJ_MEMBER_METHOD						"method"
+
+#define JSONREST_RESPONSEOBJ_MEMBER_HTTPSTATUS			"status"
+#define JSONREST_RESPONSEOBJ_MEMBER_HTTPSTATUSTEXT	"statustext"
+
+#define JSONREST_OBJ_MEMBER_HEADERS									"headers"
+
+#define JSONREST_AUTOCHUNK_MEMBER										"autochunk"	// rmm8670
+
+// Omnis error response header
+#define OMNIS_ERROR_HEADER "Omnis-error"
+// End rmm_rws
+
+// PK_comm
+const short	// column numbers for parameter list
+	xnORFCparmType	= 1, // see eORFCparam
+	xnORFCparmData1 = 2, // dependent on parm type
+	xnORFCparmData2 = 3, // dependent on parm type
+	xnORFCparmData3 = 4, // dependent on parm type
+	xnORFCparmData4 = 5, // dependent on parm type // mpmTHINe
+	xnORFCparmData5 = 6, // dependent on parm type // mpmSubform2
+	xnORFCparmData6 = 7, // dependent on parm type // rmm4682
+	cORFCdataParmCount = 6,	// rmm_jsc: UPDATE THIS COUNT IF YOU ADD ANOTHER DATA PARAMETER
+	xnORFCcidParam7 = 8;	// rmm7533: Special last parameter for JS client connection id
+
+const short // column numbers for instance vars definition list // mpmTHINp
+	xnORFCdataName			= 1,
+	xnORFCdataLevel			= 2,
+	xnORFCdataType			= 3,
+	xnORFCdataSubtype		= 4,
+	xnORFCdataMaxlen		= 5,
+	xnORFCdataXn				= 6; 	 	 //DRS5100
+	
+// rmm9841: Removed unused maxLevel and Offset
+const short // column numbers for method info crb //DRS5100
+	xnORFCminfoRecipient= 1,  
+	xnORFCminfoAnum1 		= 2,  
+	xnORFCminfoAnum2 		= 3,
+	xnORFCminfoMinLevel = 4;
+	
+const short // column numbers for error info crb //DRS5100
+	xnORFCeinfoCode			= 1,
+	xnORFCeinfoText			= 2;
+
+const short // column numbers for core data crb //DRS5100
+	xnORFCcdConstants		= 1,  //rdef for fnConstants 
+	xnORFCcdEvparms 		= 2,  //rdef for fnEvparms
+	xnORFCcdHash 				= 3,  //rdef for fnHash
+	xnORFCcdSSZ					= 4,	//rmm6489: Raw data for screen size configuration
+	xnORFCcdStringTable	= 5;	//rmm_loc4:client.stb
+
+const int // event mask bits for form-level and page pane/complex grid events	// rmm3624 - these identify individual bits in the event mask for the form or page pane // rmm64bitux
+	evORFCformToTop = 1,
+	evORFCscreenOrientationChanged = 2,	// rmm_mobile
+	evORFCopenContextMenu = 4,					// rmm_rfmenu
+	evORFCexecuteContextMenu = 8,				// rmm_rfmenu
+	evORFCsubFormToTop = 0x10,					// rmm_iphone24
+	evORFCanimationsComplete = 0x20,		// rmm6710
+	evORFCuserChangedPage = 0x40,				// rmm6734
+	evORFCdragBorder = 0x80,						// rmm8331
+	evORFClayoutChanged = 0x100,				// rmm8982
+	evORFCclick = 0x200,								// jmg0565
+	evORFCdoubleClick = 0x400;					// jmg0565
+
+// Start rmm_thindl
+// List columns in the server generated list of controls available for download.
+const short
+	xnORFCcdlListNamecol			= 1,						// Control name
+	xnORFCcdlListPlatformList	= 2;						// List of platforms
+
+const short
+	xnORFCcdlPlatListUncompLen = 1,					// Uncompressed size
+	xnORFCcdlPlatListCompLen = 2,						// Compressed size
+	xnORFCcdlPlatListVersion = 3,						// Version
+	xnORFCcdlPlatListCtrlArrInd =	4;				// Index into control array
+
+// Version defines
+#define ORFC_VER_MARKER				"%%ORFC_VER%%"
+#define ORFC_VER_MARKER_LEN		12
+#define ORFC_VER_RESID				31020
+#define MACH_ORFC_VER_RESID		CFSTR("COMP_RES_31020") // MHMACH10
+#define ORFC_VER_START				"VER"
+// End rmm_thindl
+
+// Start rmm5190: connect flags (sent with connection id); these are bit numbers
+const int		ORFC_CONNFLAG_SERVER_CAN_DEBUG_CLIENT = 0, // rmm64bitux
+						ORFC_CONNFLAG_REPORT_CALCULATION_ERRORS = 1,
+						ORFC_CONNFLAG_DISABLE_ELLIPSIS = 2,		// PK6466
+						ORFC_CONNFLAG_DISABLE_DEFAULT_CONTEXT_MENU = 3,	// rmm_rfmenu
+						ORFC_CONNFLAG_IPHONE_CLIENT_METHODS = 4,				// rmm7008
+						ORFC_CONNFLAG_DESIGN_SERVER = 5,								// rmm_jscs2
+						ORFC_CONNFLAG_JS_SECURE = 6,										// rmm7533: Change to secure URL
+						ORFC_CONNFLAG_JS_LOCALTIME = 7,									// rmm7590
+						ORFC_CONNFLAG_JS_TASKSTRINGTABLE = 8,						// rmm7868
+						ORFC_CONNFLAG_JS_MAPDMLTOSQLITE = 9, //gra1125c
+						ORFC_CONNFLAG_JS_MAPDMLTOPGSQL = 10; //gra1125c
+// End rmm5190
+
+// rmm_wsk:
+enum OWSclientType
+{
+	eOWSclientNotOmnis = 0,
+	eOWSclientOmnisStandard = 1,
+	eOWSclientOmnisUnicode = 2
+};
+
+// rmm3365:
+// Structure which contains information about a message received by OMNIS
+#ifdef isOMNISCORE
+	struct exfldval;
+	class  WSserviceWSDL; // rmm_rws2
+	class  tqappfile;
+#else
+	class exfldval;
+#endif
+// rmm64bitux: Replaced long with int in this structure
+struct COMMmsgInfo
+{
+	void					*mId;
+	eORFCmess			mMessageType;
+	int					  mMessageLen;
+	unsigned char	*mMessage;
+	int					  mClientIpAddress;
+	// rmm7073: Obsolete: long					mSessRefNum;						//DRS5000 on Mac this holds the session reference number
+	int					  mStartTime;							//rmm_ls: time at which request arrived (milliseconds on windows, 1/60 second on Mac)
+	exfldval			*mResponseFval;					//rmm3935: non-Null if called from webmessage function
+	#ifdef isOMNISCORE	// rmm_wsa
+		tqappfile			*mWebServiceApp;			//rmm_ws8: library containing web service
+		WSserviceWSDL	*mService;						//rmm_wsa: web service // rmm_rws2
+		qlong					mServiceUnq;					//rmm_wsa: unique id of service
+		OWSclientType	mClientType;					//rmm_wsk: type of client
+		qbool					mJavaScriptClient;		//rmm7029: True when the message is from the JavaScript client
+		qbool					mUsingMainStack;			//rmm8091: The message is being processed on the main stack in the multi-threaded server
+		qbool					mResponseDeferred;		//rmm_rws7: True when response is deferred
+	#endif
+};
+
+// Start rmm_ls 
+// This must have the same value as q4NotAListvers in dmxstruc.h
+#define COMM_NOT_A_LISTVERS 0xcc
+
+// Maximum length of a server pool name
+#define COMM_MAX_SERVER_POOLNAME_LEN 128
+
+// load sharing process message types
+enum eCOMMlspMess
+{
+	eLSPmessGetOmnisServer = 0,											// Request to get an OMNIS server in a pool
+	eLSPmessRGetOmnisServer = 1,										// Response containing the OMNIS server address
+	eLSPmessStopLoadSharingProcess = 2,							// Message from "omnislsp -stop" to stop the background load sharing process
+	eLSPmessRStopLoadSharingProcess = 3							// Response to eLSPmessStopLoadSharingProcess
+};
+
+// Size of parameter block returned in load sharing statistics response
+#define COMM_STATS_BLOCK_SIZE 16									// 4 longs containing server statistics
+// End rmm_ls
+
+// rmm4694: number of retries attempted, when binding to the socket used for incoming connections
+// Each retry is separated by a second, so these values also indicate how long Omnis will suspend while trying to bind.
+#define COMM_SERVER_RETRY_BIND_COUNT	0x7fffffff			// Bind attempt count when Omnis is running as a server version (service or runtime web server) // rmm5446
+#define COMM_DEV_RETRY_BIND_COUNT			5								// Bind attempt count when Omnis is running normally as a development version										// rmm5446
+
+// Start rmm_cldl: structure used to manage updates to the basic client components
+#define COMM_MAX_FILES_FOR_CLIENT_UPDATE 10
+
+struct COMMclientUpdate
+{
+	short					mUpdateCount;																				// Array of files to update
+	unsigned int		*mUpdateList[COMM_MAX_FILES_FOR_CLIENT_UPDATE];			// (qchar) // rmm64bitux
+	unsigned int		*mUpdateExePath;																		// Pathname of executable to perform update (qchar) // rmm64bitux
+	#ifdef isunix
+		char *mCurrentPageUrl;																							// rmmunilnx3: qoschar is char on Unix
+	#else
+		unsigned short	*mCurrentPageUrl;																		// Url of current Web page	(qoschar)
+	#endif
+};
+// End rmm_cldl
+
+// rmm_cldl:
+#ifndef ismobile	// rmm_mobile
+	#ifdef SET_BYTE_PACKING_OFF
+		GCC_SET_BYTE_PACKING_OFF // MHMACH
+		#pragma SET_BYTE_PACKING_OFF
+	#endif
+#endif
+
+#ifdef ismobile
+	// rmm_rfmenu: parameter to eORFCmessSetMenuBar is a pointer to COMMmenuBarTitles
+	struct COMMmenuBarTitles
+	{
+		unsigned long	*mLeftTitle;			// Left title - null or empty string if no left menu (qchar *)
+		unsigned long	*mRightTitle;			// Right title - null or empty string if no right menu (qchar *)
+	};
+#endif
+
+// rmm_rfmenu: popup menu positions for remote menus
+#define ORFC_MENU_POSN_CONTEXT		0
+#define ORFC_MENU_POSN_LEFT				1
+#define ORFC_MENU_POSN_RIGHT			2
+
+// rmm4977: cross-platform key state bits
+#define ORFC_KEY_STATE_SHIFT	0
+#define ORFC_KEY_STATE_CTRL	1
+#define ORFC_KEY_STATE_ALT		2
+
+// rmm_wsa: reworked these lists
+// Start rmm_ws9: Web service list column numbers
+// Columns in method list
+#define WS_METH_COL_METHOD_NAME				1
+#define WS_METH_COL_REMOTE_TASK_IDENT	2	// Store ident rather than name, so if class is renamed it doesn't matter
+#define WS_METH_COL_WS_METHOD_TYPE		3
+#define WS_METH_COL_PARAMETER_LIST		4
+#define WS_METH_COL_METHOD_DESC				5
+#define WS_METH_COL_REMOTE_TASK_INSTANCE_IDENT	6	// Ident of remote task used to create instance (a remote task with $webservice set) (rather than task containing method, which could be different due to inheritance)
+#define WS_METH_COL_OPERATIONID				7	// rmm_rws2 // rmm8620: was nickname
+
+// Columns in parameter list (note - first row of this list is the return value, with number zero)
+#define WS_PARAM_COL_NAME							1
+#define WS_PARAM_COL_TYPE							2
+#define WS_PARAM_COL_SUBTYPE					3
+#define WS_PARAM_COL_DESC							4
+#define WS_PARAM_COL_SCHEMA_IDENT			5	// for list/row - the ident of the schema class in the library identified by the subtype (defaults to this library if no library in subtype)
+#define WS_PARAM_COL_NUM_DATATYPE			6	// Numeric value of data type
+#define WS_PARAM_COL_NUM_DATASUBTYPE	7 // Numeric value of data subtype (if applicable)
+#define WS_PARAM_COL_LENGTH						8	// rmm_wsf: Length value of data type (character types only)
+
+// Columns in the error list for a service
+#define WS_ELOG_COL_ERROR_TEXT									1
+#define WS_ELOG_COL_METHOD_CLASS_IDENT					2
+#define WS_ELOG_COL_METHOD_NAME									3
+#define WS_ELOG_COL_PARAMETER_NAME							4
+#define WS_ELOG_COL_SCHEMA_CLASS_IDENT					5
+#define WS_ELOG_COL_SCHEMA_COLUMN								6
+#define WS_ELOG_COL_SCHEMA_LIB									7	// tqappfile * - zero unless this line is for a schema in another library
+#define WS_ELOG_COL_REMOTE_TASK_INSTANCE_IDENT	8	// Ident of remote task used to create instance (a remote task with $webservice set)
+#define WS_ELOG_COL_LOGLINE											9	// line number in this list - allows a copy of the list to be sorted in the user interface, and tied back to this list
+#define WS_ELOG_COL_SFLDNO											10	// rmm_rws2: Field number (for RESTful services) Only significant if non-zero
+#define WS_ELOG_COL_SEQNO												11	// rmm_rws2: Method number (for RESTful services)
+#define WS_ELOG_COL_LOCALS_INDEX								12	// rmm_rws2: Index into locals (for RESTful services, errors in RESTful panel)
+#define WS_ELOG_COL_DUP_URI_CLASS								13	// rmm_rws2: The original class containing the URI that is reported as a duplicate
+
+// Columns in the schema list for a service
+#define WS_SCHEMA_COL_LIBNAME					1	// empty if the library is the same library as that containing the service remote tasks; otherwise, the name of the library containing the schema
+#define WS_SCHEMA_COL_IDENT						2	// schema class ident
+#define WS_SCHEMA_COL_DEFN						3	// schema class definition - a list with the same definition as the parameter list
+#define WS_SCHEMA_COL_TASK_IDENT_LIST	4	// single column list of remote task idents - the instance idents that are using this schema
+#define WS_SCHEMA_COL_NEED_TABLEINST	5	// rmm_wsg: Boolean column - true if the schema requires a table instance for a list or row it defines
+// End rmm_ws9
+
+// Start rmm_cldlu: platform line number for control
+// rmm_cldlu: moved to here from orfcinst.he, and added some more line numbers
+// The line number in the platform list for the platform for which we are built
+#define ORFC_PLATFORM_LINE_WINDOWS								1
+#define ORFC_PLATFORM_LINE_CLASSIC_MAC						2
+#define ORFC_PLATFORM_LINE_UNIX										3
+#define ORFC_PLATFORM_LINE_MACOSX									4
+#define ORFC_PLATFORM_LINE_SOLARIS								5
+#define ORFC_PLATFORM_LINE_SOLARIS_INTEL					6
+#define ORFC_PLATFORM_LINE_MACH_O                 7 // MHMACH1 // MHMACH10
+#define ORFC_PLATFORM_LINE_WINDOWSMOBILE					8	// rmm_mobile
+// Start rmm5289: these Unicode line numbers are now obsolete
+//#define ORFC_PLATFORM_LINE_WINDOWS_UNICODE				7
+//#define ORFC_PLATFORM_LINE_MACOSX_UNICODE					8
+//#define ORFC_PLATFORM_LINE_SOLARIS_UNICODE				9
+//#define ORFC_PLATFORM_LINE_SOLARIS_INTEL_UNICODE	10			
+// End rmm5289
+
+#if defined(ismacosx) // MHCARBON
+  // MHMACH10 begins
+  #ifdef ismach_o
+ 		#define ORFC_PLATFORM_LINE_NUMBER ORFC_PLATFORM_LINE_MACH_O	
+  #else
+ 		#define ORFC_PLATFORM_LINE_NUMBER ORFC_PLATFORM_LINE_MACOSX	
+  #endif
+  // MHMACH10 ends
+#elif defined(ismac) // MHCARBON
+	#define ORFC_PLATFORM_LINE_NUMBER ORFC_PLATFORM_LINE_CLASSIC_MAC
+#elif defined(issolaris)
+	#ifdef ordermsb
+		#define ORFC_PLATFORM_LINE_NUMBER ORFC_PLATFORM_LINE_SOLARIS	// rmm5289
+	#else
+		#define ORFC_PLATFORM_LINE_NUMBER ORFC_PLATFORM_LINE_SOLARIS_INTEL	// rmm5289
+	#endif
+#elif defined(isunix)
+	#define ORFC_PLATFORM_LINE_NUMBER ORFC_PLATFORM_LINE_UNIX
+#elif defined(iswin32)
+	#ifdef ismobile
+		#define ORFC_PLATFORM_LINE_NUMBER ORFC_PLATFORM_LINE_WINDOWSMOBILE	// rmm_mobile
+	#else
+		#define ORFC_PLATFORM_LINE_NUMBER ORFC_PLATFORM_LINE_WINDOWS	// rmm5289
+	#endif
+#else
+	// This case should never occur
+	#error "No platform defined"
+#endif
+// End rmm_cldlu
+
+#endif
